@@ -111,6 +111,25 @@ def sfx() -> None:
     write("sfx/level_complete.ogg", arp, SR_SFX)
 
 
+def sfx_enemies() -> None:
+    t = t_axis(0.6)
+    scrape = lowpass(noise(len(t)), 4) * env(t, 0.02, 0.25) * (0.6 + 0.4 * np.sin(2 * np.pi * 37 * t))
+    clicks = np.zeros_like(t)
+    for c in np.linspace(0.02, 0.45, 9):
+        tt = np.maximum(t - c, 0)
+        clicks += np.sin(2 * np.pi * 2400 * tt) * env(tt, 0.0005, 0.006) * (t >= c)
+    write("sfx/enemy_wake.ogg", scrape + clicks * 0.7, SR_SFX)
+
+    t = t_axis(0.55)
+    hiss = noise(len(t)) - lowpass(noise(len(t)), 12)          # high-passed noise
+    write("sfx/enemy_hiss.ogg", hiss * env(t, 0.03, 0.18) * (1 + 0.5 * np.sin(2 * np.pi * 9 * t)), SR_SFX)
+
+    t = t_axis(0.8)
+    chime = sum(np.sin(2 * np.pi * f * t) * a for f, a in ((880, 1.0), (1320, 0.5), (1760, 0.3)))
+    swell = np.clip(t / 0.35, 0, 1) * np.exp(-np.maximum(t - 0.35, 0) / 0.2)
+    write("sfx/lantern_return.ogg", chime * swell * (1 + 0.4 * np.sin(2 * np.pi * 14 * t)), SR_SFX)
+
+
 # ── Music (seamless loops) ────────────────────────────────────────────────
 def note(n: float) -> float:
     return 440.0 * 2 ** ((n - 69) / 12)
@@ -172,3 +191,4 @@ def music() -> None:
 if __name__ == "__main__":
     sfx()
     music()
+    sfx_enemies()

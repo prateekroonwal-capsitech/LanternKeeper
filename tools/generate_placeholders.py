@@ -166,27 +166,6 @@ def sky() -> None:
 
 
 # ── Enemies / shrine ─────────────────────────────────────────────────────
-def shadow() -> None:
-    w = h = 160
-    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    for _ in range(26):
-        r = random.randint(18, 42)
-        x = random.randint(40, 120)
-        y = random.randint(40, 125)
-        d.ellipse((x - r, y - r, x + r, y + r), fill=(4, 3, 8, 200))
-    d.polygon([(40, 110), (60, 155), (80, 115), (100, 158), (120, 110)], fill=(4, 3, 8, 200))
-    img = img.filter(ImageFilter.GaussianBlur(5))
-    save(img, "single/enemies/shadow_body.png")
-    eyes = Image.new("RGBA", (96, 48), (0, 0, 0, 0))
-    e = ImageDraw.Draw(eyes)
-    for cx in (28, 68):
-        e.polygon([(cx - 14, 24), (cx + 12, 16), (cx + 10, 30)], fill=(255, 255, 255, 255))
-    glow = eyes.filter(ImageFilter.GaussianBlur(4))
-    eyes = Image.alpha_composite(glow, eyes)
-    save(eyes, "single/enemies/shadow_eyes.png")
-
-
 def shrine() -> None:
     w, h = 128, 192
     img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
@@ -234,30 +213,6 @@ def icon_on_circle(size, draw_fn, bg=(10, 12, 20, 150), fg=(230, 230, 240, 230))
 
 
 def ui() -> None:
-    save(rounded((440, 40), 18, (8, 10, 18, 190), (120, 150, 200, 160), 3), "single/ui/hud_oil_under.png")
-    save(rounded((440, 40), 18, (80, 160, 255, 255)), "single/ui/hud_oil_fill.png")
-    flask = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
-    f = ImageDraw.Draw(flask)
-    f.rectangle((26, 6, 38, 20), fill=(150, 200, 255, 255))
-    f.ellipse((12, 18, 52, 60), fill=(90, 170, 255, 255))
-    save(flask, "single/ui/hud_oil_icon.png")
-    save(ring(112, 12, (40, 40, 60, 200)), "single/ui/hud_dark_ring_under.png")
-    save(ring(112, 12, (200, 60, 70, 255)), "single/ui/hud_dark_ring_fill.png")
-    eye = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
-    ed = ImageDraw.Draw(eye)
-    ed.ellipse((6, 18, 58, 46), fill=(220, 220, 235, 230))
-    ed.ellipse((22, 20, 42, 44), fill=(20, 20, 30, 255))
-    save(eye, "single/ui/hud_dark_eye.png")
-    vig = Image.new("RGBA", (512, 512), (0, 0, 0, 0))
-    px = vig.load()
-    for y in range(512):
-        for x in range(512):
-            dx, dy = (x - 255.5) / 256, (y - 255.5) / 256
-            d = math.sqrt(dx * dx + dy * dy)
-            a = max(0.0, min(1.0, (d - 0.45) / 0.6))
-            px[x, y] = (0, 0, 4, int(255 * a ** 1.5))
-    save(vig, "single/ui/dark_vignette.png")
-
     def pause(d, s, c):
         d.rectangle((s * 0.33, s * 0.28, s * 0.44, s * 0.72), fill=c)
         d.rectangle((s * 0.56, s * 0.28, s * 0.67, s * 0.72), fill=c)
@@ -362,7 +317,6 @@ if __name__ == "__main__":
     layer("backgrounds/bg_far.png", (16, 21, 34, 255), 220, [(2, 40), (5, 25), (11, 10)])
     layer("backgrounds/bg_mid.png", (10, 13, 22, 255), 300, [(3, 30), (7, 15)], trees=14)
     layer("backgrounds/bg_near.png", (5, 6, 10, 255), 380, [(4, 20), (13, 8)], trees=8)
-    shadow()
     shrine()
     ui()
     menus()
@@ -414,21 +368,48 @@ def dressing() -> None:
     d.rectangle((64, 74, 84, 100), outline=sil, width=4)
     save(post, "single/environment/decor_post.png")
 
-    # Dark tide: opaque on the left, ragged wisps toward the right edge.
-    w, h = 256, 1024
-    tide = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    px = tide.load()
-    r = random.Random(5)
-    phases = [r.uniform(0, math.tau) for _ in range(4)]
-    for y in range(h):
-        edge = w * 0.62 + sum(a * math.sin(math.tau * k * y / h + p)
-                              for (k, a), p in zip(((3, 22), (7, 14), (13, 8), (29, 5)), phases))
-        for x in range(w):
-            t = (x - (edge - 70)) / 70.0
-            a = 1.0 if t <= 0 else max(0.0, 1.0 - t)
-            glow = max(0.0, 1.0 - abs(t - 0.35) / 0.45)          # violet fringe on the front
-            px[x, y] = (int(5 + 95 * glow), int(3 + 22 * glow), int(10 + 140 * glow), int(255 * a ** 1.4))
-    save(tide.filter(ImageFilter.GaussianBlur(2)), "single/enemies/dark_tide_edge.png")
 
 
 dressing()
+
+
+# ── Wordless control hints (polish pass) ─────────────────────────────────
+def hints() -> None:
+    from PIL import ImageFont
+    hand = Image.new("RGBA", (160, 160), (0, 0, 0, 0))
+    d = ImageDraw.Draw(hand)
+    pale = (235, 238, 255, 255)
+    d.rounded_rectangle((52, 70, 118, 150), radius=26, fill=pale)          # palm
+    d.rounded_rectangle((66, 8, 88, 92), radius=11, fill=pale)             # index finger (pointing up)
+    for x, top in ((90, 52), (106, 60)):
+        d.rounded_rectangle((x, top, x + 18, 100), radius=9, fill=pale)
+    d.rounded_rectangle((34, 86, 60, 112), radius=12, fill=pale)           # thumb
+    hand = hand.filter(ImageFilter.GaussianBlur(1.2))
+    save(hand, "single/ui/hint_hand.png")
+
+    try:
+        font = ImageFont.truetype("arialbd.ttf", 44)
+    except OSError:
+        font = ImageFont.load_default()
+
+    def keycaps(labels, widths, rel):
+        gap = 16
+        w = sum(widths) + gap * (len(widths) - 1) + 8
+        img = Image.new("RGBA", (w, 104), (0, 0, 0, 0))
+        dd = ImageDraw.Draw(img)
+        x = 4
+        for label, kw in zip(labels, widths):
+            dd.rounded_rectangle((x, 4, x + kw, 100), radius=16, fill=(12, 12, 18, 200), outline=(235, 235, 245, 230), width=4)
+            box = dd.textbbox((0, 0), label, font=font)
+            dd.text((x + (kw - (box[2] - box[0])) / 2 - box[0], 52 - (box[3] - box[1]) / 2 - box[1]), label,
+                    font=font, fill=(240, 240, 250, 255))
+            x += kw + gap
+        save(img, rel)
+
+    keycaps(["A", "D"], [96, 96], "single/ui/key_move.png")
+    keycaps(["SPACE"], [260], "single/ui/key_jump.png")
+    keycaps(["E"], [96], "single/ui/key_place.png")
+    keycaps(["SHIFT"], [200], "single/ui/key_raise.png")
+
+
+hints()

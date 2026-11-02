@@ -12,7 +12,7 @@
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LevelExit.tscn" id="10_exit"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Shrine.tscn" id="11_shrine"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="12_hint"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/DarkTide.tscn" id="13_tide"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/BigShadow.tscn" id="13_tide"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_a.png" id="14_tree_a"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_b.png" id="15_tree_b"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_rocks.png" id="16_rocks"]
@@ -108,7 +108,7 @@ offset = Vector2(0, 192)
 flip_h = false
 pixel_size = 0.01
 alpha_cut = 1
-texture_filter = 2
+texture_filter = 3
 texture = ExtResource("15_tree_b")
 
 [node name="rocks_2" type="Sprite3D" parent="Decor"]
@@ -117,7 +117,7 @@ offset = Vector2(0, 48)
 flip_h = false
 pixel_size = 0.01
 alpha_cut = 1
-texture_filter = 2
+texture_filter = 3
 texture = ExtResource("16_rocks")
 
 [node name="tree_a_3" type="Sprite3D" parent="Decor"]
@@ -126,7 +126,7 @@ offset = Vector2(0, 256)
 flip_h = true
 pixel_size = 0.01
 alpha_cut = 1
-texture_filter = 2
+texture_filter = 3
 texture = ExtResource("14_tree_a")
 
 [node name="grass_4" type="Sprite3D" parent="Decor"]
@@ -135,7 +135,7 @@ offset = Vector2(0, 24)
 flip_h = false
 pixel_size = 0.01
 alpha_cut = 1
-texture_filter = 2
+texture_filter = 3
 texture = ExtResource("17_grass")
 
 [node name="post_5" type="Sprite3D" parent="Decor"]
@@ -144,7 +144,7 @@ offset = Vector2(0, 160)
 flip_h = false
 pixel_size = 0.01
 alpha_cut = 1
-texture_filter = 2
+texture_filter = 3
 texture = ExtResource("18_post")
 
 [node name="KillZone" parent="." instance=ExtResource("9_kill")]

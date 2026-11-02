@@ -36,6 +36,10 @@ const DEV_BOOT_META := &"dev_boot_scene"
 ## Dark-meter seconds regained per second while in light.
 @export var dark_meter_refill_rate: float = 2.0
 
+@export_group("Bounds")
+## Anything below this Y has fallen out of the level (placed lantern → returned beside you).
+@export var kill_y: float = -12.0
+
 @export_group("Death")
 ## Seconds between a death and the start of the fade to black (the shake moment).
 @export var respawn_delay: float = 0.25

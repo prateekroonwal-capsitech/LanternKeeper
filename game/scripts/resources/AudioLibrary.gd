@@ -22,6 +22,10 @@ extends Resource
 @export var death: AudioStream
 @export var level_complete: AudioStream
 
+@export var lantern_return: AudioStream
+@export var enemy_wake: AudioStream
+@export var enemy_hiss: AudioStream
+
 @export_group("UI SFX")
 @export var ui_button: AudioStream
 

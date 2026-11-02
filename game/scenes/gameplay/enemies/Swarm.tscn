@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/SwarmMite.tscn" id="mite"]
+
+[node name="Swarm" type="Node3D"]
+
+[node name="Mite1" parent="." instance=ExtResource("mite")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0, 0.0, 0)
+
+[node name="Mite2" parent="." instance=ExtResource("mite")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.0, 0)
+
+[node name="Mite3" parent="." instance=ExtResource("mite")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.0, 0)
+
+[node name="Mite4" parent="." instance=ExtResource("mite")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0, 0.0, 0)
+
+[node name="Mite5" parent="." instance=ExtResource("mite")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 4.0, 0)
+emerge_offset = Vector3(0, -0.8, 0)

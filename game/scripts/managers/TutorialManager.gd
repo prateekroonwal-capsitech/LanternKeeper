@@ -1,12 +1,13 @@
 class_name TutorialManager
 extends Node
 
-## TutorialManager — one-time hints for the first levels of each world.
+## TutorialManager — one-time, wordless control hints (ghost hand on touch, key icon on
+## PC) in the first levels. Every other lesson is taught by level layout.
 ## A hint is shown once, then its "seen" flag is saved (SaveManager → tutorials bucket).
-## The popup scenes themselves live in the UI (Phase 4); this manager only decides.
+## GestureHint (UIRoot) draws it; this manager only decides.
 ##
 ## Sends: GameBus.tutorial_hint_requested(hint_id); SaveManager.mark_tutorial_seen().
-## Receives: request_hint(hint_id) — called by TutorialTrigger nodes (Phase 4) via GameManager.
+## Receives: request_hint(hint_id) — TutorialTrigger nodes via GameManager.report_tutorial_trigger().
 
 var _logger: Node
 var _bus: Node

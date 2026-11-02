@@ -21,7 +21,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.6)
 offset = Vector2(0, 128)
 pixel_size = 0.0105
 alpha_cut = 1
-texture_filter = 2
+texture_filter = 3
 texture = ExtResource("2_sprite")
 
 [node name="Light" type="OmniLight3D" parent="."]

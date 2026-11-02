@@ -1,130 +1,133 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="1_level"]
-[ext_resource type="Environment" path="res://game/assets/materials/world_environment.tres" id="2_env"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/environment/Backdrop.tscn" id="3_backdrop"]
-[ext_resource type="Script" path="res://game/scripts/controllers/CameraController3D.gd" id="4_camera"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Player.tscn" id="5_player"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Lantern.tscn" id="6_lantern"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="7_platform"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/GhostPlatform.tscn" id="8_ghost"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/OilFlask.tscn" id="9_flask"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="10_kill"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LevelExit.tscn" id="11_exit"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Shrine.tscn" id="12_shrine"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Shadow.tscn" id="13_shadow"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="14_hint"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="level"]
+[ext_resource type="Environment" path="res://game/assets/materials/world_environment.tres" id="env"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/environment/Backdrop.tscn" id="backdrop"]
+[ext_resource type="Script" path="res://game/scripts/controllers/CameraController3D.gd" id="camera"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Player.tscn" id="player"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Lantern.tscn" id="lantern"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="platform"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/GhostPlatform.tscn" id="ghost"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="kill"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LevelExit.tscn" id="exit"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Shrine.tscn" id="shrine"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/OilFlask.tscn" id="flask"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="hint"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Crawler.tscn" id="crawler"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Dropper.tscn" id="dropper"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Stalker.tscn" id="stalker"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Swarm.tscn" id="swarm"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/BigShadow.tscn" id="big"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/WakeTrigger.tscn" id="wake"]
 
 [node name="TestLevel" type="Node3D" node_paths=PackedStringArray("spawn_point")]
-script = ExtResource("1_level")
+script = ExtResource("level")
 level_id = "test"
 spawn_point = NodePath("SpawnPoint")
+dark_meter_time = 5.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = ExtResource("2_env")
+environment = ExtResource("env")
 
-[node name="Backdrop" parent="." instance=ExtResource("3_backdrop")]
+[node name="Backdrop" parent="." instance=ExtResource("backdrop")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0, 0)
 
 [node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 14)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.2, 14)
 current = true
 fov = 45.0
-script = ExtResource("4_camera")
+script = ExtResource("camera")
 
 [node name="SpawnPoint" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.05, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.05, 0)
 
-[node name="Player" parent="." instance=ExtResource("5_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.05, 0)
+[node name="Player" parent="." instance=ExtResource("player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.05, 0)
 
-[node name="Lantern" parent="." instance=ExtResource("6_lantern")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1, 0.3)
+[node name="Lantern" parent="." instance=ExtResource("lantern")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.7, 0.3, 0.3)
 
 [node name="Geometry" type="Node3D" parent="."]
 
-[node name="GroundStart" parent="Geometry" instance=ExtResource("7_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
-size = Vector2(12, 2)
+[node name="GroundA" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, -2, 0)
+size = Vector2(36, 4)
 
-[node name="GroundMid" parent="Geometry" instance=ExtResource("7_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -1, 0)
-size = Vector2(8, 2)
+[node name="GroundB" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.0, -2, 0)
+size = Vector2(34, 4)
 
-[node name="HighLedge" parent="Geometry" instance=ExtResource("7_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, 2, 0)
-size = Vector2(6, 1)
+[node name="GroundC" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 97.0, -2, 0)
+size = Vector2(70, 4)
 
-[node name="GroundEnd" parent="Geometry" instance=ExtResource("7_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, -1, 0)
-size = Vector2(16, 2)
+[node name="TunnelRoof" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.0, 5.1, 0)
+size = Vector2(8, 3.8)
 
-[node name="GhostPlatforms" type="Node3D" parent="."]
+[node name="SwarmRoof" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70.0, 5.5, 0)
+size = Vector2(8, 3.0)
 
-[node name="GhostBridge" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, -0.25, 0)
-size = Vector2(4, 0.5)
+[node name="WallLeft" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 6.0, 0)
+size = Vector2(1, 12)
 
-[node name="GhostStepA" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 1.25, 0)
-size = Vector2(2.5, 0.5)
+[node name="Bridge" parent="." instance=ExtResource("ghost")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, -0.2, 0)
+size = Vector2(6, 0.4)
 
-[node name="GhostStepB" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.5, 2.75, 0)
-size = Vector2(2.5, 0.5)
+[node name="ShrineA" parent="." instance=ExtResource("shrine")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
 
-[node name="Pickups" type="Node3D" parent="."]
+[node name="ShrineB" parent="." instance=ExtResource("shrine")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 0, 0)
 
-[node name="OilFlaskA" parent="Pickups" instance=ExtResource("9_flask")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 0.7, 0)
+[node name="Flask" parent="." instance=ExtResource("flask")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 0.7, 0)
 
-[node name="OilFlaskB" parent="Pickups" instance=ExtResource("9_flask")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0.7, 0)
-
-[node name="KillZone" parent="." instance=ExtResource("10_kill")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -14, 0)
-
-[node name="LevelExit" parent="." instance=ExtResource("11_exit")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 0, 0)
-
-[node name="Shrines" type="Node3D" parent="."]
-
-[node name="ShrineMid" parent="Shrines" instance=ExtResource("12_shrine")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
-
-[node name="Shadows" type="Node3D" parent="."]
-
-[node name="ShadowA" parent="Shadows" instance=ExtResource("13_shadow")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44.5, 1.6, 0)
-
-[node name="ShadowB" parent="Shadows" instance=ExtResource("13_shadow")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 3.2, 0)
-
-[node name="Hints" type="Node3D" parent="."]
-
-[node name="HintMove" parent="Hints" instance=ExtResource("14_hint")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 0)
+[node name="HintMove" parent="." instance=ExtResource("hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
 hint_id = "move"
 
-[node name="HintGhost" parent="Hints" instance=ExtResource("14_hint")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
-hint_id = "ghost"
+[node name="Crawler" parent="." instance=ExtResource("crawler")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37, -0.6, 0)
+wake_group = &"crawl"
+emerge_offset = Vector3(0, 0.65, 0)
 
-[node name="HintJump" parent="Hints" instance=ExtResource("14_hint")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0, 0)
-hint_id = "jump"
+[node name="WakeCrawl" parent="." instance=ExtResource("wake")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 0, 0)
+wake_group = &"crawl"
 
-[node name="HintOil" parent="Hints" instance=ExtResource("14_hint")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 0, 0)
-hint_id = "oil"
+[node name="Dropper" parent="." instance=ExtResource("dropper")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 3.2, 0)
+emerge_offset = Vector3(0, -1, 0)
 
-[node name="HintShrine" parent="Hints" instance=ExtResource("14_hint")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
-hint_id = "shrine"
+[node name="Stalker" parent="." instance=ExtResource("stalker")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 1.2, 0)
+wake_group = &"stalk"
 
-[node name="HintPlace" parent="Hints" instance=ExtResource("14_hint")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 2.5, 0)
-hint_id = "place"
+[node name="WakeStalk" parent="." instance=ExtResource("wake")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, 0, 0)
+wake_group = &"stalk"
 
-[node name="HintShadow" parent="Hints" instance=ExtResource("14_hint")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 0, 0)
-hint_id = "shadow"
+[node name="Swarm" parent="." instance=ExtResource("swarm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, -0.4, 0)
+
+[node name="WakeSwarm" parent="." instance=ExtResource("wake")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76, 0, 0)
+wake_group = &"swarm"
+
+[node name="BigShadow" parent="." instance=ExtResource("big")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 2.5, 0)
+
+[node name="WakeChase" parent="." instance=ExtResource("wake")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 96, 0, 0)
+wake_group = &"chase"
+
+[node name="KillZone" parent="." instance=ExtResource("kill")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, -14, 0)
+size = Vector3(220, 4, 4)
+
+[node name="LevelExit" parent="." instance=ExtResource("exit")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 0, 0)

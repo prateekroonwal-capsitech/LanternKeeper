@@ -11,6 +11,9 @@
 [ext_resource type="AudioStream" path="res://game/assets/audio/sfx/level_complete.ogg" id="sfx_level_complete"]
 [ext_resource type="AudioStream" path="res://game/assets/audio/sfx/ui_button.ogg" id="sfx_ui_button"]
 [ext_resource type="AudioStream" path="res://game/assets/audio/sfx/heartbeat.ogg" id="sfx_heartbeat"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/lantern_return.ogg" id="sfx_lantern_return"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/enemy_wake.ogg" id="sfx_enemy_wake"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/enemy_hiss.ogg" id="sfx_enemy_hiss"]
 [ext_resource type="AudioStream" path="res://game/assets/audio/music/menu.ogg" id="mus_menu"]
 [ext_resource type="AudioStream" path="res://game/assets/audio/music/world_1_light.ogg" id="mus_world_1_light"]
 [ext_resource type="AudioStream" path="res://game/assets/audio/music/world_2_oil.ogg" id="mus_world_2_oil"]
@@ -31,3 +34,6 @@ death = ExtResource("sfx_death")
 level_complete = ExtResource("sfx_level_complete")
 ui_button = ExtResource("sfx_ui_button")
 heartbeat = ExtResource("sfx_heartbeat")
+lantern_return = ExtResource("sfx_lantern_return")
+enemy_wake = ExtResource("sfx_enemy_wake")
+enemy_hiss = ExtResource("sfx_enemy_hiss")

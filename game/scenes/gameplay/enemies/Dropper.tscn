@@ -1,0 +1,56 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/enemies/Dropper.gd" id="script"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/enemy_eyes.png" id="eyes"]
+[ext_resource type="SpriteFrames" path="res://game/assets/sprites/enemies/dropper_frames.tres" id="frames"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/lair_hole.png" id="hole"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/thread.png" id="thread"]
+
+[sub_resource type="SphereShape3D" id="shape"]
+radius = 0.35
+
+[node name="Dropper" type="CharacterBody3D"]
+collision_layer = 16
+script = ExtResource("script")
+collision_mask = 5
+axis_lock_linear_z = true
+enemy_kind = "dropper"
+emerge_offset = Vector3(0, -2, 0)
+body_radius = 0.35
+wake_distance = 9.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("shape")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Body" type="AnimatedSprite3D" parent="Visual"]
+offset = Vector2(0, 0)
+pixel_size = 0.008
+alpha_cut = 1
+texture_filter = 3
+sprite_frames = ExtResource("frames")
+animation = &"move"
+autoplay = "move"
+
+[node name="Eyes" type="Sprite3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, -0.02, 0.05)
+modulate = Color(2.6, 0.18, 0.12, 1)
+render_priority = 10
+pixel_size = 0.0034
+no_depth_test = true
+texture_filter = 3
+texture = ExtResource("eyes")
+
+[node name="Thread" type="Sprite3D" parent="."]
+top_level = true
+pixel_size = 0.015625
+texture_filter = 3
+texture = ExtResource("thread")
+
+[node name="Lair" type="Sprite3D" parent="."]
+top_level = true
+transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0, 0, -0.9)
+pixel_size = 0.008
+texture_filter = 3
+texture = ExtResource("hole")

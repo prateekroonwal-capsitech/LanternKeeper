@@ -32,7 +32,7 @@ func inject_services(registry: Node) -> void:
 	if _game:
 		_game.bus.level_reset.connect(_on_level_reset)
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	_time += delta
 	_visual.position.y = _base_y + sin(_time * bob_speed) * bob_height
 

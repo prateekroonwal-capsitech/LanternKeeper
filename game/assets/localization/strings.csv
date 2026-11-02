@@ -27,28 +27,6 @@ COMPLETE_TITLE,Level complete
 COMPLETE_NEXT,Next level
 COMPLETE_REPLAY,Replay
 COMPLETE_LEVELS,Level select
-HINT_MOVE_KEYS,Move with A / D or the arrow keys.
-HINT_MOVE_TOUCH,Drag on the left side of the screen to walk.
-HINT_MOVE_CLASSIC,Use the arrow buttons to walk.
-HINT_JUMP_KEYS,Press Space to jump. Hold it to jump higher.
-HINT_JUMP_TOUCH,Tap the right side of the screen to jump.
-HINT_JUMP_CLASSIC,Press the jump button. Hold it to jump higher.
-HINT_GHOST,Faint platforms are only solid inside the lantern's light.
-HINT_PLACE_KEYS,Press E to set the lantern down. Walk into it to pick it up.
-HINT_PLACE_TOUCH,Swipe down on the right side to set the lantern down. Walk into it to pick it up.
-HINT_PLACE_CLASSIC,Press the lantern button to set it down. Walk into it to pick it up.
-HINT_RAISE_KEYS,"Hold Shift to raise the light. It reaches further, but burns oil three times faster."
-HINT_RAISE_TOUCH,"Hold the right side of the screen to raise the light. It reaches further, but burns oil three times faster."
-HINT_RAISE_CLASSIC,"Hold the sun button to raise the light. It reaches further, but burns oil three times faster."
-HINT_SINK,"The lantern sinks through faint platforms and lights them from below. Walk into it to take it back."
-HINT_WALL,"Light makes faint walls solid too. Leave the lantern behind to slip through."
-HINT_LID,"Set the lantern where it lights your way up, but not the lid above."
-HINT_FIND,"Your lantern is somewhere ahead. Find it in the dark."
-HINT_TIDE,"The dark tide is coming. Run!"
-HINT_OIL,The light shrinks as the oil burns. Blue flasks refill it.
-HINT_DARK,Stay out of the light too long and the darkness closes in.
-HINT_SHRINE,"Shrines refill your oil. If you fall, you return to the last one."
-HINT_SHADOW,Shadows only move while you are in the dark. Light drives them back.
 LEVEL_W1_01,First Light
 LEVEL_W1_02,Leave It Behind
 LEVEL_W1_03,Sinking Light

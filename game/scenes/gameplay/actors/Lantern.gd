@@ -1,15 +1,23 @@
 class_name Lantern
 extends CharacterBody3D
 
-## Lantern — the one light. Carried, it follows the player's hand; placed, it
-## drops to the solid ground below and lights that spot. It sinks through ghost
-## platforms (they only bear the boy), so it can be lowered to light a path from below. Walking into a placed lantern picks
-## it up again. Burns oil (3× while raised); its radius shrinks with the oil.
+## Lantern — the one light. Carried, it follows the player's hand; placed, it drops
+## to the nearest surface below (solid ground, or a ghost platform it lights itself)
+## and lights that spot. Walking into a placed lantern picks it up again.
+## Burns oil (3× while raised); its radius shrinks with the oil and it flickers harder
+## when oil runs low.
 ##
-## Sends: GameManager.register_lantern(self), register_light_source(self) / unregister_light_source(self),
-##   report_oil_burned(amount), report_lantern_placed(at), report_lantern_picked_up()
-## Receives: GameBus.lantern_place_requested → place; GameBus.player_respawned → back to hand;
-##   GameManager.input.raise_held, GameManager.get_oil_ratio()
+## Checkpoints: GameManager calls capture_state() when a checkpoint is saved and
+## restore_state() on respawn, so a lantern that was placed is back where it was.
+## A placed lantern that falls below the level's kill height reports report_lantern_lost();
+## GameManager then calls respawn_at() with a safe spot beside the player.
+##
+## Sends: GameManager.register_lantern(self), register_light_source(self) /
+##   unregister_light_source(self), report_oil_burned(amount), report_lantern_placed(at),
+##   report_lantern_picked_up(), report_lantern_lost()
+## Receives: GameBus.lantern_place_requested → place; GameManager.input.raise_held,
+##   GameManager.get_oil_ratio(), GameManager.get_kill_y() (polled);
+##   capture_state() / restore_state() / respawn_at() from GameManager.
 ## Light-source API (used by GameManager.is_point_lit): get_light_position(),
 ##   get_light_radius(), is_light_active().
 
@@ -35,9 +43,9 @@ extends CharacterBody3D
 @export_group("Carry")
 ## Where the lantern's base sits relative to the player's feet; X is mirrored with facing.
 ## The boy's arm is aimed at the handle, so keep the handle within arm's reach of the shoulder.
-@export var carry_offset: Vector3 = Vector3(0.38, 0.28, 0.3)
+@export var carry_offset: Vector3 = Vector3(0.32, 0.26, 0.3)
 ## Added to carry_offset while the light is raised (X mirrored with facing).
-@export var raise_offset: Vector3 = Vector3(-0.1, 0.4, 0.0)
+@export var raise_offset: Vector3 = Vector3(-0.12, 0.3, 0.0)
 ## Height of the handle above the lantern's base (where the hand grips).
 @export var handle_height: float = 0.6
 @export var follow_speed: float = 22.0
@@ -45,12 +53,15 @@ extends CharacterBody3D
 @export_group("Placed")
 @export var gravity: float = 25.0
 @export var max_fall_speed: float = 20.0
-## A placed lantern that falls this far is returned to the player.
-@export var lost_fall_distance: float = 25.0
 
 @export_group("Flicker")
-@export var flicker_strength: float = 0.12
+@export var flicker_strength: float = 0.1
 @export var flicker_speed: float = 9.0
+## Below this oil ratio the flicker grows toward low_oil_flicker_strength.
+@export_range(0.0, 1.0) var low_oil_ratio: float = 0.25
+@export var low_oil_flicker_strength: float = 0.45
+## Seconds of the flicker-in effect when the lantern reappears beside the player.
+@export var appear_time: float = 0.6
 
 var carried: bool = true
 
@@ -58,8 +69,9 @@ var _game: GameManager
 var _radius: float = 0.0
 var _raised: bool = false
 var _awaiting_exit: bool = false
-var _placed_y: float = 0.0
 var _time: float = 0.0
+var _flicker: float = 1.0
+var _appear: float = 1.0
 
 @onready var _light: OmniLight3D = $Light
 @onready var _glow: MeshInstance3D = $Glow
@@ -84,7 +96,6 @@ func inject_services(registry: Node) -> void:
 	_game.register_lantern(self)
 	_game.register_light_source(self)
 	_game.bus.lantern_place_requested.connect(_on_place_requested)
-	_game.bus.player_respawned.connect(_return_to_player)
 	_game.bus.level_started.connect(func(_id: String) -> void:
 		if carried:
 			_snap_to_hand())
@@ -105,16 +116,57 @@ func get_light_position() -> Vector3:
 	return global_position + Vector3(0.0, 0.35, 0.0)
 
 func get_light_radius() -> float:
-	return _radius
+	return _radius * _appear
 
 func is_light_active() -> bool:
-	return _radius > 0.05
+	return get_light_radius() > 0.05
+
+func is_raised() -> bool:
+	return _raised
+
+# ── Checkpoint snapshot (called by GameManager) ───────────────────────────
+
+func capture_state() -> Dictionary:
+	return { "carried": carried, "position": global_position }
+
+func restore_state(state: Dictionary) -> void:
+	velocity = Vector3.ZERO
+	_raised = false
+	_appear = 1.0
+	if state.get("carried", true):
+		carried = true
+		_awaiting_exit = false
+		_snap_to_hand()
+	else:
+		carried = false
+		_awaiting_exit = false
+		global_position = state.get("position", global_position)
+		reset_physics_interpolation()
+
+## Puts a lost lantern down at `point` (on the ground) with a flicker-in.
+func respawn_at(point: Vector3) -> void:
+	carried = false
+	_awaiting_exit = true
+	velocity = Vector3.ZERO
+	global_position = Vector3(point.x, point.y, 0.0)
+	reset_physics_interpolation()
+	_appear = 0.0
+
+func return_to_hand() -> void:
+	carried = true
+	_awaiting_exit = false
+	velocity = Vector3.ZERO
+	_snap_to_hand()
 
 # ── Simulation ────────────────────────────────────────────────────────────
 
 func _physics_process(delta: float) -> void:
-	if not _game.is_playing():
-		return
+	_appear = move_toward(_appear, 1.0, delta / maxf(appear_time, 0.01))
+	if _game.is_playing():
+		_simulate(delta)
+	_update_transforms()
+
+func _simulate(delta: float) -> void:
 	var oil_ratio := _game.get_oil_ratio()
 	_raised = carried and _game.input.raise_held and oil_ratio > 0.0
 
@@ -131,13 +183,10 @@ func _physics_process(delta: float) -> void:
 		_radius = 0.0
 
 	if carried:
-		_follow_hand(delta)
+		var hand := _hand_position()
+		global_position = global_position.lerp(hand, 1.0 - exp(-follow_speed * delta))
 	else:
 		_simulate_placed(delta)
-
-func _follow_hand(delta: float) -> void:
-	var target := _hand_position()
-	global_position = global_position.lerp(target, 1.0 - exp(-follow_speed * delta))
 
 func _hand_position() -> Vector3:
 	var facing := _game.get_player_facing()
@@ -145,6 +194,8 @@ func _hand_position() -> Vector3:
 	return _game.get_player_position() + Vector3(offset.x * facing, offset.y, offset.z)
 
 func _snap_to_hand() -> void:
+	if _game == null:
+		return
 	global_position = _hand_position()
 	reset_physics_interpolation()
 
@@ -157,31 +208,43 @@ func _simulate_placed(delta: float) -> void:
 		velocity.y = maxf(velocity.y - gravity * delta, -max_fall_speed)
 	move_and_slide()
 	global_position.z = 0.0
-	if global_position.y < _placed_y - lost_fall_distance:
-		_return_to_player()
+	if global_position.y < _game.get_kill_y():
+		_game.report_lantern_lost()
 
-# ── Visuals ───────────────────────────────────────────────────────────────
+## Transform-affecting visuals live in the physics step so interpolation stays smooth.
+func _update_transforms() -> void:
+	var r := maxf(get_light_radius(), 0.001)
+	_glow.scale = Vector3(r, r, 1.0)
+
+# ── Visuals (non-transform) ───────────────────────────────────────────────
 
 func _process(delta: float) -> void:
 	_time += delta
-	var flicker := 1.0 + flicker_strength * (
+	var ratio := _game.get_oil_ratio() if _game else 1.0
+	var strength := flicker_strength
+	if ratio < low_oil_ratio:
+		strength = lerpf(low_oil_flicker_strength, flicker_strength, ratio / maxf(low_oil_ratio, 0.001))
+	_flicker = 1.0 + strength * (
 		sin(_time * flicker_speed) * 0.5
 		+ sin(_time * flicker_speed * 2.3 + 1.7) * 0.3
 		+ sin(_time * flicker_speed * 5.1 + 0.4) * 0.2)
-	var visible_light := _radius > 0.05
-	_light.visible = visible_light
-	_glow.visible = visible_light
-	_dust.emitting = visible_light
-	if not visible_light:
-		_sprite.modulate = Color(0.35, 0.35, 0.4)
+	if _appear < 1.0:
+		_flicker *= 0.5 + 0.5 * signf(sin(_time * 60.0))  # stutter while flickering in
+	var r := get_light_radius()
+	var lit := r > 0.05
+	_light.visible = lit
+	_glow.visible = lit
+	_dust.emitting = lit
+	_sprite.modulate.a = _appear
+	if not lit:
+		_sprite.modulate = Color(0.35, 0.35, 0.4, _appear)
 		return
-	_light.omni_range = _radius * light_range_scale
-	_light.light_energy = light_energy * flicker
-	_glow.scale = Vector3(_radius, _radius, 1.0)
-	_glow_material.set_shader_parameter(&"flicker", flicker)
-	_dust.emission_sphere_radius = _radius * 0.8
-	var warmth := clampf(_game.get_oil_ratio() * 1.5, 0.4, 1.0)
-	_sprite.modulate = Color(1.0, warmth, warmth * 0.9)
+	_light.omni_range = r * light_range_scale
+	_light.light_energy = light_energy * _flicker * _appear
+	_glow_material.set_shader_parameter(&"flicker", _flicker * _appear)
+	_dust.emission_sphere_radius = r * 0.8
+	var warmth := clampf(ratio * 1.5, 0.4, 1.0)
+	_sprite.modulate = Color(1.0, warmth, warmth * 0.9, _appear)
 
 # ── Place / pick up ───────────────────────────────────────────────────────
 
@@ -191,8 +254,8 @@ func _on_place_requested() -> void:
 	carried = false
 	_raised = false
 	_awaiting_exit = true
-	global_position = Vector3(_game.get_player_position().x, _game.get_player_position().y + 0.3, 0.0)
-	_placed_y = global_position.y
+	var p := _game.get_player_position()
+	global_position = Vector3(p.x, p.y + 0.3, 0.0)
 	velocity = Vector3.ZERO
 	reset_physics_interpolation()
 	_game.report_lantern_placed(global_position)
@@ -207,10 +270,3 @@ func _on_pickup_body_entered(body: Node3D) -> void:
 func _on_pickup_body_exited(body: Node3D) -> void:
 	if body.is_in_group(&"player"):
 		_awaiting_exit = false
-
-func _return_to_player() -> void:
-	carried = true
-	_awaiting_exit = false
-	velocity = Vector3.ZERO
-	# Deferred: on respawn the player may teleport after this handler runs.
-	_snap_to_hand.call_deferred()

@@ -20,7 +20,7 @@ shape = SubResource("SphereShape3D_pickup")
 [node name="Sprite" type="Sprite3D" parent="Visual"]
 pixel_size = 0.009
 alpha_cut = 1
-texture_filter = 2
+texture_filter = 3
 texture = ExtResource("2_sprite")
 
 [node name="Light" type="OmniLight3D" parent="Visual"]

@@ -21,6 +21,9 @@ extends Node
 ##   report_player_died(cause)                                  — KillZone, Shadow
 ##   report_shrine_reached(shrine)                              — Shrine
 ##   report_level_exit_reached()                                — LevelExit
+##   report_lantern_lost()                                      — Lantern (fell into a pit)
+##   report_enemy_woke(enemy) / report_enemy_repelled(enemy) /
+##   report_player_caught(enemy) / report_wake_trigger(group)   — enemies, WakeTrigger
 ##   report_player_jumped() / report_player_landed(speed)       — Player (sound)
 ##   report_tutorial_trigger(hint_id)                           — TutorialTrigger
 ##   report_menu_ready()                                        — HomeScene (menu backdrop)
@@ -30,7 +33,13 @@ extends Node
 ## Sends (GameBus): game_state_changed, level_started, level_completed, oil_changed,
 ##   dark_meter_changed, dark_meter_emptied, dark_meter_recovered, lantern_place_requested,
 ##   lantern_placed, lantern_picked_up, platform_lost, player_died, player_respawned,
-##   level_reset, checkpoint_activated, game_paused, game_resumed, game_started, game_over
+##   level_reset, checkpoint_saved, checkpoint_activated, enemy_woke, enemies_wake_requested,
+##   game_paused, game_resumed, game_started, game_over
+##
+## Checkpoints: at level start and at every new shrine GameManager saves a snapshot —
+## the lantern's state (carried / placed + position) and the oil — and emits
+## checkpoint_saved so every resettable object (enemies, triggers, crates…) stores its own
+## state. On respawn the snapshot is restored exactly and level_reset tells the rest.
 ## Calls: UIManager (fades, menus), AudioManager (events, music, heartbeat), LevelManager
 ##   (loading, progress), TutorialManager (hints), SaveManager (settings), HapticsManager.
 ##
@@ -87,6 +96,8 @@ var player_lit: bool = true
 var _player: Node3D = null
 var _lantern: Node3D = null
 var _active_shrine: Node3D = null
+var _checkpoint_lantern: Dictionary = {}
+var _last_hiss_at: float = -100.0
 var _light_sources: Array[Node3D] = []
 var _dark_emptied: bool = false
 var _last_dark_ratio: float = -1.0
@@ -188,6 +199,7 @@ func report_level_ready(level_root: LevelRoot) -> void:
 		bus.level_started.emit(current_level_id)
 		bus.oil_changed.emit(oil, max_oil)
 		bus.dark_meter_changed.emit(1.0)
+	_save_checkpoint()
 
 func report_level_unloaded(level_root: LevelRoot) -> void:
 	if level_root != current_level:
@@ -328,6 +340,24 @@ func report_player_died(cause: String) -> void:
 func get_respawn_position() -> Vector3:
 	return checkpoint_position
 
+## Interpolated (rendered) player position — for cameras and other per-frame visuals.
+func get_player_visual_position() -> Vector3:
+	return _player.get_global_transform_interpolated().origin if is_instance_valid(_player) else Vector3.ZERO
+
+func get_player() -> Node3D:
+	return _player if is_instance_valid(_player) else null
+
+## Anything below this Y has fallen out of the level (LevelRoot.kill_y).
+func get_kill_y() -> float:
+	return current_level.kill_y if is_instance_valid(current_level) else -50.0
+
+func _save_checkpoint() -> void:
+	if is_instance_valid(_lantern):
+		_checkpoint_lantern = _lantern.capture_state()
+	checkpoint_oil = oil
+	if bus:
+		bus.checkpoint_saved.emit(checkpoint_serial)
+
 func _respawn() -> void:
 	if state != State.DEAD or not is_instance_valid(current_level):
 		return
@@ -340,6 +370,8 @@ func _respawn() -> void:
 		bus.player_respawned.emit()
 		bus.oil_changed.emit(oil, max_oil)
 		bus.dark_meter_changed.emit(1.0)
+	if is_instance_valid(_lantern) and not _checkpoint_lantern.is_empty():
+		_lantern.restore_state(_checkpoint_lantern)
 	state = State.PLAYING
 
 # ── Shrines (checkpoint + full oil) ───────────────────────────────────────
@@ -355,12 +387,14 @@ func report_shrine_reached(shrine: Node3D) -> void:
 	if bus:
 		bus.oil_changed.emit(oil, max_oil)
 	if shrine == _active_shrine:
+		_save_checkpoint()   # touching the active shrine again refreshes the snapshot
 		return
 	if audio:
 		audio.play_event(&"shrine")
 	_active_shrine = shrine
 	checkpoint_position = shrine.get_respawn_position()
 	checkpoint_serial += 1
+	_save_checkpoint()
 	if haptics:
 		haptics.medium()
 	if logger:
@@ -394,12 +428,29 @@ func report_lantern_picked_up() -> void:
 func register_lantern(lantern: Node3D) -> void:
 	_lantern = lantern
 
+func is_lantern_raised() -> bool:
+	return _lantern.is_raised() if is_instance_valid(_lantern) else false
+
 func is_lantern_carried() -> bool:
 	return _lantern.carried if is_instance_valid(_lantern) else false
 
 ## World position of the lantern's handle (where the player's hand holds it).
 func get_lantern_handle_position() -> Vector3:
 	return _lantern.get_handle_position() if is_instance_valid(_lantern) else get_player_position()
+
+## A placed lantern fell out of the level: put it down on safe ground beside the player.
+func report_lantern_lost() -> void:
+	if not is_instance_valid(_lantern) or _lantern.carried:
+		return
+	var spot: Variant = _player.find_lantern_spot() if is_instance_valid(_player) else null
+	if spot == null:
+		_lantern.return_to_hand()
+	else:
+		_lantern.respawn_at(spot)
+	if audio:
+		audio.play_event(&"lantern_return")
+	if bus:
+		bus.lantern_returned.emit()
 
 func report_oil_burned(amount: float) -> void:
 	if oil <= 0.0 or amount <= 0.0 or not uses_oil():
@@ -474,6 +525,34 @@ func get_nearest_light_position(point: Vector3) -> Vector3:
 			best_d = d
 			best = c
 	return best
+
+# ── Enemies ───────────────────────────────────────────────────────────────
+
+## True while the player holds a lit lantern: enemies can't touch them.
+func is_player_protected() -> bool:
+	return is_instance_valid(_lantern) and _lantern.carried and _lantern.is_light_active()
+
+func report_wake_trigger(group: StringName) -> void:
+	if bus and state == State.PLAYING:
+		bus.enemies_wake_requested.emit(group)
+
+func report_enemy_woke(enemy: Node3D) -> void:
+	if audio:
+		audio.play_event(&"enemy_wake", true)
+	if bus:
+		bus.enemy_woke.emit(enemy)
+
+## An enemy hit the edge of a light. Rate-limited hiss.
+func report_enemy_repelled(_enemy: Node3D) -> void:
+	if audio and _now() - _last_hiss_at > 0.6:
+		_last_hiss_at = _now()
+		audio.play_event(&"enemy_hiss", true)
+
+func report_player_caught(enemy: Node3D) -> void:
+	if state != State.PLAYING:
+		return
+	var kind: String = enemy.get("enemy_kind") if enemy.get("enemy_kind") else "enemy"
+	report_player_died("caught_" + kind)
 
 func report_platform_lost() -> void:
 	_platform_lost_at = _now()

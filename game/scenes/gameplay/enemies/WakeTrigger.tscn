@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/enemies/WakeTrigger.gd" id="script"]
+
+[sub_resource type="BoxShape3D" id="shape"]
+resource_local_to_scene = true
+size = Vector3(2, 4, 2)
+
+[node name="WakeTrigger" type="Area3D"]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+shape = SubResource("shape")

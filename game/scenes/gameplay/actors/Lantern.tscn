@@ -46,7 +46,7 @@ radius = 0.7
 
 [node name="Lantern" type="CharacterBody3D"]
 collision_layer = 8
-collision_mask = 1
+collision_mask = 5
 axis_lock_linear_z = true
 script = ExtResource("1_script")
 
@@ -58,7 +58,7 @@ shape = SubResource("BoxShape3D_body")
 offset = Vector2(0, 48)
 pixel_size = 0.007
 alpha_cut = 1
-texture_filter = 2
+texture_filter = 3
 texture = ExtResource("2_sprite")
 
 [node name="Light" type="OmniLight3D" parent="."]

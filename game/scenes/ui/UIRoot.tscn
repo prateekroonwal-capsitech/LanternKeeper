@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/hud/HUD.tscn" id="2_hud"]
 [ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/touch/TouchControls.tscn" id="3_touch"]
 [ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/fade/ScreenFade.tscn" id="4_fade"]
-[ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/tutorial/TutorialPopup.tscn" id="5_tutorial"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/tutorial/GestureHint.tscn" id="5_tutorial"]
 [ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/menus/MainMenu.tscn" id="6_main"]
 [ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/menus/LevelSelect.tscn" id="7_select"]
 [ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/menus/PauseMenu.tscn" id="8_pause"]
@@ -21,7 +21,7 @@ visible = false
 [node name="TouchControls" parent="." instance=ExtResource("3_touch")]
 visible = false
 
-[node name="TutorialPopup" parent="." instance=ExtResource("5_tutorial")]
+[node name="GestureHint" parent="." instance=ExtResource("5_tutorial")]
 visible = false
 
 [node name="MainMenu" parent="." instance=ExtResource("6_main")]
