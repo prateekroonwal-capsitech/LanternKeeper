@@ -1,0 +1,49 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/ui/hfw/tutorial/TutorialPopup.gd" id="1_r"]
+[ext_resource type="Script" path="res://game/scripts/controllers/SafeArea.gd" id="2_r"]
+
+[node name="TutorialPopup" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_r")
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_r")
+
+[node name="Layout" type="Control" parent="SafeArea"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="HintPanel" type="PanelContainer" parent="SafeArea/Layout"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -560.0
+offset_top = 130.0
+offset_right = 560.0
+offset_bottom = 290.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="HintText" type="Label" parent="SafeArea/Layout/HintPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "HINT_MOVE_KEYS"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3

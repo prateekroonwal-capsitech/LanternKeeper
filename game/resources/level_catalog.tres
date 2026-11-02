@@ -6,5 +6,5 @@
 script = ExtResource("1_catalog")
 levels_per_world = 10
 world_names = PackedStringArray("Light", "Oil", "Shadows", "Mirrors")
-level_paths = PackedStringArray()
+level_paths = PackedStringArray("res://game/scenes/gameplay/levels/world1/W1_01.tscn", "res://game/scenes/gameplay/levels/world1/W1_02.tscn", "res://game/scenes/gameplay/levels/world1/W1_03.tscn", "res://game/scenes/gameplay/levels/world1/W1_04.tscn", "res://game/scenes/gameplay/levels/world1/W1_05.tscn", "res://game/scenes/gameplay/levels/world1/W1_06.tscn", "res://game/scenes/gameplay/levels/world1/W1_07.tscn", "res://game/scenes/gameplay/levels/world1/W1_08.tscn", "res://game/scenes/gameplay/levels/world1/W1_09.tscn", "res://game/scenes/gameplay/levels/world1/W1_10.tscn")
 test_level_path = "res://game/scenes/gameplay/levels/TestLevel.tscn"

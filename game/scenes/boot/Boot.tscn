@@ -1,11 +1,13 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://game/scenes/boot/BootScene.gd" id="1_boot"]
 [ext_resource type="Script" path="res://game/autoloads/GameService.gd" id="2_services"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/UIRoot.tscn" id="3_ui"]
 
 [node name="Boot" type="Node"]
 script = ExtResource("1_boot")
-next_scene_path = "res://game/scenes/gameplay/levels/TestLevel.tscn"
 
 [node name="GameService" type="Node" parent="."]
 script = ExtResource("2_services")
+
+[node name="UIRoot" parent="GameService" instance=ExtResource("3_ui")]

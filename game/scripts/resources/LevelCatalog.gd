@@ -11,5 +11,7 @@ extends Resource
 @export var levels_per_world: int = 10
 @export var world_names: PackedStringArray = PackedStringArray(["Light", "Oil", "Shadows", "Mirrors"])
 @export var level_paths: PackedStringArray = PackedStringArray()
+## Menu backdrop scene (main menu and level select are shown over it).
+@export_file("*.tscn") var menu_scene_path: String = "res://game/scenes/Home/Home.tscn"
 ## Sandbox level loaded with the id "test".
 @export_file("*.tscn") var test_level_path: String = ""

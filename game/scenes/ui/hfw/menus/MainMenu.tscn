@@ -1,0 +1,74 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/ui/hfw/menus/MainMenu.gd" id="1_r"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/ui/title_logo.png" id="2_r"]
+
+[node name="MainMenu" type="Control" node_paths=PackedStringArray("focus_on_show")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_r")
+focus_on_show = NodePath("Buttons/PlayButton")
+
+[node name="Logo" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -640.0
+offset_top = 90.0
+offset_right = 640.0
+offset_bottom = 330.0
+grow_horizontal = 2
+mouse_filter = 2
+texture = ExtResource("2_r")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Tagline" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 330.0
+offset_bottom = 390.0
+grow_horizontal = 2
+theme_type_variation = &"SmallLabel"
+text = "MENU_TAGLINE"
+horizontal_alignment = 1
+
+[node name="Buttons" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 140.0
+offset_top = -520.0
+offset_right = 660.0
+offset_bottom = -120.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 24
+
+[node name="PlayButton" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(520, 100)
+layout_mode = 2
+text = "MENU_PLAY"
+
+[node name="SettingsButton" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(520, 100)
+layout_mode = 2
+text = "MENU_SETTINGS"
+
+[node name="QuitButton" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(520, 100)
+layout_mode = 2
+text = "MENU_QUIT"

@@ -79,6 +79,14 @@ Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":""
 
 enabled=PackedStringArray()
 
+[gui]
+
+theme/custom="res://game/assets/theme/main_theme.tres"
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://game/assets/localization/strings.en.translation")
+
 [layer_names]
 
 3d_physics/layer_1="world"

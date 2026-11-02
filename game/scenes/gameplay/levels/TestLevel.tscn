@@ -11,6 +11,9 @@
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/OilFlask.tscn" id="9_flask"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="10_kill"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LevelExit.tscn" id="11_exit"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Shrine.tscn" id="12_shrine"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Shadow.tscn" id="13_shadow"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="14_hint"]
 
 [node name="TestLevel" type="Node3D" node_paths=PackedStringArray("spawn_point")]
 script = ExtResource("1_level")
@@ -82,3 +85,46 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -14, 0)
 
 [node name="LevelExit" parent="." instance=ExtResource("11_exit")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 0, 0)
+
+[node name="Shrines" type="Node3D" parent="."]
+
+[node name="ShrineMid" parent="Shrines" instance=ExtResource("12_shrine")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
+
+[node name="Shadows" type="Node3D" parent="."]
+
+[node name="ShadowA" parent="Shadows" instance=ExtResource("13_shadow")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44.5, 1.6, 0)
+
+[node name="ShadowB" parent="Shadows" instance=ExtResource("13_shadow")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 3.2, 0)
+
+[node name="Hints" type="Node3D" parent="."]
+
+[node name="HintMove" parent="Hints" instance=ExtResource("14_hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 0)
+hint_id = "move"
+
+[node name="HintGhost" parent="Hints" instance=ExtResource("14_hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+hint_id = "ghost"
+
+[node name="HintJump" parent="Hints" instance=ExtResource("14_hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0, 0)
+hint_id = "jump"
+
+[node name="HintOil" parent="Hints" instance=ExtResource("14_hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 0, 0)
+hint_id = "oil"
+
+[node name="HintShrine" parent="Hints" instance=ExtResource("14_hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
+hint_id = "shrine"
+
+[node name="HintPlace" parent="Hints" instance=ExtResource("14_hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 2.5, 0)
+hint_id = "place"
+
+[node name="HintShadow" parent="Hints" instance=ExtResource("14_hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 0, 0)
+hint_id = "shadow"

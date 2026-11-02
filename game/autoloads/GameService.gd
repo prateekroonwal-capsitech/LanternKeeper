@@ -24,6 +24,7 @@ var level: LevelManager
 var tutorial: TutorialManager
 
 const LEVEL_CATALOG_PATH := "res://game/resources/level_catalog.tres"
+const AUDIO_LIBRARY_PATH := "res://game/resources/audio_library.tres"
 
 func _ready() -> void:
 	# Persist composition root across scene transitions
@@ -52,7 +53,7 @@ func _ready() -> void:
 	# 2. Initialize managers
 	audio = AudioManager.new()
 	audio.name = "AudioManager"
-	audio.configure(logger)
+	audio.configure(logger, AUDIO_LIBRARY_PATH)
 	add_child(audio)
 	
 	game = GameManager.new()
@@ -86,7 +87,7 @@ func _ready() -> void:
 	
 	input = InputManager.new()
 	input.name = "InputManager"
-	input.configure(game)
+	input.configure(game, save, bus)
 	add_child(input)
 	
 	level = LevelManager.new()
@@ -104,6 +105,13 @@ func _ready() -> void:
 		"audio": audio, "ui": ui, "save": save, "scene": scene, "haptics": haptics,
 		"input": input, "level": level, "tutorial": tutorial,
 	})
+	
+	# UIRoot.tscn (child of GameService in Boot.tscn) holds every screen, placed in the editor.
+	var ui_root := get_node_or_null("UIRoot") as UIRoot
+	if ui_root:
+		ui.register_root(ui_root)
+	else:
+		logger.warn("GameService: UIRoot not found under GameService — no HUD / fades")
 	
 	_register_services()
 	logger.info("GameService initialized")

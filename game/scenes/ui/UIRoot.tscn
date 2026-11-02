@@ -1,0 +1,42 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/ui/UIRoot.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/hud/HUD.tscn" id="2_hud"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/touch/TouchControls.tscn" id="3_touch"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/fade/ScreenFade.tscn" id="4_fade"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/tutorial/TutorialPopup.tscn" id="5_tutorial"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/menus/MainMenu.tscn" id="6_main"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/menus/LevelSelect.tscn" id="7_select"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/menus/PauseMenu.tscn" id="8_pause"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/menus/SettingsMenu.tscn" id="9_settings"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/menus/LevelCompleteMenu.tscn" id="10_complete"]
+
+[node name="UIRoot" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_script")
+
+[node name="HUD" parent="." instance=ExtResource("2_hud")]
+visible = false
+
+[node name="TouchControls" parent="." instance=ExtResource("3_touch")]
+visible = false
+
+[node name="TutorialPopup" parent="." instance=ExtResource("5_tutorial")]
+visible = false
+
+[node name="MainMenu" parent="." instance=ExtResource("6_main")]
+visible = false
+
+[node name="LevelSelect" parent="." instance=ExtResource("7_select")]
+visible = false
+
+[node name="PauseMenu" parent="." instance=ExtResource("8_pause")]
+visible = false
+
+[node name="Settings" parent="." instance=ExtResource("9_settings")]
+visible = false
+
+[node name="LevelComplete" parent="." instance=ExtResource("10_complete")]
+visible = false
+
+[node name="ScreenFade" parent="." instance=ExtResource("4_fade")]

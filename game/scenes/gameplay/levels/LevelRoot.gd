@@ -15,22 +15,30 @@ const DEV_BOOT_META := &"dev_boot_scene"
 
 ## ID used by LevelManager and the save file, e.g. "w1_01". Use "test" for sandboxes.
 @export var level_id: String = "test"
+## World number (1–4): picks the music track.
+@export_range(1, 4) var world: int = 1
+## Translation key of the level's name, shown as a title card when it starts.
+@export var title_key: String = ""
 ## Where the player starts and respawns until a shrine is lit.
 @export var spawn_point: Marker3D
 
 @export_group("Oil")
+## Off = the lantern never burns oil and the HUD hides the oil bar (World 1).
+@export var oil_enabled: bool = true
 @export var max_oil: float = 100.0
 @export var start_oil: float = 100.0
 
 @export_group("Darkness")
+## Off = no dark meter, heartbeat or vignette (worlds without shadows).
+@export var dark_meter_enabled: bool = true
 ## Seconds the player can stay outside all light before the shadows rush.
 @export var dark_meter_time: float = 5.0
 ## Dark-meter seconds regained per second while in light.
 @export var dark_meter_refill_rate: float = 2.0
 
 @export_group("Death")
-## Seconds between a death and the respawn.
-@export var respawn_delay: float = 0.6
+## Seconds between a death and the start of the fade to black (the shake moment).
+@export var respawn_delay: float = 0.25
 
 var _game: GameManager
 

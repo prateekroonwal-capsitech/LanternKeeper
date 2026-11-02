@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="AudioLibrary" format=3]
+
+[ext_resource type="Script" path="res://game/scripts/resources/AudioLibrary.gd" id="1_lib"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/jump.ogg" id="sfx_jump"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/land.ogg" id="sfx_land"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/lantern_place.ogg" id="sfx_lantern_place"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/lantern_pickup.ogg" id="sfx_lantern_pickup"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/oil_pickup.ogg" id="sfx_oil_pickup"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/shrine.ogg" id="sfx_shrine"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/death.ogg" id="sfx_death"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/level_complete.ogg" id="sfx_level_complete"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/ui_button.ogg" id="sfx_ui_button"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/heartbeat.ogg" id="sfx_heartbeat"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/music/menu.ogg" id="mus_menu"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/music/world_1_light.ogg" id="mus_world_1_light"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/music/world_2_oil.ogg" id="mus_world_2_oil"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/music/world_3_shadows.ogg" id="mus_world_3_shadows"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/music/world_4_mirrors.ogg" id="mus_world_4_mirrors"]
+
+[resource]
+script = ExtResource("1_lib")
+menu_music = ExtResource("mus_menu")
+world_music = Array[AudioStream]([ExtResource("mus_world_1_light"), ExtResource("mus_world_2_oil"), ExtResource("mus_world_3_shadows"), ExtResource("mus_world_4_mirrors")])
+jump = ExtResource("sfx_jump")
+land = ExtResource("sfx_land")
+lantern_place = ExtResource("sfx_lantern_place")
+lantern_pickup = ExtResource("sfx_lantern_pickup")
+oil_pickup = ExtResource("sfx_oil_pickup")
+shrine = ExtResource("sfx_shrine")
+death = ExtResource("sfx_death")
+level_complete = ExtResource("sfx_level_complete")
+ui_button = ExtResource("sfx_ui_button")
+heartbeat = ExtResource("sfx_heartbeat")

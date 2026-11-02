@@ -12,17 +12,27 @@ extends Node
 ##   report_level_ready(level) / report_level_unloaded(level)  — LevelRoot
 ##   register_player(player)                                    — Player
 ##   register_light_source(src) / unregister_light_source(src)  — Lantern
+##   register_lantern(lantern)                                  — Lantern (for is_lantern_carried / handle)
 ##   report_oil_burned(amount)                                  — Lantern
 ##   report_oil_collected(amount)                               — OilFlask
 ##   report_lantern_placed(at) / report_lantern_picked_up()     — Lantern
 ##   report_place_lantern_pressed() / report_pause_pressed()    — InputManager
 ##   report_platform_lost()                                     — GhostPlatform
-##   report_player_died(cause)                                  — KillZone (Phase 3: shadows)
+##   report_player_died(cause)                                  — KillZone, Shadow
+##   report_shrine_reached(shrine)                              — Shrine
 ##   report_level_exit_reached()                                — LevelExit
+##   report_player_jumped() / report_player_landed(speed)       — Player (sound)
+##   report_tutorial_trigger(hint_id)                           — TutorialTrigger
+##   report_menu_ready()                                        — HomeScene (menu backdrop)
+##   start_level(id), restart_level(), go_to_next_level(), go_to_level_select(),
+##   go_to_main_menu(), quit_game(), pause()/resume()           — menus
+##   set_volume(bus, v), set_control_layout(l), set_locale(code) — Settings
 ## Sends (GameBus): game_state_changed, level_started, level_completed, oil_changed,
 ##   dark_meter_changed, dark_meter_emptied, dark_meter_recovered, lantern_place_requested,
 ##   lantern_placed, lantern_picked_up, platform_lost, player_died, player_respawned,
-##   level_reset, game_paused, game_resumed, game_started, game_over
+##   level_reset, checkpoint_activated, game_paused, game_resumed, game_started, game_over
+## Calls: UIManager (fades, menus), AudioManager (events, music, heartbeat), LevelManager
+##   (loading, progress), TutorialManager (hints), SaveManager (settings), HapticsManager.
 ##
 ## Light sources are any node with get_light_position(), get_light_radius() and
 ## is_light_active(); is_point_lit() / is_box_lit() answer "is this spot in the light?".
@@ -71,12 +81,23 @@ var checkpoint_oil: float = 100.0
 ## Increments every time a new checkpoint is activated. Pickups use it to know
 ## whether they were collected after the active checkpoint (and must come back on respawn).
 var checkpoint_serial: int = 0
+## True while the player stands inside any light radius (updated every physics frame).
+var player_lit: bool = true
 
 var _player: Node3D = null
+var _lantern: Node3D = null
+var _active_shrine: Node3D = null
 var _light_sources: Array[Node3D] = []
 var _dark_emptied: bool = false
 var _last_dark_ratio: float = -1.0
 var _platform_lost_at: float = -100.0
+var _menu_target: StringName = &"MainMenu"
+var _transitioning: bool = false
+var _heartbeat: float = 0.0
+
+## Seconds between reaching the exit and the Level Complete screen.
+const _LEVEL_COMPLETE_DELAY := 0.8
+const _MASTER_VOLUME_KEY := "master_volume"
 
 func configure(p_logger: Node, p_bus: Node) -> void:
 	logger = p_logger
@@ -91,6 +112,7 @@ func register_managers(managers: Dictionary) -> void:
 	input = managers.get("input")
 	level = managers.get("level")
 	tutorial = managers.get("tutorial")
+	_apply_saved_settings()
 
 func _ready() -> void:
 	set_physics_process(false)
@@ -109,6 +131,9 @@ func pause() -> void:
 		return
 	state = State.PAUSED
 	get_tree().paused = true
+	_set_heartbeat(0.0)
+	if ui:
+		ui.open_menu(&"PauseMenu")
 	if bus:
 		bus.game_paused.emit()
 
@@ -117,6 +142,8 @@ func resume() -> void:
 		return
 	state = State.PLAYING
 	get_tree().paused = false
+	if ui:
+		ui.close_all_menus()
 	if bus:
 		bus.game_resumed.emit()
 
@@ -144,11 +171,19 @@ func report_level_ready(level_root: LevelRoot) -> void:
 	checkpoint_position = level_root.get_spawn_position()
 	checkpoint_oil = oil
 	checkpoint_serial = 0
+	_active_shrine = null
+	player_lit = true
 	_dark_emptied = false
 	_last_dark_ratio = -1.0
 	get_tree().paused = false
 	state = State.PLAYING
 	set_physics_process(true)
+	_transitioning = false
+	if ui:
+		ui.close_all_menus()
+		ui.fade_in()
+	if audio:
+		audio.play_world_music(level_root.world)
 	if bus:
 		bus.level_started.emit(current_level_id)
 		bus.oil_changed.emit(oil, max_oil)
@@ -160,20 +195,94 @@ func report_level_unloaded(level_root: LevelRoot) -> void:
 	current_level = null
 	current_level_id = ""
 	_player = null
+	_lantern = null
+	_active_shrine = null
 	_light_sources.clear()
 	set_physics_process(false)
+	_set_heartbeat(0.0)
 	state = State.MENU
 
 func report_level_exit_reached() -> void:
 	if state != State.PLAYING:
 		return
 	state = State.LEVEL_COMPLETE
+	_set_heartbeat(0.0)
 	if level:
 		level.mark_completed(current_level_id)
 	if haptics:
 		haptics.medium()
+	if audio:
+		audio.play_event(&"level_complete")
 	if bus:
 		bus.level_completed.emit(current_level_id)
+	await get_tree().create_timer(_LEVEL_COMPLETE_DELAY).timeout
+	if state == State.LEVEL_COMPLETE and ui:
+		ui.open_menu(&"LevelComplete")
+
+# ── Navigation (menus → scenes, always through a fade) ─────────────────────
+
+func start_level(level_id: String) -> void:
+	if level == null or not level.has_level(level_id) or _transitioning:
+		return
+	await _leave_current_screen()
+	level.load_level(level_id)
+
+func restart_level() -> void:
+	if not current_level_id.is_empty():
+		start_level(current_level_id)
+
+func go_to_next_level() -> void:
+	var next := level.get_next_level_id(current_level_id) if level else ""
+	if not next.is_empty() and level.has_level(next):
+		start_level(next)
+	else:
+		go_to_level_select()
+
+func go_to_level_select() -> void:
+	_go_to_menu_scene(&"LevelSelect")
+
+func go_to_main_menu() -> void:
+	_go_to_menu_scene(&"MainMenu")
+
+func has_next_level() -> bool:
+	if level == null:
+		return false
+	var next := level.get_next_level_id(current_level_id)
+	return not next.is_empty() and level.has_level(next)
+
+func quit_game() -> void:
+	if save:
+		save.save_game()
+	get_tree().quit()
+
+## Called by the menu backdrop scene (Home) once it is wired up.
+func report_menu_ready() -> void:
+	state = State.MENU
+	_transitioning = false
+	get_tree().paused = false
+	oil = max_oil
+	if audio:
+		audio.play_menu_music()
+	if ui:
+		ui.close_all_menus()
+		ui.open_menu(_menu_target)
+		ui.fade_in()
+
+func _go_to_menu_scene(menu: StringName) -> void:
+	if _transitioning or level == null or level.catalog == null:
+		return
+	_menu_target = menu
+	await _leave_current_screen()
+	scene.go_to(level.catalog.menu_scene_path)
+
+func _leave_current_screen() -> void:
+	_transitioning = true
+	_set_heartbeat(0.0)
+	if ui:
+		await ui.fade_out()
+		ui.close_all_menus()
+	get_tree().paused = false
+	state = State.MENU
 
 # ── Player ────────────────────────────────────────────────────────────────
 
@@ -203,11 +312,18 @@ func report_player_died(cause: String) -> void:
 		logger.info("Player died", { "cause": cause, "level": current_level_id })
 	if haptics:
 		haptics.heavy()
+	if audio:
+		audio.play_event(&"death")
+	_set_heartbeat(0.0)
 	if bus:
 		bus.player_died.emit(cause)
-	var delay := current_level.respawn_delay if is_instance_valid(current_level) else 0.5
+	var delay := current_level.respawn_delay if is_instance_valid(current_level) else 0.25
 	await get_tree().create_timer(delay, false).timeout
+	if ui:
+		await ui.fade_out()
 	_respawn()
+	if ui:
+		ui.fade_in()
 
 func get_respawn_position() -> Vector3:
 	return checkpoint_position
@@ -217,6 +333,7 @@ func _respawn() -> void:
 		return
 	oil = checkpoint_oil
 	dark_meter = dark_meter_max
+	player_lit = true
 	_dark_emptied = false
 	if bus:
 		bus.level_reset.emit(checkpoint_serial)
@@ -225,6 +342,35 @@ func _respawn() -> void:
 		bus.dark_meter_changed.emit(1.0)
 	state = State.PLAYING
 
+# ── Shrines (checkpoint + full oil) ───────────────────────────────────────
+
+## Shrines call this whenever the player touches them: full oil refill, and the
+## shrine becomes the respawn point if it isn't already.
+func report_shrine_reached(shrine: Node3D) -> void:
+	if state != State.PLAYING:
+		return
+	oil = max_oil
+	checkpoint_oil = max_oil
+	dark_meter = dark_meter_max
+	if bus:
+		bus.oil_changed.emit(oil, max_oil)
+	if shrine == _active_shrine:
+		return
+	if audio:
+		audio.play_event(&"shrine")
+	_active_shrine = shrine
+	checkpoint_position = shrine.get_respawn_position()
+	checkpoint_serial += 1
+	if haptics:
+		haptics.medium()
+	if logger:
+		logger.info("Checkpoint", { "shrine": shrine.name, "serial": checkpoint_serial })
+	if bus:
+		bus.checkpoint_activated.emit(shrine)
+
+func get_active_shrine() -> Node3D:
+	return _active_shrine if is_instance_valid(_active_shrine) else null
+
 # ── Lantern & oil ─────────────────────────────────────────────────────────
 
 func report_place_lantern_pressed() -> void:
@@ -232,17 +378,31 @@ func report_place_lantern_pressed() -> void:
 		bus.lantern_place_requested.emit()
 
 func report_lantern_placed(at: Vector3) -> void:
+	if audio:
+		audio.play_event(&"lantern_place", true)
 	if bus:
 		bus.lantern_placed.emit(at)
 
 func report_lantern_picked_up() -> void:
+	if audio:
+		audio.play_event(&"lantern_pickup")
 	if haptics:
 		haptics.light()
 	if bus:
 		bus.lantern_picked_up.emit()
 
+func register_lantern(lantern: Node3D) -> void:
+	_lantern = lantern
+
+func is_lantern_carried() -> bool:
+	return _lantern.carried if is_instance_valid(_lantern) else false
+
+## World position of the lantern's handle (where the player's hand holds it).
+func get_lantern_handle_position() -> Vector3:
+	return _lantern.get_handle_position() if is_instance_valid(_lantern) else get_player_position()
+
 func report_oil_burned(amount: float) -> void:
-	if oil <= 0.0 or amount <= 0.0:
+	if oil <= 0.0 or amount <= 0.0 or not uses_oil():
 		return
 	oil = maxf(oil - amount, 0.0)
 	if bus:
@@ -250,10 +410,19 @@ func report_oil_burned(amount: float) -> void:
 
 func report_oil_collected(amount: float) -> void:
 	oil = minf(oil + amount, max_oil)
+	if audio:
+		audio.play_event(&"oil_pickup", true)
 	if haptics:
 		haptics.light()
 	if bus:
 		bus.oil_changed.emit(oil, max_oil)
+
+## False in levels with LevelRoot.oil_enabled off (the lantern never runs dry).
+func uses_oil() -> bool:
+	return current_level.oil_enabled if is_instance_valid(current_level) else true
+
+func uses_dark_meter() -> bool:
+	return current_level.dark_meter_enabled if is_instance_valid(current_level) else true
 
 func get_oil_ratio() -> float:
 	return oil / max_oil if max_oil > 0.0 else 0.0
@@ -292,6 +461,20 @@ func is_box_lit(center: Vector3, half_extents: Vector2, padding: float = 0.0) ->
 			return true
 	return false
 
+## Position of the nearest active light source to `point` (X/Y plane), or `point` if none.
+func get_nearest_light_position(point: Vector3) -> Vector3:
+	var best := point
+	var best_d := INF
+	for source in _light_sources:
+		if not is_instance_valid(source) or not source.is_light_active():
+			continue
+		var c: Vector3 = source.get_light_position()
+		var d := Vector2(point.x - c.x, point.y - c.y).length_squared()
+		if d < best_d:
+			best_d = d
+			best = c
+	return best
+
 func report_platform_lost() -> void:
 	_platform_lost_at = _now()
 	if bus:
@@ -309,6 +492,9 @@ func _physics_process(delta: float) -> void:
 	if state != State.PLAYING or not is_instance_valid(_player):
 		return
 	var lit := is_point_lit(_player.global_position + _PLAYER_LIGHT_PROBE)
+	player_lit = lit
+	if not uses_dark_meter():
+		return
 	if lit:
 		var refill := current_level.dark_meter_refill_rate if is_instance_valid(current_level) else 2.0
 		dark_meter = minf(dark_meter + delta * refill, dark_meter_max)
@@ -327,10 +513,88 @@ func _physics_process(delta: float) -> void:
 		_last_dark_ratio = ratio
 		if bus:
 			bus.dark_meter_changed.emit(ratio)
+	_update_heartbeat(ratio)
+
+func _update_heartbeat(ratio: float) -> void:
+	if audio == null or audio.library == null:
+		return
+	var threshold := audio.library.heartbeat_threshold
+	var intensity := 0.0
+	if threshold > 0.0 and ratio < threshold:
+		intensity = clampf((threshold - ratio) / threshold, 0.05, 1.0)
+	if absf(intensity - _heartbeat) > 0.02 or (intensity == 0.0) != (_heartbeat == 0.0):
+		_set_heartbeat(intensity)
+
+func _set_heartbeat(intensity: float) -> void:
+	_heartbeat = intensity
+	if audio:
+		audio.set_heartbeat(intensity)
+
+# ── Player sounds & tutorial ──────────────────────────────────────────────
+
+func report_player_jumped() -> void:
+	if audio and state == State.PLAYING:
+		audio.play_event(&"jump", true)
+
+func report_player_landed(fall_speed: float) -> void:
+	if audio and state == State.PLAYING and fall_speed > 4.0:
+		audio.play_event(&"land", true)
+
+func report_tutorial_trigger(hint_id: String) -> void:
+	if tutorial and state == State.PLAYING:
+		tutorial.request_hint(hint_id)
+
+# ── Settings (persisted through SaveManager) ──────────────────────────────
+
+## bus_name: &"Master", &"Music" or &"SFX". linear 0..1.
+func set_volume(bus_name: StringName, linear: float) -> void:
+	if audio:
+		audio.set_bus_volume(bus_name, linear)
+	if save == null:
+		return
+	match bus_name:
+		&"Music":
+			if save.settings_data:
+				save.settings_data.music_volume = linear
+				save.settings.mark_dirty()
+		&"SFX":
+			if save.settings_data:
+				save.settings_data.sfx_volume = linear
+				save.settings.mark_dirty()
+		_:
+			save.set_value(_MASTER_VOLUME_KEY, linear)
+	save.save_game()
+
+func get_volume(bus_name: StringName) -> float:
+	return audio.get_bus_volume(bus_name) if audio else 1.0
+
+func set_control_layout(layout: StringName) -> void:
+	if input:
+		input.set_control_layout(layout)
+
+func set_locale(locale: String) -> void:
+	TranslationServer.set_locale(locale)
+	if save and save.settings_data:
+		save.settings_data.locale = locale
+		save.settings.mark_dirty()
+		save.save_game()
+
+func _apply_saved_settings() -> void:
+	if save == null:
+		return
+	if audio:
+		audio.set_bus_volume(&"Master", float(save.get_value(_MASTER_VOLUME_KEY, 1.0)))
+		if save.settings_data:
+			audio.set_bus_volume(&"Music", save.settings_data.music_volume)
+			audio.set_bus_volume(&"SFX", save.settings_data.sfx_volume)
+	if save.settings_data and not save.settings_data.locale.is_empty():
+		TranslationServer.set_locale(save.settings_data.locale)
 
 # ── Input relays ──────────────────────────────────────────────────────────
 
 func report_pause_pressed() -> void:
+	if _transitioning:
+		return
 	if state == State.PLAYING:
 		pause()
 	elif state == State.PAUSED:

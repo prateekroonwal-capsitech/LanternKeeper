@@ -7,12 +7,20 @@ extends CanvasLayer
 # PDF §5 (Big scenes): large scenes are handled by SceneManager — UIManager
 #   manages panels only, not full scene transitions.
 # PDF §4 CPU: hidden screens use hide(), reducing draw calls on inactive panels.
+#
+# Lantern Keeper: every game screen is placed ahead of time in UIRoot.tscn (no runtime
+# instancing). register_root() wires them up; show_screen()/hide_screen() toggle them
+# and fade_out()/fade_in() drive the full-screen ScreenFade.
+# Receives: GameManager.report_player_died → fade_out()/fade_in() (called by GameManager).
+# Sends: GameBus.screen_opened / screen_closed.
 
 var _stack: Array[Control] = []
 var _logger: Node
 var _bus: Node
 var _audio: AudioManager
 var _game: GameManager
+var _root: UIRoot
+var _menu_stack: Array[StringName] = []
 
 func configure(logger: Node, bus: Node, audio: AudioManager = null, game: GameManager = null) -> void:
 	_logger = logger
@@ -22,6 +30,72 @@ func configure(logger: Node, bus: Node, audio: AudioManager = null, game: GameMa
 
 func _ready() -> void:
 	pass
+
+# ── Placed screens (UIRoot.tscn) ──────────────────────────────────────────
+
+## Called once by GameService. Injects every UIController screen under the root.
+func register_root(root: UIRoot) -> void:
+	_root = root
+	for screen in root.get_screens():
+		_auto_inject_screen(screen)
+	# Every button in the UI plays the button sound.
+	for button in root.find_children("*", "BaseButton", true, false):
+		(button as BaseButton).pressed.connect(_on_any_button_pressed)
+
+func _on_any_button_pressed() -> void:
+	if _audio:
+		_audio.play_event(&"ui_button")
+
+# ── Menus (a stack of placed screens: open / back / close all) ─────────────
+
+## Opens a menu on top of the current one (the current one hides until you go back).
+func open_menu(menu: StringName) -> void:
+	if not _menu_stack.is_empty():
+		hide_screen(_menu_stack.back())
+	_menu_stack.append(menu)
+	show_screen(menu)
+
+## Closes the top menu and shows the one under it.
+func close_menu() -> void:
+	if _menu_stack.is_empty():
+		return
+	hide_screen(_menu_stack.pop_back())
+	if not _menu_stack.is_empty():
+		show_screen(_menu_stack.back())
+
+func close_all_menus() -> void:
+	while not _menu_stack.is_empty():
+		hide_screen(_menu_stack.pop_back())
+
+func top_menu() -> StringName:
+	return _menu_stack.back() if not _menu_stack.is_empty() else &""
+
+func get_root() -> UIRoot:
+	return _root
+
+func show_screen(screen_name: StringName) -> void:
+	var screen := _root.get_screen(screen_name) if _root else null
+	if screen and not screen.visible:
+		screen.show()
+		if _bus:
+			_bus.screen_opened.emit(String(screen_name))
+
+func hide_screen(screen_name: StringName) -> void:
+	var screen := _root.get_screen(screen_name) if _root else null
+	if screen and screen.visible:
+		screen.hide()
+		if _bus:
+			_bus.screen_closed.emit(String(screen_name))
+
+## Fades the whole screen to black. Await it: `await ui.fade_out()`.
+func fade_out() -> void:
+	if _root and _root.screen_fade:
+		await _root.screen_fade.fade_out()
+
+## Fades back in from black. Await it if you need to know when it is done.
+func fade_in() -> void:
+	if _root and _root.screen_fade:
+		await _root.screen_fade.fade_in()
 
 # ── Push ──────────────────────────────────────────────────────────────────
 

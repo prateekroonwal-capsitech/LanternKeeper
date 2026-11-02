@@ -1,15 +1,23 @@
 class_name InputManager
 extends Node
 
-## InputManager — turns keyboard / controller input (and touch gestures, Phase 3)
-## into the same game actions: move, jump, place_lantern, raise_light, pause.
+## InputManager — turns keyboard, controller and touch into the same game actions:
+## move, jump, place_lantern, raise_light, pause.
 ##
-## Continuous actions are exposed as state that gameplay polls through
-## GameManager.input (move_axis, jump_held, jump_just_pressed, raise_held).
-## One-shot actions are reported to the hub.
+## Keyboard / controller come from the InputMap (project.godot). Touch comes from
+## TouchControls (UI), which feeds the "virtual" setters below — gestures layout —
+## or presses the InputMap actions directly via TouchScreenButtons — classic layout.
+## Continuous state is polled by gameplay through GameManager.input
+## (move_axis, jump_held, jump_just_pressed, raise_held).
 ##
-## Sends: GameManager.report_place_lantern_pressed(), GameManager.report_pause_pressed()
-## Receives: nothing (reads the InputMap actions defined in project.godot).
+## Sends: GameManager.report_place_lantern_pressed(), GameManager.report_pause_pressed(),
+##   GameBus.control_layout_changed(layout)
+## Receives: set_virtual_axis(), trigger_virtual_jump(), trigger_virtual_place(),
+##   set_virtual_raise() from TouchControls; set_control_layout() from Settings (Phase 4).
+
+const LAYOUT_GESTURES := &"gestures"
+const LAYOUT_CLASSIC := &"classic"
+const _LAYOUT_SAVE_KEY := "control_layout"
 
 ## -1..1 horizontal movement for this physics frame.
 var move_axis: float = 0.0
@@ -17,24 +25,41 @@ var jump_held: bool = false
 var jump_just_pressed: bool = false
 var raise_held: bool = false
 
-var _game: GameManager
+## Active touch layout: LAYOUT_GESTURES or LAYOUT_CLASSIC.
+var control_layout: StringName = LAYOUT_GESTURES
 
-func configure(game: GameManager) -> void:
+var _game: GameManager
+var _save: SaveManager
+var _bus: Node
+
+# Touch (virtual) inputs from TouchControls
+var _virtual_axis: float = 0.0
+var _virtual_jump_latch: bool = false
+var _virtual_jump_hold: float = 0.0
+var _virtual_raise: bool = false
+
+func configure(game: GameManager, save: SaveManager = null, bus: Node = null) -> void:
 	_game = game
+	_save = save
+	_bus = bus
 
 func _ready() -> void:
 	# Runs while paused (to unpause) and before every gameplay node in the frame.
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	process_physics_priority = -100
+	if _save:
+		control_layout = StringName(_save.get_value(_LAYOUT_SAVE_KEY, String(LAYOUT_GESTURES)))
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if get_tree().paused:
 		_clear()
 		return
-	move_axis = Input.get_axis(&"move_left", &"move_right")
-	jump_held = Input.is_action_pressed(&"jump")
-	jump_just_pressed = Input.is_action_just_pressed(&"jump")
-	raise_held = Input.is_action_pressed(&"raise_light")
+	move_axis = clampf(Input.get_axis(&"move_left", &"move_right") + _virtual_axis, -1.0, 1.0)
+	_virtual_jump_hold = maxf(_virtual_jump_hold - delta, 0.0)
+	jump_held = Input.is_action_pressed(&"jump") or _virtual_jump_hold > 0.0
+	jump_just_pressed = Input.is_action_just_pressed(&"jump") or _virtual_jump_latch
+	_virtual_jump_latch = false
+	raise_held = Input.is_action_pressed(&"raise_light") or _virtual_raise
 	if Input.is_action_just_pressed(&"place_lantern") and _game:
 		_game.report_place_lantern_pressed()
 
@@ -42,6 +67,42 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"pause") and _game:
 		_game.report_pause_pressed()
 		get_viewport().set_input_as_handled()
+
+# ── Touch (virtual) inputs ────────────────────────────────────────────────
+
+func set_virtual_axis(value: float) -> void:
+	_virtual_axis = clampf(value, -1.0, 1.0)
+
+## A tap jump: one press, held for `hold_time` seconds (touch taps have no "hold").
+func trigger_virtual_jump(hold_time: float) -> void:
+	_virtual_jump_latch = true
+	_virtual_jump_hold = hold_time
+
+func trigger_virtual_place() -> void:
+	if _game:
+		_game.report_place_lantern_pressed()
+
+func set_virtual_raise(held: bool) -> void:
+	_virtual_raise = held
+
+func clear_virtual() -> void:
+	_virtual_axis = 0.0
+	_virtual_jump_latch = false
+	_virtual_jump_hold = 0.0
+	_virtual_raise = false
+
+# ── Control layout ────────────────────────────────────────────────────────
+
+func set_control_layout(layout: StringName) -> void:
+	if layout != LAYOUT_GESTURES and layout != LAYOUT_CLASSIC:
+		return
+	control_layout = layout
+	clear_virtual()
+	if _save:
+		_save.set_value(_LAYOUT_SAVE_KEY, String(layout))
+		_save.save_game()
+	if _bus:
+		_bus.control_layout_changed.emit(layout)
 
 func _clear() -> void:
 	move_axis = 0.0

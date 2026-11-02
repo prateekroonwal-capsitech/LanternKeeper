@@ -1,0 +1,116 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/ui/hfw/menus/LevelSelect.gd" id="1_r"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/ui/arrow_left.png" id="2_r"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/ui/arrow_right.png" id="3_r"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/hfw/menus/LevelButton.tscn" id="4_r"]
+[ext_resource type="Script" path="res://game/scripts/controllers/SafeArea.gd" id="5_r"]
+
+[node name="LevelSelect" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_r")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.35)
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_r")
+
+[node name="Column" type="VBoxContainer" parent="SafeArea"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 48
+
+[node name="Heading" type="Label" parent="SafeArea/Column"]
+layout_mode = 2
+theme_type_variation = &"SmallLabel"
+text = "SELECT_TITLE"
+horizontal_alignment = 1
+
+[node name="WorldRow" type="HBoxContainer" parent="SafeArea/Column"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 40
+
+[node name="PrevWorld" type="TextureButton" parent="SafeArea/Column/WorldRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+texture_normal = ExtResource("2_r")
+
+[node name="WorldTitle" type="Label" parent="SafeArea/Column/WorldRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(760, 0)
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+text = "World 1 · Light"
+horizontal_alignment = 1
+
+[node name="NextWorld" type="TextureButton" parent="SafeArea/Column/WorldRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+texture_normal = ExtResource("3_r")
+
+[node name="Grid" type="GridContainer" parent="SafeArea/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 30
+theme_override_constants/v_separation = 30
+columns = 5
+
+[node name="Level01" parent="SafeArea/Column/Grid" instance=ExtResource("4_r")]
+layout_mode = 2
+
+[node name="Level02" parent="SafeArea/Column/Grid" instance=ExtResource("4_r")]
+layout_mode = 2
+
+[node name="Level03" parent="SafeArea/Column/Grid" instance=ExtResource("4_r")]
+layout_mode = 2
+
+[node name="Level04" parent="SafeArea/Column/Grid" instance=ExtResource("4_r")]
+layout_mode = 2
+
+[node name="Level05" parent="SafeArea/Column/Grid" instance=ExtResource("4_r")]
+layout_mode = 2
+
+[node name="Level06" parent="SafeArea/Column/Grid" instance=ExtResource("4_r")]
+layout_mode = 2
+
+[node name="Level07" parent="SafeArea/Column/Grid" instance=ExtResource("4_r")]
+layout_mode = 2
+
+[node name="Level08" parent="SafeArea/Column/Grid" instance=ExtResource("4_r")]
+layout_mode = 2
+
+[node name="Level09" parent="SafeArea/Column/Grid" instance=ExtResource("4_r")]
+layout_mode = 2
+
+[node name="Level10" parent="SafeArea/Column/Grid" instance=ExtResource("4_r")]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="SafeArea/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "MENU_BACK"

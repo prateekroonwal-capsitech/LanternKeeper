@@ -2,10 +2,11 @@ class_name Lantern
 extends CharacterBody3D
 
 ## Lantern — the one light. Carried, it follows the player's hand; placed, it
-## drops to the ground and lights that spot. Walking into a placed lantern picks
+## drops to the solid ground below and lights that spot. It sinks through ghost
+## platforms (they only bear the boy), so it can be lowered to light a path from below. Walking into a placed lantern picks
 ## it up again. Burns oil (3× while raised); its radius shrinks with the oil.
 ##
-## Sends: GameManager.register_light_source(self) / unregister_light_source(self),
+## Sends: GameManager.register_lantern(self), register_light_source(self) / unregister_light_source(self),
 ##   report_oil_burned(amount), report_lantern_placed(at), report_lantern_picked_up()
 ## Receives: GameBus.lantern_place_requested → place; GameBus.player_respawned → back to hand;
 ##   GameManager.input.raise_held, GameManager.get_oil_ratio()
@@ -32,8 +33,13 @@ extends CharacterBody3D
 @export var raise_burn_multiplier: float = 3.0
 
 @export_group("Carry")
-## Hand offset from the player's feet; X is mirrored with facing.
-@export var carry_offset: Vector3 = Vector3(0.5, 0.95, 0.3)
+## Where the lantern's base sits relative to the player's feet; X is mirrored with facing.
+## The boy's arm is aimed at the handle, so keep the handle within arm's reach of the shoulder.
+@export var carry_offset: Vector3 = Vector3(0.38, 0.28, 0.3)
+## Added to carry_offset while the light is raised (X mirrored with facing).
+@export var raise_offset: Vector3 = Vector3(-0.1, 0.4, 0.0)
+## Height of the handle above the lantern's base (where the hand grips).
+@export var handle_height: float = 0.6
 @export var follow_speed: float = 22.0
 
 @export_group("Placed")
@@ -75,6 +81,7 @@ func inject_services(registry: Node) -> void:
 	_game = registry.get_service(&"game") as GameManager
 	if _game == null:
 		return
+	_game.register_lantern(self)
 	_game.register_light_source(self)
 	_game.bus.lantern_place_requested.connect(_on_place_requested)
 	_game.bus.player_respawned.connect(_return_to_player)
@@ -90,6 +97,9 @@ func _exit_tree() -> void:
 		_game.unregister_light_source(self)
 
 # ── Light-source API ──────────────────────────────────────────────────────
+
+func get_handle_position() -> Vector3:
+	return global_position + Vector3(0.0, handle_height, 0.0)
 
 func get_light_position() -> Vector3:
 	return global_position + Vector3(0.0, 0.35, 0.0)
@@ -131,8 +141,8 @@ func _follow_hand(delta: float) -> void:
 
 func _hand_position() -> Vector3:
 	var facing := _game.get_player_facing()
-	var raise := Vector3(0.0, 0.5, 0.0) if _raised else Vector3.ZERO
-	return _game.get_player_position() + Vector3(carry_offset.x * facing, carry_offset.y, carry_offset.z) + raise
+	var offset := carry_offset + (raise_offset if _raised else Vector3.ZERO)
+	return _game.get_player_position() + Vector3(offset.x * facing, offset.y, offset.z)
 
 func _snap_to_hand() -> void:
 	global_position = _hand_position()

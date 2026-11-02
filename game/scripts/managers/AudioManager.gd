@@ -10,8 +10,20 @@ extends Node
 ## - Avoids music restart stutter if the same track is requested again.
 ## - Pitch variation option for punchy sound effects.
 ## - Bus fallback (checks for "Music" and "SFX" buses, falls back to "Master").
+##
+## Lantern Keeper additions:
+## - AudioLibrary (game/resources/audio_library.tres): every stream, set in the Inspector.
+## - play_event(name): plays a library sound by name (called by GameManager / UIManager).
+## - crossfade_music(): two music players, crossfade between menu / world tracks.
+## - set_heartbeat(intensity): looping heartbeat while the dark meter is low.
+## - set_bus_volume(): Master / Music / SFX bus volumes (settings).
+## Receives: calls from GameManager and UIManager only. Sends: nothing.
 
 var _music_player: AudioStreamPlayer
+var _music_player_b: AudioStreamPlayer
+var _heartbeat_player: AudioStreamPlayer
+var _music_tween: Tween
+var library: AudioLibrary
 var _sfx_pool: Array[AudioStreamPlayer] = []
 
 const _POOL_SIZE := 8
@@ -22,8 +34,12 @@ var _sfx_enabled: bool = true
 var _music_volume: float = 1.0
 var _sfx_volume: float = 1.0
 
-func configure(logger: Node) -> void:
+func configure(logger: Node, library_path: String = "") -> void:
 	_logger = logger
+	if not library_path.is_empty():
+		library = load(library_path) as AudioLibrary
+		if library == null and _logger:
+			_logger.error("AudioManager: audio library missing", { "path": library_path })
 
 func _ready() -> void:
 	# UI sounds and background music should continue playing during pause menu:
@@ -120,6 +136,83 @@ func set_sfx_volume(linear: float) -> void:
 		p.volume_db = db
 
 # ==============================================================================
+# 🏮 LANTERN KEEPER: EVENTS, CROSSFADE, HEARTBEAT, BUS VOLUMES
+# ==============================================================================
+
+## Plays a library sound by name, e.g. play_event(&"jump").
+func play_event(event_name: StringName, vary_pitch: bool = false) -> void:
+	if library == null:
+		return
+	var pitch := 1.0
+	if vary_pitch:
+		pitch = randf_range(1.0 - library.pitch_variation, 1.0 + library.pitch_variation)
+	play_sfx(library.get_event(event_name), 0.0, pitch)
+
+func play_menu_music() -> void:
+	if library:
+		crossfade_music(library.menu_music)
+
+## world is 1-based.
+func play_world_music(world: int) -> void:
+	if library and world >= 1 and world <= library.world_music.size():
+		crossfade_music(library.world_music[world - 1])
+
+## Fades the current track out while `stream` fades in. Same track = no restart.
+func crossfade_music(stream: AudioStream, duration: float = -1.0) -> void:
+	if stream == null or (_music_player.stream == stream and _music_player.playing):
+		return
+	if duration < 0.0:
+		duration = library.music_crossfade_time if library else 1.0
+	var target_db := library.music_volume_db if library else 0.0
+	if stream is AudioStreamOggVorbis:
+		(stream as AudioStreamOggVorbis).loop = true
+	var old := _music_player
+	_music_player = _music_player_b
+	_music_player_b = old
+	_music_player.stream = stream
+	_music_player.volume_db = -40.0
+	if _music_enabled:
+		_music_player.play()
+	if _music_tween:
+		_music_tween.kill()
+	_music_tween = create_tween().set_parallel(true)
+	_music_tween.tween_property(_music_player, "volume_db", target_db, duration)
+	if old.playing:
+		_music_tween.tween_property(old, "volume_db", -40.0, duration)
+		_music_tween.chain().tween_callback(old.stop)
+
+## 0 = off. 0..1 raises volume and tempo as the dark meter empties.
+func set_heartbeat(intensity: float) -> void:
+	if library == null or library.heartbeat == null:
+		return
+	if intensity <= 0.0 or not _sfx_enabled:
+		if _heartbeat_player.playing:
+			_heartbeat_player.stop()
+		return
+	if _heartbeat_player.stream != library.heartbeat:
+		if library.heartbeat is AudioStreamOggVorbis:
+			(library.heartbeat as AudioStreamOggVorbis).loop = true
+		_heartbeat_player.stream = library.heartbeat
+	_heartbeat_player.volume_db = lerpf(-24.0, library.heartbeat_volume_db, intensity)
+	_heartbeat_player.pitch_scale = lerpf(library.heartbeat_pitch_range.x, library.heartbeat_pitch_range.y, intensity)
+	if not _heartbeat_player.playing:
+		_heartbeat_player.play()
+
+## Linear 0..1 volume of a bus ("Master", "Music", "SFX").
+func set_bus_volume(bus_name: StringName, linear: float) -> void:
+	var idx := AudioServer.get_bus_index(bus_name)
+	if idx >= 0:
+		var v := clampf(linear, 0.0, 1.0)
+		AudioServer.set_bus_volume_db(idx, linear_to_db(maxf(v, 0.0001)))
+		AudioServer.set_bus_mute(idx, v <= 0.001)
+
+func get_bus_volume(bus_name: StringName) -> float:
+	var idx := AudioServer.get_bus_index(bus_name)
+	if idx < 0 or AudioServer.is_bus_mute(idx):
+		return 0.0 if idx >= 0 else 1.0
+	return db_to_linear(AudioServer.get_bus_volume_db(idx))
+
+# ==============================================================================
 # 🔇 GLOBAL MUTE
 # ==============================================================================
 
@@ -140,6 +233,16 @@ func _setup_music_player() -> void:
 	_music_player.bus = bus
 	_music_player.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_music_player)
+	# Second player for crossfades, and a looping heartbeat player (SFX bus).
+	_music_player_b = AudioStreamPlayer.new()
+	_music_player_b.name = "MusicPlayerB"
+	_music_player_b.bus = bus
+	_music_player_b.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(_music_player_b)
+	_heartbeat_player = AudioStreamPlayer.new()
+	_heartbeat_player.name = "HeartbeatPlayer"
+	_heartbeat_player.bus = "SFX" if AudioServer.get_bus_index("SFX") >= 0 else "Master"
+	add_child(_heartbeat_player)
 
 func _setup_sfx_pool() -> void:
 	var bus := "SFX" if AudioServer.get_bus_index("SFX") >= 0 else "Master"

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cqiy0cf722w15"
-path="res://.godot/imported/player_idle.png-39b3ae037ec7d7a6a10fc87a27723f0e.ctex"
+uid="uid://dtx83wdwp8r3p"
+path="res://.godot/imported/touch_joystick_knob.png-f25b05b2d8b690ad2413788bb74b7913.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://game/assets/sprites/single/player/player_idle.png"
-dest_files=["res://.godot/imported/player_idle.png-39b3ae037ec7d7a6a10fc87a27723f0e.ctex"]
+source_file="res://game/assets/sprites/single/ui/touch_joystick_knob.png"
+dest_files=["res://.godot/imported/touch_joystick_knob.png-f25b05b2d8b690ad2413788bb74b7913.ctex"]
 
 [params]
 

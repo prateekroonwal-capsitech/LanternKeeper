@@ -1,0 +1,128 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/ui/hfw/touch/TouchControls.gd" id="1_script"]
+[ext_resource type="Script" path="res://game/scripts/controllers/SafeArea.gd" id="2_safe"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/ui/touch_joystick_base.png" id="3_base"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/ui/touch_joystick_knob.png" id="4_knob"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/ui/touch_btn_left.png" id="5_left"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/ui/touch_btn_right.png" id="6_right"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/ui/touch_btn_jump.png" id="7_jump"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/ui/touch_btn_place.png" id="8_place"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/ui/touch_btn_raise.png" id="9_raise"]
+
+[node name="TouchControls" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Gestures" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Joystick" type="Control" parent="Gestures"]
+layout_mode = 0
+mouse_filter = 2
+
+[node name="Base" type="TextureRect" parent="Gestures/Joystick"]
+layout_mode = 0
+offset_left = -128.0
+offset_top = -128.0
+offset_right = 128.0
+offset_bottom = 128.0
+mouse_filter = 2
+texture = ExtResource("3_base")
+
+[node name="Knob" type="Control" parent="Gestures/Joystick"]
+layout_mode = 0
+mouse_filter = 2
+
+[node name="KnobImage" type="TextureRect" parent="Gestures/Joystick/Knob"]
+layout_mode = 0
+offset_left = -64.0
+offset_top = -64.0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+texture = ExtResource("4_knob")
+
+[node name="Classic" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SafeArea" type="MarginContainer" parent="Classic"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_safe")
+
+[node name="Layout" type="Control" parent="Classic/SafeArea"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MoveCluster" type="Control" parent="Classic/SafeArea/Layout"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -190.0
+offset_right = 400.0
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="Left" type="TouchScreenButton" parent="Classic/SafeArea/Layout/MoveCluster"]
+position = Vector2(0, 8)
+texture_normal = ExtResource("5_left")
+action = "move_left"
+
+[node name="Right" type="TouchScreenButton" parent="Classic/SafeArea/Layout/MoveCluster"]
+position = Vector2(210, 8)
+texture_normal = ExtResource("6_right")
+action = "move_right"
+
+[node name="ActionCluster" type="Control" parent="Classic/SafeArea/Layout"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -600.0
+offset_top = -420.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="Jump" type="TouchScreenButton" parent="Classic/SafeArea/Layout/ActionCluster"]
+position = Vector2(400, 220)
+texture_normal = ExtResource("7_jump")
+action = "jump"
+
+[node name="Place" type="TouchScreenButton" parent="Classic/SafeArea/Layout/ActionCluster"]
+position = Vector2(196, 244)
+texture_normal = ExtResource("8_place")
+action = "place_lantern"
+
+[node name="Raise" type="TouchScreenButton" parent="Classic/SafeArea/Layout/ActionCluster"]
+position = Vector2(412, 20)
+texture_normal = ExtResource("9_raise")
+action = "raise_light"

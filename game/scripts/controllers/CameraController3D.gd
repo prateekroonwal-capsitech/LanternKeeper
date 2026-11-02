@@ -7,7 +7,8 @@ extends Camera3D
 ##
 ## Sends: nothing.
 ## Receives: GameManager.get_player_position() / get_player_facing() (polled);
-##   GameBus.level_started, GameBus.player_respawned → snap to the player.
+##   GameBus.level_started, GameBus.player_respawned → snap to the player;
+##   GameBus.player_died → light shake.
 
 ## Camera position relative to the player's feet.
 @export var follow_offset: Vector3 = Vector3(0.0, 2.2, 14.0)
@@ -18,8 +19,15 @@ extends Camera3D
 ## The camera never goes below this Y, so falls into pits read as falls.
 @export var min_y: float = -2.0
 
+@export_group("Death shake")
+@export var shake_strength: float = 0.25
+@export var shake_duration: float = 0.3
+
 var _game: GameManager
 var _look: float = 0.0
+var _shake_time: float = 0.0
+var _shake_amount: float = 0.0
+var _shake_length: float = 0.0
 
 func _ready() -> void:
 	set_process(false)
@@ -32,6 +40,7 @@ func inject_services(registry: Node) -> void:
 		return
 	_game.bus.level_started.connect(func(_id: String) -> void: _snap())
 	_game.bus.player_respawned.connect(_snap.call_deferred)
+	_game.bus.player_died.connect(func(_cause: String) -> void: shake(shake_strength, shake_duration))
 	set_process(true)
 
 func _process(delta: float) -> void:
@@ -39,6 +48,19 @@ func _process(delta: float) -> void:
 		return
 	_look = lerpf(_look, look_ahead * _game.get_player_facing(), 1.0 - exp(-look_ahead_speed * delta))
 	global_position = global_position.lerp(_target(), 1.0 - exp(-follow_speed * delta))
+	if _shake_time > 0.0:
+		_shake_time -= delta
+		var k := clampf(_shake_time / maxf(_shake_length, 0.001), 0.0, 1.0) * _shake_amount
+		h_offset = randf_range(-k, k)
+		v_offset = randf_range(-k, k)
+	else:
+		h_offset = 0.0
+		v_offset = 0.0
+
+func shake(strength: float, duration: float) -> void:
+	_shake_amount = strength
+	_shake_length = duration
+	_shake_time = duration
 
 func _target() -> Vector3:
 	var t := _game.get_player_position() + follow_offset + Vector3(_look, 0.0, 0.0)

@@ -1,0 +1,78 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/ui/hfw/menus/PauseMenu.gd" id="1_r"]
+
+[node name="PauseMenu" type="Control" node_paths=PackedStringArray("focus_on_show")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_r")
+focus_on_show = NodePath("Center/Panel/Column/ResumeButton")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+layout_mode = 2
+
+[node name="Column" type="VBoxContainer" parent="Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 22
+
+[node name="Title" type="Label" parent="Center/Panel/Column"]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+text = "PAUSE_TITLE"
+horizontal_alignment = 1
+
+[node name="Gap" type="Control" parent="Center/Panel/Column"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="ResumeButton" type="Button" parent="Center/Panel/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 100)
+layout_mode = 2
+text = "PAUSE_RESUME"
+
+[node name="RestartButton" type="Button" parent="Center/Panel/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 100)
+layout_mode = 2
+text = "PAUSE_RESTART"
+
+[node name="SettingsButton" type="Button" parent="Center/Panel/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 100)
+layout_mode = 2
+text = "MENU_SETTINGS"
+
+[node name="LevelsButton" type="Button" parent="Center/Panel/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 100)
+layout_mode = 2
+text = "PAUSE_LEVELS"
+
+[node name="MenuButton" type="Button" parent="Center/Panel/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 100)
+layout_mode = 2
+text = "PAUSE_MENU"

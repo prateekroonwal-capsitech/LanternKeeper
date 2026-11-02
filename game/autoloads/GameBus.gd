@@ -33,6 +33,8 @@ signal lantern_placed(at: Vector3)
 signal lantern_picked_up
 signal platform_lost
 signal level_reset(checkpoint_serial: int)
+signal checkpoint_activated(shrine: Node3D)
+signal control_layout_changed(layout: StringName)
 signal tutorial_hint_requested(hint_id: String)
 
 # ── Economy ───────────────────────────────────────────────────────────────
