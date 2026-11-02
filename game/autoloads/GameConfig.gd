@@ -25,7 +25,7 @@ const _FUNCTIONS_URL: Dictionary = {
 }
 
 # ── Game Identity ─────────────────────────────────────────────────────────
-const GAME_ID:    String = "game-template"   # must match backend GameConfig
+const GAME_ID:    String = "lantern-keeper"   # must match backend GameConfig
 const APP_VERSION: String = "1.0.0"
 
 # ── Feature Flags ─────────────────────────────────────────────────────────

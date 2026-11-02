@@ -1,0 +1,84 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="1_level"]
+[ext_resource type="Environment" path="res://game/assets/materials/world_environment.tres" id="2_env"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/environment/Backdrop.tscn" id="3_backdrop"]
+[ext_resource type="Script" path="res://game/scripts/controllers/CameraController3D.gd" id="4_camera"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Player.tscn" id="5_player"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Lantern.tscn" id="6_lantern"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="7_platform"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/GhostPlatform.tscn" id="8_ghost"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/OilFlask.tscn" id="9_flask"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="10_kill"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LevelExit.tscn" id="11_exit"]
+
+[node name="TestLevel" type="Node3D" node_paths=PackedStringArray("spawn_point")]
+script = ExtResource("1_level")
+level_id = "test"
+spawn_point = NodePath("SpawnPoint")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("2_env")
+
+[node name="Backdrop" parent="." instance=ExtResource("3_backdrop")]
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 14)
+current = true
+fov = 45.0
+script = ExtResource("4_camera")
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.05, 0)
+
+[node name="Player" parent="." instance=ExtResource("5_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.05, 0)
+
+[node name="Lantern" parent="." instance=ExtResource("6_lantern")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1, 0.3)
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="GroundStart" parent="Geometry" instance=ExtResource("7_platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+size = Vector2(12, 2)
+
+[node name="GroundMid" parent="Geometry" instance=ExtResource("7_platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -1, 0)
+size = Vector2(8, 2)
+
+[node name="HighLedge" parent="Geometry" instance=ExtResource("7_platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, 2, 0)
+size = Vector2(6, 1)
+
+[node name="GroundEnd" parent="Geometry" instance=ExtResource("7_platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, -1, 0)
+size = Vector2(16, 2)
+
+[node name="GhostPlatforms" type="Node3D" parent="."]
+
+[node name="GhostBridge" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, -0.25, 0)
+size = Vector2(4, 0.5)
+
+[node name="GhostStepA" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 1.25, 0)
+size = Vector2(2.5, 0.5)
+
+[node name="GhostStepB" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.5, 2.75, 0)
+size = Vector2(2.5, 0.5)
+
+[node name="Pickups" type="Node3D" parent="."]
+
+[node name="OilFlaskA" parent="Pickups" instance=ExtResource("9_flask")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 0.7, 0)
+
+[node name="OilFlaskB" parent="Pickups" instance=ExtResource("9_flask")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0.7, 0)
+
+[node name="KillZone" parent="." instance=ExtResource("10_kill")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -14, 0)
+
+[node name="LevelExit" parent="." instance=ExtResource("11_exit")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 0, 0)

@@ -269,6 +269,39 @@ func complete_level(level: int, stars: int = 3, xp_reward: int = 150) -> void:
 		)
 
 # ==============================================================================
+# 🏮 LANTERN KEEPER SHORTCUTS (level progress + tutorial flags)
+# ==============================================================================
+# Level progress uses progression_data: level_stars[level_id] = 1 marks a completed
+# level, unlocked_levels is how many catalog slots (from the start) are playable.
+
+func is_level_completed(level_id: String) -> bool:
+	return progression_data.level_stars.has(level_id) if progression_data else false
+
+func get_unlocked_level_count() -> int:
+	return progression_data.unlocked_levels if progression_data else 1
+
+## Marks a level complete and unlocks every slot below `unlock_count`. Saves to disk.
+func mark_level_completed(level_id: String, unlock_count: int) -> void:
+	if not progression_data:
+		return
+	progression_data.level_stars[level_id] = 1
+	progression_data.unlocked_levels = maxi(progression_data.unlocked_levels, unlock_count)
+	if progression:
+		progression.mark_dirty()
+	save_game()
+
+func is_tutorial_seen(hint_id: String) -> bool:
+	return bool(tutorials_data.seen.get(hint_id, false)) if tutorials_data else false
+
+func mark_tutorial_seen(hint_id: String) -> void:
+	if not tutorials_data:
+		return
+	tutorials_data.seen[hint_id] = true
+	if tutorials:
+		tutorials.mark_dirty()
+	save_game()
+
+# ==============================================================================
 # ⚡ DIRECT PROPERTY ACCESS EXAMPLES (Without Mutate / Batch Dirty Marking)
 # ==============================================================================
 

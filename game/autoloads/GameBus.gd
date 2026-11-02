@@ -4,9 +4,11 @@ extends Node
 # Nothing talks to each other directly — everything goes through signals here
 #
 # Features receive this bus through explicit dependency setup.
+# Lantern Keeper: GameManager is the only emitter of the gameplay signals below;
+# gameplay scripts report to GameManager and listen here.
 
 # ── Player ────────────────────────────────────────────────────────────────
-signal player_died
+signal player_died(cause: String)
 signal player_respawned
 signal score_changed(new_score: int)
 signal health_changed(new_health: int, max_health: int)
@@ -18,6 +20,20 @@ signal game_resumed
 signal game_over(reason: String)
 signal level_started(level_id: String)
 signal level_completed(level_id: String)
+
+signal game_state_changed(new_state: int)
+
+# ── Lantern Keeper: light, oil, darkness ─────────────────────────────────
+signal oil_changed(oil: float, max_oil: float)
+signal dark_meter_changed(ratio: float)
+signal dark_meter_emptied
+signal dark_meter_recovered
+signal lantern_place_requested
+signal lantern_placed(at: Vector3)
+signal lantern_picked_up
+signal platform_lost
+signal level_reset(checkpoint_serial: int)
+signal tutorial_hint_requested(hint_id: String)
 
 # ── Economy ───────────────────────────────────────────────────────────────
 signal coins_changed(new_amount: int)

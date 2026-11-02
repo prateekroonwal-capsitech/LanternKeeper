@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/LevelExit.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/props/exit_door.png" id="2_sprite"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_door"]
+size = Vector3(1, 2.2, 2)
+
+[node name="LevelExit" type="Area3D"]
+collision_layer = 32
+collision_mask = 2
+monitorable = false
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+shape = SubResource("BoxShape3D_door")
+
+[node name="Sprite" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.6)
+offset = Vector2(0, 128)
+pixel_size = 0.0105
+alpha_cut = 1
+texture_filter = 2
+texture = ExtResource("2_sprite")
+
+[node name="Light" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0.6)
+light_color = Color(0.45, 0.7, 1, 1)
+light_energy = 1.2
+omni_range = 3.0

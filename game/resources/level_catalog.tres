@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="LevelCatalog" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/resources/LevelCatalog.gd" id="1_catalog"]
+
+[resource]
+script = ExtResource("1_catalog")
+levels_per_world = 10
+world_names = PackedStringArray("Light", "Oil", "Shadows", "Mirrors")
+level_paths = PackedStringArray()
+test_level_path = "res://game/scenes/gameplay/levels/TestLevel.tscn"

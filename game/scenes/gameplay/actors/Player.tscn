@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/actors/Player.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/player/player_idle.png" id="2_sprite"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.32
+height = 1.55
+
+[node name="Player" type="CharacterBody3D" groups=["player"]]
+collision_layer = 2
+collision_mask = 5
+axis_lock_linear_z = true
+floor_max_angle = 0.959931
+floor_snap_length = 0.2
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.775, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Sprite" type="Sprite3D" parent="."]
+offset = Vector2(0, 96)
+pixel_size = 0.009
+alpha_cut = 1
+texture_filter = 2
+texture = ExtResource("2_sprite")

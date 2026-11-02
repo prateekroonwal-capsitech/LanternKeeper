@@ -1,0 +1,44 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://game/assets/materials/bg_sky.tres" id="1_sky"]
+[ext_resource type="Material" path="res://game/assets/materials/bg_far.tres" id="2_far"]
+[ext_resource type="Material" path="res://game/assets/materials/bg_mid.tres" id="3_mid"]
+[ext_resource type="Material" path="res://game/assets/materials/bg_near.tres" id="4_near"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_sky"]
+size = Vector2(500, 90)
+
+[sub_resource type="QuadMesh" id="QuadMesh_far"]
+size = Vector2(360, 30)
+
+[sub_resource type="QuadMesh" id="QuadMesh_mid"]
+size = Vector2(320, 20)
+
+[sub_resource type="QuadMesh" id="QuadMesh_near"]
+size = Vector2(288, 12)
+
+[node name="Backdrop" type="Node3D"]
+
+[node name="Sky" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 8, -60)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_sky")
+material_override = ExtResource("1_sky")
+
+[node name="FarLayer" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, -4, -40)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_far")
+material_override = ExtResource("2_far")
+
+[node name="MidLayer" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, -3.5, -22)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_mid")
+material_override = ExtResource("3_mid")
+
+[node name="NearLayer" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, -3, -10)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_near")
+material_override = ExtResource("4_near")

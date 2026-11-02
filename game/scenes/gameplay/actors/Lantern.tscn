@@ -1,0 +1,101 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/actors/Lantern.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/props/lantern.png" id="2_sprite"]
+[ext_resource type="Shader" path="res://game/assets/shaders/light_glow.gdshader" id="3_glow"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/fx/dust_mote.png" id="4_dust"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_body"]
+size = Vector3(0.4, 0.6, 0.4)
+
+[sub_resource type="QuadMesh" id="QuadMesh_glow"]
+size = Vector2(2, 2)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_glow"]
+resource_local_to_scene = true
+render_priority = -1
+shader = ExtResource("3_glow")
+shader_parameter/glow_color = Color(1, 0.6, 0.22, 1)
+shader_parameter/intensity = 0.55
+shader_parameter/falloff = 1.8
+shader_parameter/core_size = 0.12
+shader_parameter/core_intensity = 0.6
+shader_parameter/rim_width = 0.05
+shader_parameter/rim_intensity = 0.25
+shader_parameter/flicker = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dust"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(1, 0.75, 0.45, 1)
+albedo_texture = ExtResource("4_dust")
+billboard_mode = 3
+
+[sub_resource type="QuadMesh" id="QuadMesh_dust"]
+material = SubResource("StandardMaterial3D_dust")
+size = Vector2(0.07, 0.07)
+
+[sub_resource type="Gradient" id="Gradient_dust"]
+offsets = PackedFloat32Array(0, 0.2, 0.75, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.9, 1, 1, 1, 0.6, 1, 1, 1, 0)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_pickup"]
+radius = 0.7
+
+[node name="Lantern" type="CharacterBody3D"]
+collision_layer = 8
+collision_mask = 5
+axis_lock_linear_z = true
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+shape = SubResource("BoxShape3D_body")
+
+[node name="Sprite" type="Sprite3D" parent="."]
+offset = Vector2(0, 48)
+pixel_size = 0.007
+alpha_cut = 1
+texture_filter = 2
+texture = ExtResource("2_sprite")
+
+[node name="Light" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0.6)
+light_color = Color(1, 0.62, 0.28, 1)
+light_energy = 2.2
+omni_range = 5.6
+omni_attenuation = 1.2
+
+[node name="Glow" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, -1.5)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_glow")
+material_override = SubResource("ShaderMaterial_glow")
+
+[node name="Dust" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+amount = 28
+lifetime = 4.0
+preprocess = 4.0
+mesh = SubResource("QuadMesh_dust")
+emission_shape = 1
+emission_sphere_radius = 3.0
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, 0.04, 0)
+initial_velocity_min = 0.02
+initial_velocity_max = 0.15
+scale_amount_min = 0.6
+scale_amount_max = 1.4
+color_ramp = SubResource("Gradient_dust")
+
+[node name="PickupArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+shape = SubResource("SphereShape3D_pickup")

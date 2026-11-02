@@ -5,6 +5,7 @@
 
 [node name="Boot" type="Node"]
 script = ExtResource("1_boot")
+next_scene_path = "res://game/scenes/gameplay/levels/TestLevel.tscn"
 
 [node name="GameService" type="Node" parent="."]
 script = ExtResource("2_services")

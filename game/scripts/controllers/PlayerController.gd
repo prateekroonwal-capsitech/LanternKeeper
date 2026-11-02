@@ -61,7 +61,7 @@ func die() -> void:
 	if _logger:
 		_logger.info("Player died")
 	if _bus:
-		_bus.player_died.emit()
+		_bus.player_died.emit("unknown")
 
 # ── PDF §4: disable physics tick when player leaves the screen ────────────
 

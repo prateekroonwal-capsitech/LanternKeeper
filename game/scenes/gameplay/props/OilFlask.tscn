@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/OilFlask.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/props/oil_flask.png" id="2_sprite"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_pickup"]
+radius = 0.55
+
+[node name="OilFlask" type="Area3D"]
+collision_layer = 32
+collision_mask = 2
+monitorable = false
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_pickup")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Sprite" type="Sprite3D" parent="Visual"]
+pixel_size = 0.009
+alpha_cut = 1
+texture_filter = 2
+texture = ExtResource("2_sprite")
+
+[node name="Light" type="OmniLight3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5)
+light_color = Color(0.4, 0.65, 1, 1)
+light_energy = 0.8
+omni_range = 1.8

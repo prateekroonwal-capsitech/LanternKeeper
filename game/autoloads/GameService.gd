@@ -19,6 +19,11 @@ var network: NetworkManager
 var save: SaveManager
 var scene: SceneManager
 var ui: UIManager
+var input: InputManager
+var level: LevelManager
+var tutorial: TutorialManager
+
+const LEVEL_CATALOG_PATH := "res://game/resources/level_catalog.tres"
 
 func _ready() -> void:
 	# Persist composition root across scene transitions
@@ -79,6 +84,27 @@ func _ready() -> void:
 	ui.configure(logger, bus, audio, game)
 	add_child(ui)
 	
+	input = InputManager.new()
+	input.name = "InputManager"
+	input.configure(game)
+	add_child(input)
+	
+	level = LevelManager.new()
+	level.name = "LevelManager"
+	level.configure(logger, scene, save, LEVEL_CATALOG_PATH)
+	add_child(level)
+	
+	tutorial = TutorialManager.new()
+	tutorial.name = "TutorialManager"
+	tutorial.configure(logger, bus, save)
+	add_child(tutorial)
+	
+	# GameManager is the hub: it holds a reference to every other manager.
+	game.register_managers({
+		"audio": audio, "ui": ui, "save": save, "scene": scene, "haptics": haptics,
+		"input": input, "level": level, "tutorial": tutorial,
+	})
+	
 	_register_services()
 	logger.info("GameService initialized")
 
@@ -96,6 +122,9 @@ func _register_services() -> void:
 	registry.register(&"save", save)
 	registry.register(&"scene", scene)
 	registry.register(&"ui", ui)
+	registry.register(&"input", input)
+	registry.register(&"level", level)
+	registry.register(&"tutorial", tutorial)
 
 func _instantiate_and_add(script_path: String, node_name: String) -> Node:
 	var script = load(script_path)
