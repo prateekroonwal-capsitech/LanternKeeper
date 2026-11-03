@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/CollapsingPlatform.gd" id="1_script"]
+[ext_resource type="Material" path="res://game/assets/materials/platform_cracked.tres" id="2_mat"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_body"]
+resource_local_to_scene = true
+size = Vector3(3, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_feet"]
+resource_local_to_scene = true
+size = Vector3(2.9, 0.3, 2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_unit"]
+size = Vector3(1, 1, 1)
+
+[node name="CollapsingPlatform" type="StaticBody3D"]
+collision_mask = 0
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_body")
+
+[node name="Visual" type="MeshInstance3D" parent="."]
+transform = Transform3D(3, 0, 0, 0, 0.4, 0, 0, 0, 2, 0, 0, 0)
+mesh = SubResource("BoxMesh_unit")
+material_override = ExtResource("2_mat")
+
+[node name="FeetCheck" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FeetCheck"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+shape = SubResource("BoxShape3D_feet")

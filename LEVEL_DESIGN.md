@@ -11,14 +11,14 @@ Status legend — **Solvable**: completed end-to-end by the route bot in the run
 |---|---|---|---|
 | 1 | First Light | Solvable | route bot PASS (12.4 s) |
 | 2 | Leave It Behind | Solvable | route bot PASS (7.5 s) |
-| 3 | Cracks (rebuilt) | Solvable | proof bot PASS — intended solution + death path |
+| 3 | Cracks (Prompt 4, easy) | Solvable | proof bot PASS — exit in 13 s; dark death; shortcut blocked |
 | 4 | The Lid | Solvable | route bot PASS (11.1 s) |
 | 5 | Ceiling (rebuilt) | Solvable | proof bot PASS — intended solution + 2 shortcuts blocked |
 | 6 | The Lift (remade) | Solvable | proof bot PASS — solution, 2 shortcuts blocked, falling behind kills |
-| 7 | Followed (remade) | Solvable | proof bot PASS — solution, shortcut blocked, dawdling kills |
+| 7 | Followed (Prompt 4, medium) | Solvable | proof bot PASS — exit in 23 s; 60 % of dark meter used; hesitating kills; shortcut blocked |
 | 8 | Lost Light | Solvable | route bot PASS (13.2 s) |
 | 9 | Holes (remade) | Solvable | proof bot PASS — solution, carrying the lantern can't grab the rope |
-| 10 | The Dark Tide (Big Shadow chase) | Solvable | route bot PASS (18.4 s) |
+| 10 | The Chase (Prompt 4, hard) | Solvable | proof bot PASS — exit in 62.5 s, shadow ≥ 11 m behind; resets on death; hesitating kills |
 
 All 10 levels are solvable. Levels 3, 5, 6, 7 and 9 follow the remake brief; levels 1, 2,
 4, 8 and 10 are still the original Phase 5 layouts (solvable, not yet reworked to the brief).
@@ -39,21 +39,22 @@ All 10 levels are solvable. Levels 3, 5, 6, 7 and 9 follow the remake brief; lev
 - Shortcut check: the wall reaches the ceiling (no jump over it).
 - Soft-lock check: placing the lantern too close keeps the wall solid — walk back, pick it up, retry.
 
-## 1-3 Cracks (rebuilt) — crawlers; hang the lantern to open the gate
-1. A crawler bursts from a floor crack at x 9 — it meets the carried light, freezes, hisses
-   and slips back into its crack (lesson: light protects you).
-2. At the hook (x 15) set the lantern down: it **hangs on the hook** and the gate (x 24)
-   slides open. Hanging it also wakes two crawlers in the cracks before the gate.
-3. Take the lantern back off the hook (step out of reach, walk back in). The gate stays open
-   for 3 s, then shuts.
-4. Walk through the gate carrying the light — the crawlers can't come near.
-5. Cross the ghost bridge (needs the light), carry the light past two more crawlers, exit.
-- Shortcut checks: the gate reaches the ceiling (no jump over); the gate only opens while the
-  lantern hangs; going through without the lantern → crawlers catch you in the dark
-  (proof log: woke → emerged → hunt → telegraph → caught), and the bridge beyond needs light.
-- Soft-lock checks: gate shut before you reached it → hang the lantern again; went through
-  without the lantern → the gate stays open while it hangs, walk back for it; death → respawn
-  at the shrine with the lantern state from that checkpoint, gate closed, crawlers dormant.
+## 1-3 Cracks — Crawler introduction (EASY) — *Prompt 4 design*
+**Idea:** crawlers live in the dark; the lantern keeps you safe.
+**Layout:** a shrine right before a gate; a hook beside the gate; one crawler crack at the
+foot of the gate wall on each side. The lantern's light is generous here (radius 5.5 m).
+**Solution:**
+1. Touch the shrine (x 11).
+2. Set the lantern down at the hook (x 15) — it hangs, and the gate (x 21) slides open.
+3. The crawlers wake (hint: "Stay in the light"). Stay by the hook, inside its light: the near
+   crawler freezes at the light's edge and slips back into its crack; the far one stops at the edge.
+4. Wait for the gate to finish opening, take the lantern back (step out of reach, walk back in).
+5. Walk through the gate carrying it (≈ 1.2 s); the crawlers freeze and retreat. Exit at x 36.
+**Difficulty:** easy — no dark walking on the intended path; the shrine is 4 m from the hook;
+the gate stays open 3 s after you take the lantern (1.2 s needed).
+**Soft-lock checks:** gate shut before you reached it → hang the lantern again; walked through
+without the lantern → the crawlers catch you in the dark (respawn at the shrine, lantern in
+hand, gate shut, crawlers dormant); no pits; level ends sealed by walls; gate reaches the ceiling.
 
 ## 1-4 The Lid — light the climb, not the lid
 1. Enter the shaft, climb the first ghost step to the solid shelf, set the lantern on the shelf.
@@ -94,17 +95,24 @@ All 10 levels are solvable. Levels 3, 5, 6, 7 and 9 follow the remake brief; lev
 - Soft-lock checks: falling behind → death → respawn at the shrine with the lantern in hand
   and the cradle back at its start. Stones are 2.5 m wide with 2 m gaps (touch-friendly).
 
-## 1-7 Followed (remade) — the light stays on a switch; the Stalker follows
-1. Set the lantern on the **switch** (x 8): it holds the gate (x 16) open — and wakes the
-   Stalker behind you.
-2. Run the long dark stretch to the shrine (x 30). This shrine is a **sanctuary**: a small
-   light the Stalker can't enter, where the dark meter refills.
-3. Leave and keep running — two pit jumps — to the exit. Linger in the dark and the vignette
-   closes in and the Stalker catches you.
-- Shortcut checks: carrying the light through the gate → shut (the gate only opens while the
-  lantern sits on the switch; taking it off shuts the gate long before you reach it).
-- Soft-lock checks: the lantern stays behind by design (the level ends in the dark); death →
-  respawn at the sanctuary with the lantern still on its switch and the gate open.
+## 1-7 Followed — Stalker introduction (MEDIUM) — *Prompt 4 design*
+**Idea:** leave the light behind, with something that punishes you for being away from it.
+**Layout:** shrine → switch plate → 22 m of dark floor → door → sanctuary shrine + lever →
+the switch's chain carries the lantern through the door to you → two pit jumps → exit.
+**Solution:**
+1. Touch the first shrine (x −2). Set the lantern on the switch (x 4): the door (x 26) opens,
+   and the Stalker wakes behind you (hint: "Something follows. Keep moving").
+2. Walk straight to the door (≈ 4.2 s — about 70 % of the 6 s dark meter). The Stalker follows.
+3. Through the door is a shrine with a small sanctuary light (radius 2.8 m) the Stalker can't
+   enter. Walk into the lever (x 33): the switch rides its chain through the open door and
+   delivers the lantern to you (4 s).
+4. Take the lantern and carry it over the two pits to the exit (x 76). The Stalker can't come close.
+**Difficulty:** medium — a direct walk leaves ≈ 1.8 s of dark meter to spare; hesitating
+empties it, the Stalker speeds up and catches you. No route ever leads back past the Stalker.
+**Soft-lock checks:** the lever is only reachable through the door, i.e. while the lantern sits
+on the switch, so pulling it always delivers the lantern; take the lantern off the switch early
+→ the door shuts on your side (place it again); death → respawn at the last shrine with the
+switch/chain/lever state of that checkpoint; pits have kill zones; bounds sealed.
 
 ## 1-9 Holes (remade) — seal two holes, swing past the third
 1. A **rope** hangs over a wide pit. It takes both hands — you can't grab it while carrying
@@ -123,8 +131,23 @@ All 10 levels are solvable. Levels 3, 5, 6, 7 and 9 follow the remake brief; lev
 2. Pick it up; cross the ghost bridges it lights.
 3. Drop to the floor; set the lantern down ≥ 4.5 m before the ghost wall; walk through.
 
-## 1-10 The Dark Tide — Big Shadow chase
-1. The Big Shadow wakes behind you — keep moving; carry the light over the ghost floors.
-2. Shrine mid-way (the Big Shadow restarts behind it after a death).
-3. Final ghost wall: set the lantern down and run through to the exit.
-- Note: the Big Shadow ignores light; it can only be outrun.
+## 1-10 The Chase — final test of World 1 (HARD but fair) — *Prompt 4 design*
+**Idea:** everything learned, under pressure: carry the light, read ghost paths, keep moving.
+**Layout:** three ≈ 20 s segments, each ending at a shrine. The Big Shadow wakes behind you
+(hint: "Run") and chases at 4.6 m/s — slower than the child's 5.2 m/s run, so a clean run
+always escapes. Ghost bridges and ghost stepping stones appear in the carried light as you
+reach them; cracked plank bridges collapse 0.5 s after you step on them (so you can't stop on
+them). At the end, the exit gate opens only while the lantern sits on its plate.
+**Solution:**
+1. Run right; hop the gaps; cross ghost bridges and stones in your own light.
+2. Cross each cracked plank bridge without stopping.
+3. Shrines at x 2, 104 and 206 (≈ every 20 s). After a death the Big Shadow restarts 12 m
+   behind the shrine and waits 1 s; collapsed planks and ghost paths reset to the checkpoint.
+4. Final segment: set the lantern on the exit plate (x 292) — the gate (x 295) opens — walk
+   through to the exit (x 300).
+**Difficulty:** hard — no stopping on planks, chained jumps, and the shadow closes in if you
+hesitate; every hazard is on screen ≈ 8 m before you reach it; all jumps ≤ 2.4 m (touch-friendly).
+**Soft-lock checks:** every pit has a kill zone; the lantern never leaves your hand until the
+exit plate (placed there, the gate opens; take it back and it shuts — place it again); planks
+reset with checkpoints; bounds sealed by walls.
+

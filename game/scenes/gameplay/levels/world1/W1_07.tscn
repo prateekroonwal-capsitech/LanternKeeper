@@ -23,6 +23,9 @@
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/SwarmMite.tscn" id="mite"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_a.png" id="tree_a"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_rocks.png" id="rocks"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/CollapsingPlatform.tscn" id="collapse"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/BigShadow.tscn" id="big"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="hint"]
 
 [node name="W1_07" type="Node3D" node_paths=PackedStringArray("spawn_point")]
 script = ExtResource("level")
@@ -63,48 +66,55 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 5, 0)
 size = Vector2(2, 18)
 
 [node name="Floor" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, -2, 0)
-size = Vector2(54, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, -2, 0)
+size = Vector2(58, 4)
 
-[node name="GateCeiling" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 6, 0)
+[node name="DoorCeiling" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 6, 0)
 size = Vector2(4, 6)
 
 [node name="FloorMid" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.5, -2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.5, -2, 0)
 size = Vector2(15, 4)
 
 [node name="FloorEnd" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70.5, -2, 0)
-size = Vector2(19, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 72.5, -2, 0)
+size = Vector2(15, 4)
 
 [node name="WallRight" parent="Geometry" instance=ExtResource("platform")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 81, 5, 0)
 size = Vector2(2, 18)
 
 [node name="Shrine1" parent="." instance=ExtResource("shrine")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
 
 [node name="Shrine2" parent="." instance=ExtResource("shrine")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0, 0)
 sanctuary_radius = 2.8
 
 [node name="Switch" parent="." instance=ExtResource("plate")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
 hook_id = &"plate7"
 wake_group_on_hang = &"stalk7"
+lever_id = &"lever7"
+travel_offset = Vector3(27.5, 0, 0)
+travel_time = 4.0
 
-[node name="Gate" parent="." instance=ExtResource("gate")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 0)
+[node name="Door" parent="." instance=ExtResource("gate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 0, 0)
 hook_id = &"plate7"
 close_delay = 0.4
 close_time = 0.4
+
+[node name="Lever" parent="." instance=ExtResource("lever")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 0, 0)
+lever_id = &"lever7"
 
 [node name="Stalker" parent="." instance=ExtResource("stalker")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 1, 0)
 wake_group = &"stalk7"
 
-[node name="tree_a_11" type="Sprite3D" parent="Decor"]
+[node name="tree_a_12" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -0.8)
 offset = Vector2(0, 256)
 pixel_size = 0.01
@@ -112,15 +122,15 @@ alpha_cut = 1
 texture_filter = 3
 texture = ExtResource("tree_a")
 
-[node name="rocks_12" type="Sprite3D" parent="Decor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0, -0.8)
+[node name="rocks_13" type="Sprite3D" parent="Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 0, -0.8)
 offset = Vector2(0, 48)
 pixel_size = 0.01
 alpha_cut = 1
 texture_filter = 3
 texture = ExtResource("rocks")
 
-[node name="tree_a_13" type="Sprite3D" parent="Decor"]
+[node name="tree_a_14" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, 0, -0.8)
 offset = Vector2(0, 256)
 pixel_size = 0.01

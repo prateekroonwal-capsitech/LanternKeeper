@@ -17,8 +17,15 @@
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Crawler.tscn" id="crawler"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Dropper.tscn" id="dropper"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/WakeTrigger.tscn" id="wake"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Rope.tscn" id="rope"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LanternPlate.tscn" id="plate"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Stalker.tscn" id="stalker"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/SwarmMite.tscn" id="mite"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_a.png" id="tree_a"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_rocks.png" id="rocks"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/CollapsingPlatform.tscn" id="collapse"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/BigShadow.tscn" id="big"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="hint"]
 
 [node name="W1_03" type="Node3D" node_paths=PackedStringArray("spawn_point")]
 script = ExtResource("level")
@@ -36,19 +43,20 @@ environment = ExtResource("env")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -56, 0, 0)
 
 [node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.2, 14)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.2, 14)
 current = true
 fov = 45.0
 script = ExtResource("camera")
 
 [node name="SpawnPoint" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.05, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.05, 0)
 
 [node name="Player" parent="." instance=ExtResource("player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.05, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.05, 0)
 
 [node name="Lantern" parent="." instance=ExtResource("lantern")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.865, 0.6, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.865, 0.6, 0.06)
+base_radius = 5.5
 
 [node name="Geometry" type="Node3D" parent="."]
 
@@ -59,39 +67,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 5, 0)
 size = Vector2(2, 18)
 
 [node name="Floor" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, -2, 0)
-size = Vector2(45, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, -2, 0)
+size = Vector2(54, 4)
 
 [node name="GateCeiling" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 6, 0)
-size = Vector2(10, 6)
-
-[node name="Bridge" parent="Geometry" instance=ExtResource("ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, -0.2, 0)
-size = Vector2(6, 0.4)
-
-[node name="FloorFar" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.5, -2, 0)
-size = Vector2(27, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, 6, 0)
+size = Vector2(8, 6)
 
 [node name="WallRight" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 65, 5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41, 5, 0)
 size = Vector2(2, 18)
 
 [node name="Shrine1" parent="." instance=ExtResource("shrine")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
-
-[node name="Shrine2" parent="." instance=ExtResource("shrine")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 0)
-
-[node name="CrawlerIntro" parent="." instance=ExtResource("crawler")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, -0.6, 0)
-wake_group = &"intro"
-emerge_offset = Vector3(0, 0.65, 0)
-
-[node name="WakeIntro" parent="." instance=ExtResource("wake")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
-wake_group = &"intro"
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 0)
 
 [node name="GateHook" parent="." instance=ExtResource("hook")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 0)
@@ -99,35 +87,21 @@ hook_id = &"gate3"
 wake_group_on_hang = &"gate_crawlers"
 
 [node name="Gate" parent="." instance=ExtResource("gate")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 0, 0)
 hook_id = &"gate3"
 close_delay = 3.0
 
-[node name="CrawlerGateA" parent="." instance=ExtResource("crawler")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, -0.6, 0)
+[node name="CrawlerLeft" parent="." instance=ExtResource("crawler")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.6, -0.6, 0)
 wake_group = &"gate_crawlers"
 emerge_offset = Vector3(0, 0.65, 0)
 
-[node name="CrawlerGateB" parent="." instance=ExtResource("crawler")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.8, -0.6, 0)
+[node name="CrawlerRight" parent="." instance=ExtResource("crawler")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.4, -0.6, 0)
 wake_group = &"gate_crawlers"
 emerge_offset = Vector3(0, 0.65, 0)
 
-[node name="CrawlerFarA" parent="." instance=ExtResource("crawler")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, -0.6, 0)
-wake_group = &"far"
-emerge_offset = Vector3(0, 0.65, 0)
-
-[node name="CrawlerFarB" parent="." instance=ExtResource("crawler")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 53, -0.6, 0)
-wake_group = &"far"
-emerge_offset = Vector3(0, 0.65, 0)
-
-[node name="WakeFar" parent="." instance=ExtResource("wake")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 0, 0)
-wake_group = &"far"
-
-[node name="tree_a_17" type="Sprite3D" parent="Decor"]
+[node name="tree_a_9" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -0.8)
 offset = Vector2(0, 256)
 pixel_size = 0.01
@@ -135,25 +109,17 @@ alpha_cut = 1
 texture_filter = 3
 texture = ExtResource("tree_a")
 
-[node name="rocks_18" type="Sprite3D" parent="Decor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, 0, -0.8)
+[node name="rocks_10" type="Sprite3D" parent="Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 0, -0.8)
 offset = Vector2(0, 48)
 pixel_size = 0.01
 alpha_cut = 1
 texture_filter = 3
 texture = ExtResource("rocks")
 
-[node name="tree_a_19" type="Sprite3D" parent="Decor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57, 0, -0.8)
-offset = Vector2(0, 256)
-pixel_size = 0.01
-alpha_cut = 1
-texture_filter = 3
-texture = ExtResource("tree_a")
-
 [node name="KillZone" parent="." instance=ExtResource("kill")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, -14, 0)
-size = Vector3(122, 4, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, -14, 0)
+size = Vector3(98, 4, 4)
 
 [node name="LevelExit" parent="." instance=ExtResource("exit")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0, 0)

@@ -457,3 +457,28 @@ def plate() -> None:
 
 
 plate()
+
+
+def cracked_planks() -> None:
+    w = h = 256
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    r = random.Random(9)
+    for row in range(4):                                   # four rows of planks (tileable)
+        y = row * 64
+        base = 30 + r.randint(-4, 4)
+        d.rectangle((0, y, w, y + 64), fill=(base, base - 6, base - 12, 255))
+        d.line((0, y, w, y), fill=(8, 6, 6, 255), width=4)
+        for x in (r.randint(40, 110), r.randint(150, 220)):   # plank joints
+            d.line((x, y, x, y + 64), fill=(8, 6, 6, 255), width=3)
+        for _ in range(3):                                   # pale cracks: reads as "fragile"
+            cx, cy = r.randint(0, w), y + r.randint(8, 56)
+            pts = [(cx, cy)]
+            for _ in range(5):
+                cx += r.randint(6, 18); cy += r.randint(-6, 6)
+                pts.append((cx, cy))
+            d.line(pts, fill=(120, 105, 90, 255), width=2)
+    save(img, "single/environment/platform_cracked.png")
+
+
+cracked_planks()
