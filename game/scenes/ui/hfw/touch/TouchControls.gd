@@ -5,14 +5,15 @@ extends UIController
 ##
 ## Gestures layout (default):
 ##   left half  — drag: floating joystick appears where the thumb lands
-##   right half — tap: jump (on release) · swipe up: jump (the moment the swipe is long
-##   enough) · swipe down: place lantern · hold: raise the light. One touch gives at most
-##   one jump.
+##   right half — swipe up: jump (releasing early cuts jump height, keeping finger down gives full height)
+##              · hold still: raise the light (releasing lowers the light)
+##              · swipe down: place lantern
+##              · plain tap: does nothing
 ## Classic layout: visible TouchScreenButtons that press the InputMap actions directly.
 ## Lantern pick-up is automatic, so there is no button for it.
 ##
 ## Sends: InputManager (via GameManager.input) set_virtual_axis, trigger_virtual_jump,
-##   trigger_virtual_place, set_virtual_raise.
+##   set_virtual_jump_held, trigger_virtual_place, set_virtual_raise.
 ## Receives: GameBus.game_state_changed, GameBus.control_layout_changed.
 
 @export_group("Joystick")
@@ -21,18 +22,18 @@ extends UIController
 @export_range(0.0, 0.9) var joystick_deadzone: float = 0.2
 
 @export_group("Right-half gestures")
-## A touch released before this many seconds (without swiping) is a jump tap;
-## a touch held longer becomes "raise the light".
-@export var hold_time: float = 0.35
-## Movement (px) allowed before a tap stops counting as a tap.
-@export var tap_max_distance: float = 70.0
-## Downward travel (px) that counts as a swipe.
-@export var swipe_min_distance: float = 90.0
-@export var swipe_max_time: float = 0.4
-## Upward travel (px) that counts as a swipe-up jump…
-@export var swipe_up_min_distance: float = 60.0
-## …if reached within this many seconds of touching down.
-@export var swipe_up_max_time: float = 0.25
+## Upward travel (px) that counts as a swipe-up jump.
+@export var swipe_min_distance: float = 60.0
+## Maximum time (seconds) to reach swipe_min_distance for a swipe-up jump.
+@export var swipe_max_time: float = 0.25
+## Finger down and not moving for this many seconds raises the light.
+@export var hold_time: float = 0.3
+## Maximum movement (px) from touch start allowed to qualify as holding still.
+@export var hold_move_tolerance: float = 20.0
+## Downward travel (px) that counts as placing the lantern.
+@export var swipe_down_min_distance: float = 90.0
+## Maximum time (seconds) to reach swipe_down_min_distance for placing.
+@export var swipe_down_max_time: float = 0.4
 
 @export_group("Layout")
 ## Touches that start in this many px from the top belong to HUD buttons (pause).
@@ -40,7 +41,14 @@ extends UIController
 ## Show the controls with a mouse too (for testing on PC).
 @export var show_without_touchscreen: bool = false
 
-enum RightMode { NONE, PENDING, HOLD, SWIPED, JUMPED }
+enum RightMode {
+	NONE,      # No touch active
+	PENDING,   # Touch down, waiting to see if it moves (swipe) or holds still
+	HOLD,      # Held still for hold_time -> raise light active
+	SWIPED,    # Swiped down -> lantern placed
+	JUMPED,    # Swiped up -> jump triggered and held
+	INVALID    # Moved beyond hold_move_tolerance but did not match swipe -> plain drag, does nothing
+}
 
 @onready var _gestures: Control = $Gestures
 @onready var _joystick: Control = $Gestures/Joystick
@@ -52,6 +60,7 @@ var _left_origin: Vector2
 var _right_index: int = -1
 var _right_start: Vector2
 var _right_time: float = 0.0
+var _right_max_drift: float = 0.0
 var _right_mode: RightMode = RightMode.NONE
 
 func _on_ready() -> void:
@@ -95,13 +104,23 @@ func _on_touch(e: InputEventScreenTouch) -> void:
 			_right_index = e.index
 			_right_start = e.position
 			_right_time = 0.0
+			_right_max_drift = 0.0
 			_right_mode = RightMode.PENDING
 	else:
 		if e.index == _left_index:
 			_release_left()
 		elif e.index == _right_index:
-			if _right_mode == RightMode.PENDING and e.position.distance_to(_right_start) <= tap_max_distance:
-				_game_manager.input.trigger_virtual_jump()
+			# Fast flick check on release if still pending
+			if _right_mode == RightMode.PENDING:
+				var d := e.position - _right_start
+				if -d.y >= swipe_min_distance and absf(d.y) > absf(d.x) and _right_time <= swipe_max_time:
+					# Quick flick up: trigger jump (immediately released -> small jump)
+					_right_mode = RightMode.JUMPED
+					_game_manager.input.trigger_virtual_jump()
+				elif d.y >= swipe_down_min_distance and absf(d.y) > absf(d.x) and _right_time <= swipe_down_max_time:
+					_right_mode = RightMode.SWIPED
+					_game_manager.input.trigger_virtual_place()
+				# Note: plain tap does nothing!
 			_release_right()
 
 func _on_drag(e: InputEventScreenDrag) -> void:
@@ -114,17 +133,35 @@ func _on_drag(e: InputEventScreenDrag) -> void:
 		_game_manager.input.set_virtual_axis(axis)
 	elif e.index == _right_index and _right_mode == RightMode.PENDING:
 		var d := e.position - _right_start
-		if d.y >= swipe_min_distance and absf(d.y) > absf(d.x) and _right_time <= swipe_max_time:
+		var dist := d.length()
+		_right_max_drift = maxf(_right_max_drift, dist)
+
+		# 1. Swipe up = Jump (as soon as moved up >= 60px within 0.25s, mostly vertically)
+		if -d.y >= swipe_min_distance and absf(d.y) > absf(d.x) and _right_time <= swipe_max_time:
+			_right_mode = RightMode.JUMPED
+			_game_manager.input.trigger_virtual_jump()
+			_game_manager.input.set_virtual_jump_held(true)
+			return
+
+		# 2. Swipe down = Place lantern (>= 90px within 0.4s, mostly vertically)
+		if d.y >= swipe_down_min_distance and absf(d.y) > absf(d.x) and _right_time <= swipe_down_max_time:
 			_right_mode = RightMode.SWIPED
 			_game_manager.input.trigger_virtual_place()
-		elif -d.y >= swipe_up_min_distance and absf(d.y) > absf(d.x) and _right_time <= swipe_up_max_time:
-			_right_mode = RightMode.JUMPED      # this touch is a jump now: its release won't tap-jump
-			_game_manager.input.trigger_virtual_jump()
+			return
 
 func _process(delta: float) -> void:
 	if _right_mode != RightMode.PENDING:
 		return
 	_right_time += delta
+
+	# If the touch has moved beyond tolerance, it can never become HOLD
+	if _right_max_drift > hold_move_tolerance:
+		# If time has also exceeded swipe windows, invalidate this touch completely
+		if _right_time > maxf(swipe_max_time, swipe_down_max_time):
+			_right_mode = RightMode.INVALID
+		return
+
+	# 3. Hold still = Raise light (not moving under 20px for 0.3s)
 	if _right_time >= hold_time:
 		_right_mode = RightMode.HOLD
 		_game_manager.input.set_virtual_raise(true)
@@ -137,6 +174,8 @@ func _release_left() -> void:
 func _release_right() -> void:
 	if _right_mode == RightMode.HOLD:
 		_game_manager.input.set_virtual_raise(false)
+	elif _right_mode == RightMode.JUMPED:
+		_game_manager.input.set_virtual_jump_held(false)
 	_right_index = -1
 	_right_mode = RightMode.NONE
 
