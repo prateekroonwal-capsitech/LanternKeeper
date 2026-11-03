@@ -183,9 +183,19 @@ func return_to_hand() -> void:
 
 func _physics_process(delta: float) -> void:
 	_appear = move_toward(_appear, 1.0, delta / maxf(appear_time, 0.01))
-	if _game.is_playing():
+	if _game and _game.is_playing():
 		_simulate(delta)
+	elif _game:
+		_simulate_menu(delta)
 	_update_transforms()
+
+func _simulate_menu(delta: float) -> void:
+	_radius = base_radius
+	if carried:
+		global_position = _hand_position()
+		var sway_target := sin(_time * 2.2) * 0.04
+		_sway = lerpf(_sway, sway_target, 1.0 - exp(-sway_speed * delta))
+		rotation.z = _sway
 
 func _simulate(delta: float) -> void:
 	var oil_ratio := _game.get_oil_ratio()

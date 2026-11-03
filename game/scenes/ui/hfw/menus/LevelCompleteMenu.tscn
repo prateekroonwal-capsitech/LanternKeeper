@@ -35,7 +35,7 @@ layout_mode = 2
 
 [node name="Column" type="VBoxContainer" parent="Center/Panel"]
 layout_mode = 2
-theme_override_constants/separation = 22
+theme_override_constants/separation = 16
 
 [node name="Title" type="Label" parent="Center/Panel/Column"]
 layout_mode = 2
@@ -44,23 +44,23 @@ text = "COMPLETE_TITLE"
 horizontal_alignment = 1
 
 [node name="Gap" type="Control" parent="Center/Panel/Column"]
-custom_minimum_size = Vector2(0, 8)
+custom_minimum_size = Vector2(0, 6)
 layout_mode = 2
 
 [node name="NextButton" type="Button" parent="Center/Panel/Column"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(560, 100)
+custom_minimum_size = Vector2(520, 88)
 layout_mode = 2
 text = "COMPLETE_NEXT"
 
 [node name="ReplayButton" type="Button" parent="Center/Panel/Column"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(560, 100)
+custom_minimum_size = Vector2(520, 88)
 layout_mode = 2
 text = "COMPLETE_REPLAY"
 
 [node name="LevelsButton" type="Button" parent="Center/Panel/Column"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(560, 100)
+custom_minimum_size = Vector2(520, 88)
 layout_mode = 2
 text = "COMPLETE_LEVELS"

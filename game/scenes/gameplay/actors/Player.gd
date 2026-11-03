@@ -232,6 +232,8 @@ func _update_visual(delta: float) -> void:
 		_body.speed_scale = 1.0
 
 func _pick_animation() -> StringName:
+	if _game and not _game.is_playing():
+		return &"idle_carry" if _game.is_lantern_carried() else &"idle"
 	if _dead_pose:
 		return &"death"
 	if _respawn_timer > 0.0:
