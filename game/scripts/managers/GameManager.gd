@@ -20,7 +20,7 @@ extends Node
 ##   report_platform_lost()                                     — GhostPlatform
 ##   report_player_died(cause)                                  — KillZone, Shadow
 ##   report_shrine_reached(shrine)                              — Shrine
-##   report_level_exit_reached()                                — LevelExit
+##   report_level_exit_reached(menu_delay)                      — ExitPortal
 ##   report_lantern_lost()                                      — Lantern (fell into a pit)
 ##   report_enemy_woke(enemy) / report_enemy_repelled(enemy) /
 ##   report_player_caught(enemy) / report_wake_trigger(group)   — enemies, WakeTrigger
@@ -222,7 +222,9 @@ func report_level_unloaded(level_root: LevelRoot) -> void:
 	_set_heartbeat(0.0)
 	state = State.MENU
 
-func report_level_exit_reached() -> void:
+## `menu_delay`: seconds before the level-complete screen opens (the ExitPortal passes the
+## length of its pull-in / flash / fade sequence).
+func report_level_exit_reached(menu_delay: float = _LEVEL_COMPLETE_DELAY) -> void:
 	if state != State.PLAYING:
 		return
 	state = State.LEVEL_COMPLETE
@@ -235,7 +237,7 @@ func report_level_exit_reached() -> void:
 		audio.play_event(&"level_complete")
 	if bus:
 		bus.level_completed.emit(current_level_id)
-	await get_tree().create_timer(_LEVEL_COMPLETE_DELAY).timeout
+	await get_tree().create_timer(menu_delay).timeout
 	if state == State.LEVEL_COMPLETE and ui:
 		ui.open_menu(&"LevelComplete")
 

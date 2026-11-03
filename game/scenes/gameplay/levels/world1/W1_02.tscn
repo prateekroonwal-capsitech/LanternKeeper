@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="7_platform"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/GhostPlatform.tscn" id="8_ghost"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="9_kill"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LevelExit.tscn" id="10_exit"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/ExitPortal.tscn" id="10_exit"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Shrine.tscn" id="11_shrine"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="12_hint"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/BigShadow.tscn" id="13_tide"]
@@ -134,5 +134,5 @@ texture = ExtResource("14_tree_a")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, -14, 0)
 size = Vector3(108, 4, 4)
 
-[node name="LevelExit" parent="." instance=ExtResource("10_exit")]
+[node name="ExitPortal" parent="." instance=ExtResource("10_exit")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 0, 0)

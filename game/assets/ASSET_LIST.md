@@ -91,7 +91,7 @@ Located in `game/assets/sprites/single/` and `game/assets/sprites/backgrounds/`.
 | `sprites/single/props/lantern_body.png` | 64 × 96 | `Lantern.tscn` body art | Transparent. Top handle, frame cap, cage bars, and base. |
 | `sprites/single/props/lantern_glow.png` | 64 × 96 | `Lantern.tscn` glass / flame core | Transparent. Bright amber unshaded glass and luminous flame core. |
 | `sprites/single/props/oil_flask.png` | 64 × 64 | `OilFlask.tscn` → Visual/Sprite (`pixel_size` 0.009) | Transparent, centred pivot. Cold blue. |
-| `sprites/single/props/exit_door.png` | 128 × 256 | `LevelExit.tscn` → Sprite (`pixel_size` 0.0105) | Transparent. Pivot bottom-centre, offset (0, 128). |
+| `sprites/single/props/exit_door.png` | 128 × 256 | `ExitPortal.tscn` → Sprite (`pixel_size` 0.0105) | Transparent. Pivot bottom-centre, offset (0, 128). |
 | `sprites/single/environment/platform_stone.png` | 256 × 256 | `materials/platform_stone.tres` (all solid platforms) | Opaque, **must tile** both ways. Mapped world-triplanar, 2 m per tile. Dark silhouette stone. |
 | `sprites/single/environment/ghost_platform.png` | 256 × 64 | `GhostPlatform.tscn` shader `albedo_texture` | Semi-transparent, **must tile**. Tinted by shader `solid_color` when lit. |
 | `sprites/single/fx/dust_mote.png` | 16 × 16 | `Lantern.tscn` → Dust particles | Soft white dot on transparent; tinted amber by material. |
@@ -178,6 +178,7 @@ Localization; it then appears in Settings → Language automatically.
 | `shaders/dark_overlay.gdshader` | `HUD.tscn` → DarkOverlay | Full-screen canvas_item vignette + desaturation driven by `darkness` (0..1) from `HUD.gd`. Vignette closes in and colours drain to grey as the dark meter empties. |
 | `shaders/light_glow.gdshader` | `Lantern.tscn` → Glow | Additive radial halo. Rim marks the gameplay light radius. Params: colour, intensity, falloff, core, rim, flicker. |
 | `shaders/enemy_silhouette.gdshader` + `materials/enemy_silhouette.tres` | Every enemy → Visual/Body | Dark body, cool rim light (width in screen pixels), red-channel detail lines. `EnemyVisual` feeds the current frame into `albedo_texture`. |
+| `shaders/exit_swirl.gdshader` | `ExitPortal.tscn` → Swirl | Additive spiral in the door opening; `collapse` (0..1) is driven during the pull-in (tightens, speeds up, brightens). |
 | `shaders/ghost_platform.gdshader` | `GhostPlatform.tscn` → Visual | `solidity` (runtime), solid look (texture, colour, shimmer) and dark look (outline colour/alpha/width, dash length/speed). |
 | `materials/world_environment.tres` | Every level's WorldEnvironment | Near-black background, low cold ambient, glow on. |
 | `materials/platform_stone.tres` | `Platform.tscn` | Triplanar stone. |
