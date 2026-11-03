@@ -1,18 +1,19 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://game/scenes/gameplay/enemies/Dropper.gd" id="script"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/enemies/EnemyVisual.gd" id="visual_script"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/enemy_eyes.png" id="eyes"]
-[ext_resource type="SpriteFrames" path="res://game/assets/sprites/enemies/dropper_frames.tres" id="frames"]
+[ext_resource type="SpriteFrames" path="res://game/assets/sprites/enemies/dropper/dropper_frames.tres" id="frames"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/lair_hole.png" id="hole"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/thread.png" id="thread"]
 [ext_resource type="Material" path="res://game/assets/materials/enemy_silhouette.tres" id="mat"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/fx/dust_mote.png" id="dust"]
 
 [sub_resource type="SphereShape3D" id="shape"]
-radius = 0.35
+radius = 0.3
 
 [sub_resource type="SphereShape3D" id="hurt_shape"]
-radius = 0.42
+radius = 0.36
 
 [sub_resource type="StandardMaterial3D" id="dust_mat"]
 transparency = 1
@@ -68,15 +69,28 @@ scale_amount_max = 1.2
 [node name="Body" type="AnimatedSprite3D" parent="Visual"]
 material_override = ExtResource("mat")
 offset = Vector2(0, 0)
-pixel_size = 0.008
+pixel_size = 0.0039
 alpha_cut = 1
 texture_filter = 3
 sprite_frames = ExtResource("frames")
-animation = &"move"
-autoplay = "move"
+animation = &"hang"
+autoplay = "hang"
+script = ExtResource("visual_script")
+anim_map = {&"drop": &"unfold", &"ground": &"land", &"move": &"land", &"idle": &"hang", &"emerge": &"hang"}
+eye_nodes = Array[NodePath]([NodePath("../Eyes")])
+art_pixel_size = 0.00195
+canvas_origin = Vector2(256, 256)
+eye_track = {
+"hang": [[Vector2(262.0, 318.0)], [Vector2(262.0, 318.0)], [Vector2(262.0, 318.0)], [Vector2(262.0, 318.0)]],
+"unfold": [[Vector2(293.3, 321.9)], [Vector2(324.5, 314.3)], [Vector2(351.2, 295.0)], [Vector2(368.9, 265.9)]],
+"land": [[Vector2(369.7, 276.0)], [Vector2(369.7, 276.0)]],
+"windup": [[Vector2(364.7, 260.1)], [Vector2(358.2, 252.3)], [Vector2(350.4, 244.8)]],
+"lunge": [[Vector2(400.6, 289.6)], [Vector2(392.1, 281.4)], [Vector2(379.9, 270.3)]],
+"flinch": [[Vector2(300.3, 220.7)], [Vector2(322.8, 230.2)], [Vector2(347.8, 247.0)]]
+}
 
 [node name="Eyes" type="Sprite3D" parent="Visual"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, -0.02, 0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.012, -0.121, 0.05)
 modulate = Color(2.6, 0.18, 0.12, 1)
 render_priority = 10
 pixel_size = 0.0034

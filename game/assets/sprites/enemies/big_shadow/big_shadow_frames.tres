@@ -1,0 +1,105 @@
+[gd_resource type="SpriteFrames" load_steps=21 format=3]
+
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/idle_00.png" id="idle_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/idle_01.png" id="idle_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/idle_02.png" id="idle_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/idle_03.png" id="idle_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/run_00.png" id="run_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/run_01.png" id="run_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/run_02.png" id="run_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/run_03.png" id="run_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/run_04.png" id="run_4"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/run_05.png" id="run_5"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/run_06.png" id="run_6"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/run_07.png" id="run_7"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/strike_00.png" id="strike_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/strike_01.png" id="strike_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/strike_02.png" id="strike_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/strike_03.png" id="strike_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/emerge_00.png" id="emerge_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/emerge_01.png" id="emerge_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/emerge_02.png" id="emerge_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/big_shadow/emerge_03.png" id="emerge_3"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("idle_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("idle_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("idle_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("idle_3")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("run_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("run_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("run_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("run_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("run_4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("run_5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("run_6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("run_7")
+}],
+"loop": true,
+"name": &"run",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("strike_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("strike_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("strike_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("strike_3")
+}],
+"loop": true,
+"name": &"strike",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("emerge_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("emerge_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("emerge_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("emerge_3")
+}],
+"loop": false,
+"name": &"emerge",
+"speed": 10.0
+}]

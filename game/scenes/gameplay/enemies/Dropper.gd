@@ -108,6 +108,17 @@ func _hunt(delta: float) -> void:
 			else:
 				global_position += to.normalized() * minf(climb_speed * delta, to.length())
 
+## Visual state: hanging / dropping / on the ground (see Enemy.get_visual_state).
+func get_visual_state() -> StringName:
+	if mode == Mode.ATTACK:
+		return super.get_visual_state()
+	match _phase:
+		Phase.DROPPING:
+			return &"drop"
+		Phase.GROUNDED:
+			return &"flinch" if mode == Mode.FROZEN else &"ground"
+	return &"hang"
+
 func _perform_lunge_step(spd: float, delta: float) -> void:
 	if _phase == Phase.GROUNDED:
 		super._perform_lunge_step(spd, delta)

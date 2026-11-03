@@ -373,48 +373,6 @@ def dressing() -> None:
 dressing()
 
 
-# ── Wordless control hints (polish pass) ─────────────────────────────────
-def hints() -> None:
-    from PIL import ImageFont
-    hand = Image.new("RGBA", (160, 160), (0, 0, 0, 0))
-    d = ImageDraw.Draw(hand)
-    pale = (235, 238, 255, 255)
-    d.rounded_rectangle((52, 70, 118, 150), radius=26, fill=pale)          # palm
-    d.rounded_rectangle((66, 8, 88, 92), radius=11, fill=pale)             # index finger (pointing up)
-    for x, top in ((90, 52), (106, 60)):
-        d.rounded_rectangle((x, top, x + 18, 100), radius=9, fill=pale)
-    d.rounded_rectangle((34, 86, 60, 112), radius=12, fill=pale)           # thumb
-    hand = hand.filter(ImageFilter.GaussianBlur(1.2))
-    save(hand, "single/ui/hint_hand.png")
-
-    try:
-        font = ImageFont.truetype("arialbd.ttf", 44)
-    except OSError:
-        font = ImageFont.load_default()
-
-    def keycaps(labels, widths, rel):
-        gap = 16
-        w = sum(widths) + gap * (len(widths) - 1) + 8
-        img = Image.new("RGBA", (w, 104), (0, 0, 0, 0))
-        dd = ImageDraw.Draw(img)
-        x = 4
-        for label, kw in zip(labels, widths):
-            dd.rounded_rectangle((x, 4, x + kw, 100), radius=16, fill=(12, 12, 18, 200), outline=(235, 235, 245, 230), width=4)
-            box = dd.textbbox((0, 0), label, font=font)
-            dd.text((x + (kw - (box[2] - box[0])) / 2 - box[0], 52 - (box[3] - box[1]) / 2 - box[1]), label,
-                    font=font, fill=(240, 240, 250, 255))
-            x += kw + gap
-        save(img, rel)
-
-    keycaps(["A", "D"], [96, 96], "single/ui/key_move.png")
-    keycaps(["SPACE"], [260], "single/ui/key_jump.png")
-    keycaps(["E"], [96], "single/ui/key_place.png")
-    keycaps(["SHIFT"], [200], "single/ui/key_raise.png")
-
-
-hints()
-
-
 # ── Mechanisms: hook, gate, lever (Fix pass 3) ───────────────────────────
 def mechanisms() -> None:
     iron = (12, 12, 16, 255)

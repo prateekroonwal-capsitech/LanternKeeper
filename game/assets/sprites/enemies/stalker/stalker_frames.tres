@@ -1,0 +1,106 @@
+[gd_resource type="SpriteFrames" load_steps=20 format=3]
+
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/idle_00.png" id="idle_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/idle_01.png" id="idle_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/idle_02.png" id="idle_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/idle_03.png" id="idle_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/walk_00.png" id="walk_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/walk_01.png" id="walk_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/walk_02.png" id="walk_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/walk_03.png" id="walk_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/walk_04.png" id="walk_4"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/walk_05.png" id="walk_5"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/windup_00.png" id="windup_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/windup_01.png" id="windup_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/windup_02.png" id="windup_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/lunge_00.png" id="lunge_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/lunge_01.png" id="lunge_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/lunge_02.png" id="lunge_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/flinch_00.png" id="flinch_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/flinch_01.png" id="flinch_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/stalker/flinch_02.png" id="flinch_2"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("idle_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("idle_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("idle_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("idle_3")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("walk_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("walk_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("walk_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("walk_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("walk_4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("walk_5")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("windup_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("windup_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("windup_2")
+}],
+"loop": false,
+"name": &"windup",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("lunge_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("lunge_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("lunge_2")
+}],
+"loop": false,
+"name": &"lunge",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("flinch_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("flinch_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("flinch_2")
+}],
+"loop": false,
+"name": &"flinch",
+"speed": 10.0
+}]

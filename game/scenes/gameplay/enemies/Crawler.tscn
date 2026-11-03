@@ -1,17 +1,18 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://game/scenes/gameplay/enemies/Crawler.gd" id="script"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/enemies/EnemyVisual.gd" id="visual_script"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/enemy_eyes.png" id="eyes"]
-[ext_resource type="SpriteFrames" path="res://game/assets/sprites/enemies/crawler_frames.tres" id="frames"]
+[ext_resource type="SpriteFrames" path="res://game/assets/sprites/enemies/crawler/crawler_frames.tres" id="frames"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/lair_crack.png" id="crack"]
 [ext_resource type="Material" path="res://game/assets/materials/enemy_silhouette.tres" id="mat"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/fx/dust_mote.png" id="dust"]
 
 [sub_resource type="BoxShape3D" id="shape"]
-size = Vector3(0.9, 0.5, 0.6)
+size = Vector3(0.9, 0.42, 0.6)
 
 [sub_resource type="BoxShape3D" id="hurt_shape"]
-size = Vector3(1.0, 0.6, 0.8)
+size = Vector3(1.0, 0.5, 0.8)
 
 [sub_resource type="StandardMaterial3D" id="dust_mat"]
 transparency = 1
@@ -35,7 +36,7 @@ emerge_offset = Vector3(1.2, 0, 0)
 body_radius = 0.35
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)
 shape = SubResource("shape")
 
 [node name="Hurtbox" type="Area3D" parent="."]
@@ -68,16 +69,29 @@ scale_amount_max = 1.2
 
 [node name="Body" type="AnimatedSprite3D" parent="Visual"]
 material_override = ExtResource("mat")
-offset = Vector2(0, 48)
-pixel_size = 0.009
+offset = Vector2(0, 74.6667)
+pixel_size = 0.005625
 alpha_cut = 1
 texture_filter = 3
 sprite_frames = ExtResource("frames")
-animation = &"move"
-autoplay = "move"
+animation = &"idle"
+autoplay = "idle"
+script = ExtResource("visual_script")
+anim_map = {&"move": &"crawl"}
+eye_nodes = Array[NodePath]([NodePath("../Eyes")])
+art_pixel_size = 0.001875
+canvas_origin = Vector2(384, 480)
+eye_track = {
+"idle": [[Vector2(618.0, 396.0)], [Vector2(618.0, 396.0)], [Vector2(618.0, 396.0)], [Vector2(618.0, 396.0)]],
+"crawl": [[Vector2(618.0, 396.0)], [Vector2(621.5, 396.0)], [Vector2(614.5, 396.0)], [Vector2(618.0, 396.0)], [Vector2(621.5, 396.0)], [Vector2(614.5, 396.0)]],
+"emerge": [[Vector2(618.0, 388.5)], [Vector2(618.0, 391.0)], [Vector2(618.0, 393.5)], [Vector2(618.0, 396.0)]],
+"windup": [[Vector2(610.7, 384.7)], [Vector2(603.3, 373.3)], [Vector2(596.0, 362.0)]],
+"lunge": [[Vector2(719.2, 408.0)], [Vector2(693.9, 405.0)], [Vector2(653.4, 400.2)]],
+"flinch": [[Vector2(586.0, 432.0)], [Vector2(595.6, 421.2)], [Vector2(606.8, 408.6)]]
+}
 
 [node name="Eyes" type="Sprite3D" parent="Visual"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38, 0.42, 0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.439, 0.158, 0.05)
 modulate = Color(2.6, 0.18, 0.12, 1)
 render_priority = 10
 pixel_size = 0.0038

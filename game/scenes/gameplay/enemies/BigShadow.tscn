@@ -1,8 +1,9 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://game/scenes/gameplay/enemies/BigShadow.gd" id="script"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/enemies/EnemyVisual.gd" id="visual_script"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/enemy_eyes.png" id="eyes"]
-[ext_resource type="SpriteFrames" path="res://game/assets/sprites/enemies/big_shadow_frames.tres" id="frames"]
+[ext_resource type="SpriteFrames" path="res://game/assets/sprites/enemies/big_shadow/big_shadow_frames.tres" id="frames"]
 [ext_resource type="Material" path="res://game/assets/materials/enemy_silhouette.tres" id="mat"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/fx/dust_mote.png" id="dust"]
 
@@ -10,7 +11,7 @@
 radius = 1.0
 
 [sub_resource type="BoxShape3D" id="hurt_shape"]
-size = Vector3(3.6, 8.0, 2.0)
+size = Vector3(7.2, 7.1, 2.0)
 
 [sub_resource type="StandardMaterial3D" id="dust_mat"]
 transparency = 1
@@ -43,6 +44,7 @@ monitoring = false
 monitorable = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Hurtbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 1.05, 0)
 shape = SubResource("hurt_shape")
 
 [node name="DarkParticles" type="CPUParticles3D" parent="."]
@@ -64,16 +66,27 @@ scale_amount_max = 1.8
 
 [node name="Body" type="AnimatedSprite3D" parent="Visual"]
 material_override = ExtResource("mat")
-offset = Vector2(0, 0)
-pixel_size = 0.014
+offset = Vector2(-26.5, 82.5)
+pixel_size = 0.015
 alpha_cut = 1
 texture_filter = 3
 sprite_frames = ExtResource("frames")
-animation = &"move"
-autoplay = "move"
+animation = &"idle"
+autoplay = "idle"
+script = ExtResource("visual_script")
+anim_map = {&"move": &"run", &"lunge": &"strike", &"windup": &"strike", &"flinch": &"run"}
+eye_nodes = Array[NodePath]([NodePath("../Eyes"), NodePath("../EyesB"), NodePath("../EyesC")])
+art_pixel_size = 0.0075
+canvas_origin = Vector2(693, 677)
+eye_track = {
+"idle": [[Vector2(1159.7, 453.7), Vector2(1079.7, 433.7), Vector2(1189.7, 413.7)], [Vector2(1159.7, 445.7), Vector2(1079.7, 425.7), Vector2(1189.7, 405.7)], [Vector2(1159.7, 453.7), Vector2(1079.7, 433.7), Vector2(1189.7, 413.7)], [Vector2(1159.7, 461.7), Vector2(1079.7, 441.7), Vector2(1189.7, 421.7)]],
+"run": [[Vector2(1159.7, 453.7), Vector2(1079.7, 433.7), Vector2(1189.7, 413.7)], [Vector2(1159.7, 439.0), Vector2(1079.7, 419.0), Vector2(1189.7, 399.0)], [Vector2(1159.7, 453.7), Vector2(1079.7, 433.7), Vector2(1189.7, 413.7)], [Vector2(1159.7, 468.3), Vector2(1079.7, 448.3), Vector2(1189.7, 428.3)], [Vector2(1159.7, 453.7), Vector2(1079.7, 433.7), Vector2(1189.7, 413.7)], [Vector2(1159.7, 439.0), Vector2(1079.7, 419.0), Vector2(1189.7, 399.0)], [Vector2(1159.7, 453.7), Vector2(1079.7, 433.7), Vector2(1189.7, 413.7)], [Vector2(1159.7, 468.3), Vector2(1079.7, 448.3), Vector2(1189.7, 428.3)]],
+"strike": [[Vector2(1159.7, 440.3), Vector2(1079.7, 420.3), Vector2(1189.7, 400.3)], [Vector2(1159.7, 430.3), Vector2(1079.7, 410.3), Vector2(1189.7, 390.3)], [Vector2(1159.7, 467.0), Vector2(1079.7, 447.0), Vector2(1189.7, 427.0)], [Vector2(1159.7, 460.3), Vector2(1079.7, 440.3), Vector2(1189.7, 420.3)]],
+"emerge": [[Vector2(1159.7, 929.7), Vector2(1079.7, 909.7), Vector2(1189.7, 889.7)], [Vector2(1159.7, 789.7), Vector2(1079.7, 769.7), Vector2(1189.7, 749.7)], [Vector2(1159.7, 621.7), Vector2(1079.7, 601.7), Vector2(1189.7, 581.7)], [Vector2(1159.7, 453.7), Vector2(1079.7, 433.7), Vector2(1189.7, 413.7)]]
+}
 
 [node name="Eyes" type="Sprite3D" parent="Visual"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.6, 0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.500, 1.675, 0.05)
 modulate = Color(2.6, 0.18, 0.12, 1)
 render_priority = 10
 pixel_size = 0.012
@@ -82,7 +95,7 @@ texture_filter = 3
 texture = ExtResource("eyes")
 
 [node name="EyesB" type="Sprite3D" parent="Visual"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 1.4, 0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.900, 1.825, 0.05)
 modulate = Color(2.6, 0.18, 0.12, 1)
 render_priority = 10
 pixel_size = 0.007
@@ -91,7 +104,7 @@ texture_filter = 3
 texture = ExtResource("eyes")
 
 [node name="EyesC" type="Sprite3D" parent="Visual"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9, 1.2, 0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.725, 1.975, 0.05)
 modulate = Color(2.6, 0.18, 0.12, 1)
 render_priority = 10
 pixel_size = 0.006

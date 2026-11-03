@@ -1,0 +1,111 @@
+[gd_resource type="SpriteFrames" load_steps=20 format=3]
+
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/hang_00.png" id="hang_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/hang_01.png" id="hang_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/hang_02.png" id="hang_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/hang_03.png" id="hang_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/unfold_00.png" id="unfold_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/unfold_01.png" id="unfold_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/unfold_02.png" id="unfold_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/unfold_03.png" id="unfold_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/land_00.png" id="land_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/land_01.png" id="land_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/windup_00.png" id="windup_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/windup_01.png" id="windup_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/windup_02.png" id="windup_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/lunge_00.png" id="lunge_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/lunge_01.png" id="lunge_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/lunge_02.png" id="lunge_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/flinch_00.png" id="flinch_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/flinch_01.png" id="flinch_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/dropper/flinch_02.png" id="flinch_2"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("hang_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("hang_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("hang_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("hang_3")
+}],
+"loop": true,
+"name": &"hang",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("unfold_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("unfold_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("unfold_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("unfold_3")
+}],
+"loop": false,
+"name": &"unfold",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("land_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("land_1")
+}],
+"loop": true,
+"name": &"land",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("windup_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("windup_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("windup_2")
+}],
+"loop": false,
+"name": &"windup",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("lunge_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("lunge_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("lunge_2")
+}],
+"loop": false,
+"name": &"lunge",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("flinch_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("flinch_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("flinch_2")
+}],
+"loop": false,
+"name": &"flinch",
+"speed": 10.0
+}]

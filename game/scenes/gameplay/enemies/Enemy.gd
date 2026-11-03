@@ -415,6 +415,20 @@ func _animate(delta: float) -> void:
 		_eyes.scale = Vector3(1.0, 1.0, 1.0)
 		_visual.position.x = 0.0
 
+## What the creature is doing, for its EnemyVisual (visual only): "idle", "move", "emerge",
+## "windup", "lunge" or "flinch".
+func get_visual_state() -> StringName:
+	match mode:
+		Mode.EMERGING:
+			return &"emerge"
+		Mode.FROZEN:
+			return &"flinch"
+		Mode.ATTACK:
+			return &"windup" if _attack_phase == AttackPhase.WINDUP else &"lunge"
+		Mode.HUNT, Mode.RETREAT, Mode.RETURNING:
+			return &"move" if _speed_now > 0.0005 else &"idle"
+	return &"idle"
+
 func _dbg(msg: String) -> void:
 	if debug_log:
 		print("[%s %s] %s  at (%.1f, %.1f)" % [enemy_kind, name, msg, global_position.x, global_position.y])

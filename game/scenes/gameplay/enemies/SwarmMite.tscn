@@ -1,17 +1,18 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://game/scenes/gameplay/enemies/SwarmMite.gd" id="script"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/enemies/EnemyVisual.gd" id="visual_script"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/enemy_eyes.png" id="eyes"]
-[ext_resource type="SpriteFrames" path="res://game/assets/sprites/enemies/mite_frames.tres" id="frames"]
+[ext_resource type="SpriteFrames" path="res://game/assets/sprites/enemies/mite/mite_frames.tres" id="frames"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/lair_hole.png" id="hole"]
 [ext_resource type="Material" path="res://game/assets/materials/enemy_silhouette.tres" id="mat"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/fx/dust_mote.png" id="dust"]
 
 [sub_resource type="SphereShape3D" id="shape"]
-radius = 0.2
+radius = 0.14
 
 [sub_resource type="SphereShape3D" id="hurt_shape"]
-radius = 0.28
+radius = 0.2
 
 [sub_resource type="StandardMaterial3D" id="dust_mat"]
 transparency = 1
@@ -68,15 +69,25 @@ scale_amount_max = 1.0
 [node name="Body" type="AnimatedSprite3D" parent="Visual"]
 material_override = ExtResource("mat")
 offset = Vector2(0, 0)
-pixel_size = 0.008
+pixel_size = 0.0044
 alpha_cut = 1
 texture_filter = 3
 sprite_frames = ExtResource("frames")
-animation = &"move"
-autoplay = "move"
+animation = &"fly"
+autoplay = "fly"
+script = ExtResource("visual_script")
+anim_map = {&"idle": &"fly", &"move": &"fly", &"emerge": &"fly", &"windup": &"fly", &"lunge": &"dive"}
+eye_nodes = Array[NodePath]([NodePath("../Eyes")])
+art_pixel_size = 0.0011
+canvas_origin = Vector2(256, 256)
+eye_track = {
+"fly": [[Vector2(318.0, 250.0)], [Vector2(318.0, 250.0)], [Vector2(318.0, 250.0)], [Vector2(318.0, 250.0)]],
+"dive": [[Vector2(317.9, 262.7)], [Vector2(315.3, 275.0)], [Vector2(310.2, 286.6)]],
+"flinch": [[Vector2(315.4, 237.2)], [Vector2(315.4, 237.2)]]
+}
 
 [node name="Eyes" type="Sprite3D" parent="Visual"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.0, 0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.068, 0.007, 0.05)
 modulate = Color(2.6, 0.18, 0.12, 1)
 render_priority = 10
 pixel_size = 0.0022

@@ -24,6 +24,8 @@ extends Enemy
 @export var rewake_delay: float = 1.2
 ## Height above the child it follows at (it lumbers over terrain).
 @export var follow_height: float = 2.5
+## Visual only: plays its strike when the child is closer ahead than this.
+@export var strike_distance: float = 7.0
 
 var _rewake_t: float = -1.0
 
@@ -76,6 +78,12 @@ func _hunt(delta: float) -> void:
 	global_position = Vector3(x, y, _home.z)
 	_move_dir = direction
 	_speed_now = speed * delta
+
+## Visual state: strikes when the child is close ahead, otherwise runs (see Enemy).
+func get_visual_state() -> StringName:
+	if mode == Mode.HUNT and _game and (_game.get_player_position().x - global_position.x) * direction < strike_distance:
+		return &"lunge"
+	return super.get_visual_state()
 
 func _check_catch() -> void:
 	var p := _game.get_player_position()

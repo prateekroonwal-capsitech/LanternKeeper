@@ -1,0 +1,56 @@
+[gd_resource type="SpriteFrames" load_steps=10 format=3]
+
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/mite/fly_00.png" id="fly_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/mite/fly_01.png" id="fly_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/mite/fly_02.png" id="fly_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/mite/fly_03.png" id="fly_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/mite/dive_00.png" id="dive_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/mite/dive_01.png" id="dive_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/mite/dive_02.png" id="dive_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/mite/flinch_00.png" id="flinch_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/mite/flinch_01.png" id="flinch_1"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("fly_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_3")
+}],
+"loop": true,
+"name": &"fly",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("dive_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("dive_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("dive_2")
+}],
+"loop": false,
+"name": &"dive",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("flinch_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("flinch_1")
+}],
+"loop": false,
+"name": &"flinch",
+"speed": 10.0
+}]

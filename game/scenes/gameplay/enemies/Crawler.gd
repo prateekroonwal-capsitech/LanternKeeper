@@ -48,9 +48,6 @@ func _has_floor_ahead(dir: float) -> bool:
 
 func _animate(delta: float) -> void:
 	super._animate(delta)
-	var body := _visual.get_node_or_null("Body") as AnimatedSprite3D
-	if body:
-		body.speed_scale = 1.0 if _speed_now > 0.0005 else 0.0
 	if _hiss_timer > 0.5:
 		_visual.position.x = sin(_time * 60.0) * 0.03
 	else:

@@ -5,7 +5,7 @@
 [resource]
 render_priority = -1
 shader = ExtResource("1_shader")
-shader_parameter/body_color = Color(0.04, 0.04, 0.06, 1)
+shader_parameter/body_color = Color(0.008, 0.008, 0.012, 1)
 shader_parameter/rim_color = Color(0.3, 0.36, 0.46, 1)
 shader_parameter/rim_width = 1.5
 shader_parameter/rim_intensity = 0.7
