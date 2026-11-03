@@ -21,9 +21,9 @@ extends UIController
 @export_group("Right-half gestures")
 ## A touch released before this many seconds (without swiping) is a jump tap;
 ## a touch held longer becomes "raise the light".
-@export var hold_time: float = 0.2
+@export var hold_time: float = 0.35
 ## Movement (px) allowed before a tap stops counting as a tap.
-@export var tap_max_distance: float = 40.0
+@export var tap_max_distance: float = 70.0
 ## Downward travel (px) that counts as a swipe.
 @export var swipe_min_distance: float = 90.0
 @export var swipe_max_time: float = 0.4

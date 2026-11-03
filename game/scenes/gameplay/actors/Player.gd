@@ -38,7 +38,7 @@ extends CharacterBody3D
 ## Upward speed is multiplied by this when jump is released early (variable height).
 @export_range(0.0, 1.0) var jump_cut_multiplier: float = 0.5
 @export var coyote_time: float = 0.12
-@export var jump_buffer_time: float = 0.1
+@export var jump_buffer_time: float = 0.2
 
 @export_group("Landing")
 ## Falls faster than this (m/s) play the land crouch and slow the child briefly.
