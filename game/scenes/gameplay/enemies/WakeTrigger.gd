@@ -70,6 +70,7 @@ func _check_body(body: Node3D) -> void:
 		if is_lantern and _game.is_lantern_carried():
 			return
 		_fired = true
+		print("[WakeTrigger] %s fired: %s" % [name, wake_group])
 		_game.report_wake_trigger(wake_group)
 
 func _on_lantern_placed(at: Vector3) -> void:
@@ -81,6 +82,7 @@ func _on_lantern_placed(at: Vector3) -> void:
 	var diff := local_at - center
 	if absf(diff.x) <= half.x and absf(diff.y) <= half.y and absf(diff.z) <= half.z:
 		_fired = true
+		print("[WakeTrigger] %s fired: %s" % [name, wake_group])
 		_game.report_wake_trigger(wake_group)
 
 func _apply_size() -> void:

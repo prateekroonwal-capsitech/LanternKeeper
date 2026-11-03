@@ -43,6 +43,8 @@ signal lantern_hook_changed(hook_id: StringName, hung: bool)
 signal lever_pulled(lever_id: StringName)
 ## A falling trap (rock on a rope, collapsing ceiling) hit the ground; creatures under it check is_in_kill_zone().
 signal trap_sprung(trap: Node3D)
+## A creature was beaten for good (e.g. the Shade crushed in level 10). Gates with open_on_defeat == kind open.
+signal enemy_defeated(enemy_kind: String)
 ## Show this world point together with the child for `duration` seconds (the camera frames both).
 signal camera_focus_requested(point: Vector3, duration: float)
 signal control_layout_changed(layout: StringName)

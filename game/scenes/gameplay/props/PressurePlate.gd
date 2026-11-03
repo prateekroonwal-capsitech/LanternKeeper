@@ -1,8 +1,9 @@
 class_name PressurePlate
 extends Area3D
 
-## PressurePlate — a stone plate in the floor. When a crate (group "crates") rests on it, it
-## sinks and fires `plate_id` once, like a lever (traps and gates listen for that id).
+## PressurePlate — a stone plate in the floor. When a crate (group "crates") comes to rest on
+## it, it sinks and fires `plate_id`, like a lever (traps and gates listen for that id). It rises
+## when the crate leaves, and fires again the next time a crate arrives.
 ## Resets with the checkpoint.
 ##
 ## Sends: GameManager.report_lever_pulled(plate_id).
@@ -26,14 +27,19 @@ func inject_services(registry: Node) -> void:
 		_game = registry.get_service(&"game") as GameManager
 
 func _physics_process(_delta: float) -> void:
-	if _pressed or _game == null or not _game.is_playing():
+	if _game == null or not _game.is_playing():
 		return
+	var on := false
 	for body in get_overlapping_bodies():
 		if body.is_in_group(&"crates") and absf(body.global_position.x - global_position.x) <= half_width:
-			_set_pressed(true)
-			print("[PressurePlate] %s pressed" % plate_id)
-			_game.report_lever_pulled(plate_id)
-			return
+			on = true
+	if on and not _pressed:
+		_set_pressed(true)
+		print("[PressurePlate] %s pressed" % plate_id)
+		_game.report_lever_pulled(plate_id)
+	elif not on and _pressed:
+		_set_pressed(false)
+		print("[PressurePlate] %s released" % plate_id)
 
 func _set_pressed(v: bool) -> void:
 	_pressed = v

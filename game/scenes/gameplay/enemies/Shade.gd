@@ -11,9 +11,11 @@ extends Enemy
 ##           a little slower than the child, never waiting. `run_end_group` → it loses the
 ##           child and flies off to `run_exit`.
 ##  2 TRAP   (`trap_group`): perches at `perch_point`; anything within `reach` is attacked.
-##           A lantern hung on hook `bait_hook_id` lures it (after `lure_delay`) to hover at
-##           `lure_point`, under the rock trap. If the rock lands on it: pinned, wing torn,
-##           screech, then it flees to `flee_point`. Bait removed → back to the perch.
+##           It is drawn to the light: a lantern set down within `lure_range` lures it (after
+##           `lure_delay`) — hung on hook `bait_hook_id` it hovers at `lure_point` (under the
+##           rock trap), anywhere else it hovers over the lantern. If the rock lands on it:
+##           pinned, wing torn, screech, then it flees to `flee_point`. Lantern picked up →
+##           back to the perch.
 ##  3 HIDE   (`hide_group`): sweeps `patrol_follow` back and forth (`patrol_speed`, pausing
 ##           `patrol_pause` at each end). It spots the child in the open within
 ##           `spot_range`, or carrying the light within `light_spot_range` → attack.
@@ -21,10 +23,10 @@ extends Enemy
 ##  4 FINAL  (`final_group`): flies to `hover_point`, then repeats: hover `hover_time`,
 ##           screech `screech_time` (eyes flare), dive to `low_point` (`dive_time`, under the
 ##           cracked ceiling), search there for `hold_time`, then lunge at the child.
-##           If the ceiling trap lands on it: crushed, eyes fade, it reports `defeat_lever_id`.
+##           If the ceiling trap lands on it: crushed, eyes fade, it reports itself defeated.
 ##
 ## Sends: GameManager.report_player_caught(self), report_enemy_woke(self),
-##   report_lever_pulled(defeat_lever_id).
+##   report_enemy_defeated(self) (the exit gate listens for "shade").
 ## Receives: GameBus.enemies_wake_requested(group), lantern_hook_changed(id, hung),
 ##   trap_sprung(trap); GameManager.is_player_hidden() / is_lantern_carried() (polled);
 ##   checkpoint snapshot (group "enemies").
@@ -45,6 +47,8 @@ enum Act { IDLE, ARRIVE, RUN, FLY_OFF, PERCH, LURE, ATTACK, PINNED, PATROL, HOVE
 @export var flee_point: Marker3D
 @export var bait_hook_id: StringName = &"shade_bait"
 @export var lure_delay: float = 1.0
+## A lantern set down (not carried) this close to the perch draws it in.
+@export var lure_range: float = 30.0
 ## Anything this close (m) to it while it perches or hovers at the bait is attacked.
 @export var reach: float = 4.5
 @export var pinned_time: float = 1.6
@@ -69,7 +73,6 @@ enum Act { IDLE, ARRIVE, RUN, FLY_OFF, PERCH, LURE, ATTACK, PINNED, PATROL, HOVE
 @export var screech_time: float = 0.8
 @export var dive_time: float = 0.5
 @export var hold_time: float = 1.1
-@export var defeat_lever_id: StringName = &"shade_defeated"
 @export var eye_fade_time: float = 1.5
 
 @export_group("Flight")
@@ -124,9 +127,14 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_wake_requested(group: StringName) -> void:
 	if group == &"":
 		return
+	print("[Shade] heard %s while %s" % [group, Act.keys()[act]])
+	if _defeated:
+		return
+	# An encounter start always takes over, whatever it is still doing (e.g. flying off from
+	# the last encounter) — otherwise the one-shot trigger is lost and the level soft-locks.
 	match group:
 		run_group:
-			if act == Act.IDLE and run_follow:
+			if run_follow and act != Act.RUN:
 				_begin(1)
 				run_follow.progress = 0.0
 				global_position = run_follow.global_position
@@ -135,12 +143,12 @@ func _on_wake_requested(group: StringName) -> void:
 			if act == Act.RUN:
 				_fly_off(run_exit)
 		trap_group:
-			if act == Act.IDLE and perch_point:
+			if perch_point and _encounter != 2:
 				_begin(2)
 				global_position = perch_point.global_position + Vector3(0.0, 8.0, 0.0)
 				_arrive(perch_point.global_position, Act.PERCH)
 		hide_group:
-			if act == Act.IDLE and patrol_follow:
+			if patrol_follow and _encounter != 3:
 				_begin(3)
 				var length := _path_length(patrol_follow)
 				patrol_follow.progress = length if patrol_start_at_end else 0.0
@@ -151,7 +159,7 @@ func _on_wake_requested(group: StringName) -> void:
 			if act == Act.PATROL:
 				_fly_off(hide_exit)
 		final_group:
-			if act == Act.IDLE and hover_point:
+			if hover_point and _encounter != 4:
 				_begin(4)
 				set_damage(2)
 				global_position = hover_point.global_position + Vector3(-12.0, 3.0, 0.0)
@@ -208,13 +216,19 @@ func set_damage(level: int) -> void:
 # ── Bait and traps ────────────────────────────────────────────────────────
 
 func _on_hook_changed(hook_id: StringName, hung: bool) -> void:
-	if hook_id != bait_hook_id:
-		return
-	_bait_hung = hung
-	if hung and act == Act.PERCH:
-		_set_act(Act.LURE)                 # _t counts the lure delay, then it flies over
-	elif not hung and act == Act.LURE:
-		_arrive(perch_point.global_position, Act.PERCH)
+	if hook_id == bait_hook_id:
+		_bait_hung = hung
+
+## The light it is drawn to: a lantern that is lit and not carried, near the perch.
+func _lure_target() -> Variant:
+	var lantern := _game.get_lantern()
+	if not is_instance_valid(lantern) or _game.is_lantern_carried():
+		return null
+	if lantern.global_position.distance_to(perch_point.global_position) > lure_range:
+		return null
+	if _bait_hung:
+		return lure_point.global_position
+	return lantern.global_position + Vector3(0.0, 1.4, 0.0)
 
 func _on_trap_sprung(trap: Node3D) -> void:
 	if act == Act.IDLE or act == Act.CRUSHED or act == Act.PINNED:
@@ -266,10 +280,16 @@ func _physics_process(delta: float) -> void:
 			_face(p.x - global_position.x)
 			if global_position.distance_to(chest) <= reach:
 				_attack()
+			elif _lure_target() != null:
+				print("[Shade] drawn to the light (%s)" % ("bait hook" if _bait_hung else "lantern on the ground"))
+				_set_act(Act.LURE)         # _t counts the lure delay, then it flies over
 		Act.LURE:
-			if _t < lure_delay:
+			var lure = _lure_target()
+			if lure == null:
+				_arrive(perch_point.global_position, Act.PERCH)   # the light was picked up
+			elif _t < lure_delay:
 				_hover_at(perch_point.global_position, delta)
-			elif _fly_to(lure_point.global_position + _bob(), fly_speed, delta) and global_position.distance_to(chest) <= reach:
+			elif _fly_to(lure + _bob(), fly_speed, delta) and global_position.distance_to(chest) <= reach:
 				_attack()
 		Act.ATTACK:
 			_fly_to(chest, attack_speed, delta)
@@ -315,7 +335,7 @@ func _physics_process(delta: float) -> void:
 			if _t >= eye_fade_time:
 				print("[Shade] defeated: the way out opens")
 				_defeated = true    # stays defeated (hidden) until a checkpoint before it
-				_game.report_lever_pulled(defeat_lever_id)
+				_game.report_enemy_defeated(self)
 				_go_idle()
 				act = Act.CRUSHED
 	_check_catch()

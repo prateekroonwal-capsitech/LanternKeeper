@@ -5,7 +5,8 @@ extends Node3D
 ## (RockTrap.tscn) or a cracked ceiling slab (CeilingCollapse.tscn). When `lever_id` fires it
 ## drops `drop_height` metres in `fall_time`; anything under it is hit. The child is crushed;
 ## creatures ask is_in_kill_zone() when they hear trap_sprung. If `rearm_time` > 0 and nothing
-## was caught, it is hauled back up and `rearm_lever` is reset so it can be tried again.
+## was caught, it is hauled back up, `rearm_lever` is reset and `rearm_crate` slides back to its
+## start, so it can be tried again (never a soft-lock).
 ## Resets with the checkpoint.
 ##
 ## Sends: GameManager.report_trap_sprung(self), report_player_died("crushed"),
@@ -21,6 +22,7 @@ extends Node3D
 ## > 0: haul back up this many seconds after landing if nothing was caught (0 = stays down).
 @export var rearm_time: float = 0.0
 @export var rearm_lever: Lever
+@export var rearm_crate: Crate
 ## Seconds the camera keeps the landing spot in view after the fall (0 = no camera focus).
 @export var focus_hold: float = 2.6
 
@@ -102,6 +104,8 @@ func _physics_process(delta: float) -> void:
 					_rope.visible = true
 				if is_instance_valid(rearm_lever):
 					rearm_lever.reset_to_checkpoint({})
+				if is_instance_valid(rearm_crate):
+					rearm_crate.return_home()
 				print("[FallingTrap] %s hauled back up (missed)" % name)
 
 func capture_checkpoint_state() -> Dictionary:

@@ -12,6 +12,8 @@ extends AnimatableBody3D
 @export var hook_id: StringName = &"hook_a"
 ## Optional: a lever that opens it for good (empty = none).
 @export var lever_id: StringName = &""
+## Opens (and stays open) when GameManager reports this creature kind defeated (e.g. "shade").
+@export var open_on_defeat: String = ""
 @export var open_offset: Vector3 = Vector3(0.0, 3.2, 0.0)
 @export var open_time: float = 0.8
 @export var close_time: float = 0.35
@@ -37,6 +39,11 @@ func inject_services(registry: Node) -> void:
 	game.bus.lantern_hook_changed.connect(_on_hook_changed)
 	game.bus.lever_pulled.connect(func(id: StringName) -> void:
 		if lever_id != &"" and id == lever_id:
+			print("[Gate] %s opens (%s)" % [name, id])
+			_locked_open = true)
+	game.bus.enemy_defeated.connect(func(kind: String) -> void:
+		if open_on_defeat != "" and kind == open_on_defeat:
+			print("[Gate] %s opens (%s defeated)" % [name, kind])
 			_locked_open = true)
 
 func _on_hook_changed(id: StringName, hung: bool) -> void:

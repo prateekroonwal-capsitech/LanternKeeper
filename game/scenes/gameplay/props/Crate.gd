@@ -18,10 +18,12 @@ extends AnimatableBody3D
 
 var _game: GameManager
 var _pushing: int = 0
+var _home_x: float = 0.0
 
 func _ready() -> void:
 	add_to_group(&"crates")
 	add_to_group(&"resettables")
+	_home_x = global_position.x
 
 func inject_services(registry: Node) -> void:
 	if registry:
@@ -44,6 +46,11 @@ func _physics_process(delta: float) -> void:
 		_pushing = dir
 		if _game:
 			_game.report_player_pushing(dir)
+
+## Back to where it was placed in the level (a trap that missed re-arms this way).
+func return_home() -> void:
+	global_position.x = _home_x
+	reset_physics_interpolation()
 
 func capture_checkpoint_state() -> Dictionary:
 	return { "x": global_position.x }

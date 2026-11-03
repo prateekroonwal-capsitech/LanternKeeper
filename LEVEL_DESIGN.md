@@ -140,6 +140,11 @@ is death. A shrine sits right before each encounter; dying resets that encounter
 (Shade, traps, crate, lantern, collapsing planks, triggers). Bounds are walled, pits have a
 kill zone, and the dark meter is off in this level (the Shade is the threat).
 
+Hints (once per save): "It hunts your light. Run!" (1), "Use the light as bait" (2),
+"Hide in the dark" (3), "Bring the ceiling down" (4). An encounter's trigger always takes the
+Shade over, even if it is still flying off from the last one (this was the final-encounter
+soft-lock: walking on into the cavern before it had gone left it ignoring the trigger).
+
 **1 · Run** (shrine x 2, trigger x 12). The Shade bursts in from behind and follows its own
 `RunPath` at 4.6 m/s (the child runs 5.2 m/s) — it never waits.
 1. Run right across the bridge over the pit: ghost platforms (they need the carried light)
@@ -159,8 +164,11 @@ kill zone, and the dark meter is off in this level (the Shade is the threat).
    The camera pulls back so you see it: wing torn, screech, it flees.
 4. Climb down, jump over the rock, take the lantern from the hook, walk on.
 - Fail: walking near it without bait → caught.
+- Drawn to the light: a lantern set down anywhere within 30 m of its perch draws it too —
+  on the bait hook it hovers under the rock, on the ground it hovers over the lantern (and
+  attacks the child if they are next to it).
 - Soft-lock: pulling the lever with no Shade under the rock → the rock misses, is hauled
-  back up after 3 s and the lever re-arms. Taking the bait back sends it back to its perch.
+  back up after 3 s and the lever re-arms. Taking the lantern back sends it back to its perch.
 
 **3 · Hide** (shrine x 108, trigger x 120). A dark cave; the Shade sweeps a set path
 (x 124–168) back and forth at 7 m/s, pausing 1.2 s at each end.
@@ -179,12 +187,14 @@ The Shade (smoking, sparking) repeats: hover 2.2 s → screech 0.8 s (eyes flare
 the slab (0.5 s) → search there 1.1 s → lunge at the child.
 1. Stand at the crate (x 208.6), left of the pressure plate (x 211.4).
 2. When it screeches, push the crate onto the plate (≈1.2 s of pushing): the slab falls on
-   it while it searches under the ceiling. Its eyes fade; the exit gate (x 222) opens.
+   it while it searches under the ceiling. Its eyes fade; GameManager reports the Shade
+   defeated and the exit gate (x 222, `open_on_defeat = "shade"`) opens.
 3. Jump over the crate and walk into the exit portal (x 232).
 - Fail: pushing too early → the slab falls on nothing and its next dive kills; too late →
   it lunges first. Window ≈ 1.5 s (touch-friendly).
-- Soft-lock: the crate only moves between its start and the plate; dying resets crate,
-  plate and slab.
+- Soft-lock: if the slab falls with no Shade under it, it is hauled back up after 3 s and the
+  crate slides back to its start (the plate fires again on the next push); dying resets
+  Shade, crate, plate, slab and gate.
 
 ---
 

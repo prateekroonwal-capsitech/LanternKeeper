@@ -141,10 +141,25 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, 0, 0)
 wake_group = &"shade_run_end"
 size = Vector3(2, 6, 2)
 
-[node name="HintRun" parent="." instance=ExtResource("hint")]
+[node name="HintShadeLight" parent="." instance=ExtResource("hint")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, -20, 0)
-hint_id = "run"
+hint_id = "shade_light"
 on_wake_group = &"shade_run"
+
+[node name="HintShadeBait" parent="." instance=ExtResource("hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, -20, 0)
+hint_id = "shade_bait"
+on_wake_group = &"shade_trap"
+
+[node name="HintShadeHide" parent="." instance=ExtResource("hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 120, -20, 0)
+hint_id = "shade_hide"
+on_wake_group = &"shade_hide"
+
+[node name="HintShadeCeiling" parent="." instance=ExtResource("hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 192, -20, 0)
+hint_id = "shade_ceiling"
+on_wake_group = &"shade_final"
 
 [node name="RunExit" type="Marker3D" parent="Markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 18, 0)
@@ -272,10 +287,12 @@ size = Vector2(6, 2.8)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 221, 8, 0)
 size = Vector2(30, 4)
 
-[node name="Ceiling" parent="." instance=ExtResource("ceiling")]
+[node name="Ceiling" parent="." node_paths=PackedStringArray("rearm_crate") instance=ExtResource("ceiling")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 203, 5.4, 0)
 lever_id = &"ceiling_drop"
 drop_height = 4.8
+rearm_time = 3.0
+rearm_crate = NodePath("../Crate")
 
 [node name="Crate" parent="." instance=ExtResource("crate")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 208.6, 0.6, 0)
@@ -304,7 +321,7 @@ size = Vector2(2, 3)
 [node name="ExitGate" parent="." instance=ExtResource("gate")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 222, 0, 0)
 hook_id = &"none"
-lever_id = &"shade_defeated"
+open_on_defeat = "shade"
 close_delay = 9999.0
 
 [node name="Shade" parent="." node_paths=PackedStringArray("run_follow", "run_exit", "perch_point", "lure_point", "flee_point", "patrol_follow", "hide_exit", "hover_point", "low_point") instance=ExtResource("shade")]
@@ -319,7 +336,7 @@ hide_exit = NodePath("../Markers/HideExit")
 hover_point = NodePath("../Markers/Hover")
 low_point = NodePath("../Markers/Low")
 
-[node name="tree_a_58" type="Sprite3D" parent="Decor"]
+[node name="tree_a_61" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -0.8)
 offset = Vector2(0, 256)
 pixel_size = 0.01
@@ -327,7 +344,7 @@ alpha_cut = 1
 texture_filter = 3
 texture = ExtResource("tree_a")
 
-[node name="rocks_59" type="Sprite3D" parent="Decor"]
+[node name="rocks_62" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, -0.8)
 offset = Vector2(0, 48)
 pixel_size = 0.01
@@ -335,7 +352,7 @@ alpha_cut = 1
 texture_filter = 3
 texture = ExtResource("rocks")
 
-[node name="tree_a_60" type="Sprite3D" parent="Decor"]
+[node name="tree_a_63" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 0, -0.8)
 offset = Vector2(0, 256)
 pixel_size = 0.01
@@ -343,7 +360,7 @@ alpha_cut = 1
 texture_filter = 3
 texture = ExtResource("tree_a")
 
-[node name="rocks_61" type="Sprite3D" parent="Decor"]
+[node name="rocks_64" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 0, -0.8)
 offset = Vector2(0, 48)
 pixel_size = 0.01
@@ -351,7 +368,7 @@ alpha_cut = 1
 texture_filter = 3
 texture = ExtResource("rocks")
 
-[node name="rocks_62" type="Sprite3D" parent="Decor"]
+[node name="rocks_65" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 186, 0, -0.8)
 offset = Vector2(0, 48)
 pixel_size = 0.01
@@ -359,7 +376,7 @@ alpha_cut = 1
 texture_filter = 3
 texture = ExtResource("rocks")
 
-[node name="rocks_63" type="Sprite3D" parent="Decor"]
+[node name="rocks_66" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 228, 0, -0.8)
 offset = Vector2(0, 48)
 pixel_size = 0.01

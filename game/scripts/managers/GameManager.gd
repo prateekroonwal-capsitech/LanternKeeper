@@ -24,6 +24,7 @@ extends Node
 ##   report_lantern_lost()                                      — Lantern (fell into a pit)
 ##   report_enemy_woke(enemy) / report_enemy_repelled(enemy) /
 ##   report_player_caught(enemy) / report_wake_trigger(group)   — enemies, WakeTrigger
+##   report_enemy_defeated(enemy)                               — Shade (crushed)
 ##   report_player_jumped() / report_player_landed(speed)       — Player (sound)
 ##   report_tutorial_trigger(hint_id)                           — TutorialTrigger
 ##   report_trap_sprung(trap)                                   — FallingTrap (rock, ceiling)
@@ -38,7 +39,7 @@ extends Node
 ##   dark_meter_changed, dark_meter_emptied, dark_meter_recovered, lantern_place_requested,
 ##   lantern_placed, lantern_picked_up, platform_lost, player_died, player_respawned,
 ##   level_reset, checkpoint_saved, checkpoint_activated, enemy_woke, enemies_wake_requested,
-##   trap_sprung, lever_pulled, camera_focus_requested,
+##   trap_sprung, lever_pulled, camera_focus_requested, enemy_defeated,
 ##   game_paused, game_resumed, game_started, game_over
 ##
 ## Checkpoints: at level start and at every new shrine GameManager saves a snapshot —
@@ -686,6 +687,15 @@ func report_enemy_repelled(_enemy: Node3D) -> void:
 	if audio and _now() - _last_hiss_at > 0.6:
 		_last_hiss_at = _now()
 		audio.play_event(&"enemy_hiss", true)
+
+## A creature is beaten for good: gates waiting for it open (GameBus.enemy_defeated).
+func report_enemy_defeated(enemy: Node3D) -> void:
+	var kind: String = enemy.get("enemy_kind") if enemy.get("enemy_kind") else "enemy"
+	print("[GameManager] enemy defeated: %s" % kind)
+	if audio:
+		audio.play_event(&"shrine")
+	if bus:
+		bus.enemy_defeated.emit(kind)
 
 func report_player_caught(enemy: Node3D) -> void:
 	if state != State.PLAYING:
