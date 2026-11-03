@@ -264,7 +264,7 @@ wake_group = &"chase"
 chase_gap = 6.0
 danger_gap = 2.0
 min_progress = 1.0
-stuck_time = 2.0
+stuck_time = 3.0
 backtrack_limit = 2.0
 warning_time = 1.5
 attack_cooldown = 2.5
@@ -276,7 +276,7 @@ swoop_offsets = PackedFloat32Array(84, 188, 273)
 swoop_danger_zones = Array[NodePath]([NodePath("../../../SwoopDangerZone1"), NodePath("../../../SwoopDangerZone2"), NodePath("../../../SwoopDangerZone3")])
 
 [node name="SwoopDangerZone1" type="Area3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 59.8, 2.2, 0)
 collision_layer = 0
 collision_mask = 2
 
@@ -284,7 +284,7 @@ collision_mask = 2
 shape = SubResource("swoop_danger_shape")
 
 [node name="SwoopDangerZone2" type="Area3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 188, 3, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 163.2, 2.2, 0)
 collision_layer = 0
 collision_mask = 2
 
@@ -292,7 +292,7 @@ collision_mask = 2
 shape = SubResource("swoop_danger_shape")
 
 [node name="SwoopDangerZone3" type="Area3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 273, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 247.9, 2.2, 0)
 collision_layer = 0
 collision_mask = 2
 

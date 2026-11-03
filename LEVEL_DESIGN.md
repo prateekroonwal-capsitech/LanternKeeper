@@ -18,7 +18,7 @@ Status legend — **Solvable**: completed end-to-end by the route bot in the run
 | 7 | Followed (Prompt 4, medium) | Solvable | proof bot PASS — exit in 23 s; 60 % of dark meter used; hesitating kills; shortcut blocked |
 | 8 | Lost Light | Solvable | route bot PASS (13.2 s) |
 | 9 | Holes (remade) | Solvable | proof bot PASS — solution, carrying the lantern can't grab the rope |
-| 10 | The Chase (Prompt 4, hard) | Solvable | proof bot PASS — exit in 62.5 s, Shade ≥ 11 m behind; resets on death; hesitating kills |
+| 10 | The Chase (hard) | Solvable | proof bot PASS — exit in 62.5 s with no attack, swoops miss; standing / going back gets caught; resets at each checkpoint |
 
 All 10 levels are solvable. Levels 3, 5, 6, 7 and 9 follow the remake brief; levels 1, 2,
 4, 8 and 10 are still the original Phase 5 layouts (solvable, not yet reworked to the brief).
@@ -141,11 +141,20 @@ them). At the end, the exit gate opens only while the lantern sits on its plate.
 **Solution:**
 1. Run right; hop the gaps; cross ghost bridges and stones in your own light.
 2. Cross each cracked plank bridge without stopping.
-3. Shrines at x 2, 104 and 206 (≈ every 20 s). After a death The Shade restarts 12 m
-   behind the shrine on its flight path and waits 1 s; collapsed planks and ghost paths reset to the checkpoint.
+3. Shrines at x 2, 104 and 206 (≈ every 20 s). After a death the Shade restarts at that
+   checkpoint's path offset (`checkpoint_offsets`) with every timer cleared, waits 1 s, then
+   resumes the chase; collapsed planks and ghost paths reset to the checkpoint.
 4. Final segment: set the lantern on the exit plate (x 292) — the gate (x 295) opens — walk
    through to the exit (x 300).
-**Difficulty:** hard — no stopping on planks, chained jumps, and the shadow closes in if you
+**The Shade's rules:** it flies the `ChasePath` about 6 m behind you and never closes in by
+itself, so a child who keeps moving is never attacked. It attacks only when you're stuck:
+less than 1 m forward in 3 s (time in the air doesn't count), more than 2 m back, or closer
+than 2 m. Then: warning 1.5 s (screech, eyes flare, it closes in a little; moving forward
+cancels it) → pull-up 0.5 s → dive at where you are (+ velocity × 0.3) → caught, or it climbs
+back and waits 2.5 s. Three scripted swoops dip over the stepping stones (x 60) and the ghost
+bridges (x 164, x 248) just after you pass; standing still in a swoop's danger zone
+(`SwoopDangerZone1-3`) as it dips gets you caught.
+**Difficulty:** hard — no stopping on planks, chained jumps, and the Shade attacks if you
 hesitate; every hazard is on screen ≈ 8 m before you reach it; all jumps ≤ 2.4 m (touch-friendly).
 **Soft-lock checks:** every pit has a kill zone; the lantern never leaves your hand until the
 exit plate (placed there, the gate opens; take it back and it shuts — place it again); planks
