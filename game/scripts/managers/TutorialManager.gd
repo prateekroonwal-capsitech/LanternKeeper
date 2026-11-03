@@ -20,7 +20,11 @@ const HINTS := {
 	"danger_above":      { "touch": "HINT_DANGER_ABOVE", "pc": "HINT_DANGER_ABOVE", "action": "" },   # 1-5 first dropper
 	"something_follows": { "touch": "HINT_SOMETHING_FOLLOWS", "pc": "HINT_SOMETHING_FOLLOWS", "action": "" },  # 1-7 Stalker wakes
 	"seal_holes":        { "touch": "HINT_SEAL_HOLES", "pc": "HINT_SEAL_HOLES", "action": "" },       # 1-9 swarm wakes
-	"run":               { "touch": "HINT_RUN", "pc": "HINT_RUN", "action": "" },                     # 1-10 chase starts
+	"run":               { "touch": "HINT_RUN", "pc": "HINT_RUN", "action": "" },                     # (old 1-10 chase, unused)
+	"shade_light":       { "touch": "HINT_SHADE_LIGHT", "pc": "HINT_SHADE_LIGHT", "action": "" },     # 1-10 Shade appears (run)
+	"shade_bait":        { "touch": "HINT_SHADE_BAIT", "pc": "HINT_SHADE_BAIT", "action": "" },       # 1-10 Shade perches (trap)
+	"shade_hide":        { "touch": "HINT_SHADE_HIDE", "pc": "HINT_SHADE_HIDE", "action": "" },       # 1-10 Shade sweeps (hide)
+	"shade_ceiling":     { "touch": "HINT_SHADE_CEILING", "pc": "HINT_SHADE_CEILING", "action": "" }, # 1-10 into the cavern (final)
 }
 
 var _logger: Node
