@@ -62,44 +62,8 @@ enum AttackState { CHASE, SWOOP }
 ## PathFollow3D node driving position along the chase route.
 @export var path_follow: PathFollow3D
 
-# Head center offsets in local 3D space per frame of each animation
-const HEAD_OFFSETS: Dictionary = {
-	&"fly": [
-		Vector3(0.696, 0.169, 0.05),
-		Vector3(0.703, 0.067, 0.05),
-		Vector3(0.706, 0.024, 0.05),
-		Vector3(0.703, 0.067, 0.05),
-		Vector3(0.696, 0.169, 0.05),
-		Vector3(0.687, 0.271, 0.05),
-		Vector3(0.682, 0.313, 0.05),
-		Vector3(0.687, 0.271, 0.05),
-	],
-	&"glide": [
-		Vector3(0.704, 0.133, 0.05),
-		Vector3(0.704, 0.085, 0.05),
-		Vector3(0.704, 0.133, 0.05),
-		Vector3(0.704, 0.181, 0.05),
-	],
-	&"swoop": [
-		Vector3(0.712, 0.041, 0.05),
-		Vector3(0.667, -0.201, 0.05),
-		Vector3(0.687, -0.201, 0.05),
-		Vector3(0.715, -0.014, 0.05),
-	],
-	&"screech": [
-		Vector3(0.640, 0.382, 0.05),
-		Vector3(0.670, 0.313, 0.05),
-		Vector3(0.640, 0.382, 0.05),
-		Vector3(0.603, 0.447, 0.05),
-	],
-	&"emerge": [
-		Vector3(0.716, -0.150, 0.05),
-		Vector3(0.712, -0.043, 0.05),
-		Vector3(0.706, 0.063, 0.05),
-		Vector3(0.696, 0.169, 0.05),
-	],
-}
-
+## Visible damage level (see set_damage).
+var damage: int = 0
 var _progress: float = 0.0
 var _bob_t: float = 0.0
 var _rewake_t: float = -1.0
@@ -123,6 +87,9 @@ var _danger_zones: Array[Area3D] = []
 @onready var _eye_1: Sprite3D = get_node_or_null("Visual/EyeAnchor/Eye1")
 @onready var _eye_2: Sprite3D = get_node_or_null("Visual/EyeAnchor/Eye2")
 @onready var _eye_3: Sprite3D = get_node_or_null("Visual/EyeAnchor/Eye3")
+@onready var _eye_4: Sprite3D = get_node_or_null("Visual/EyeAnchor/Eye4")
+@onready var _damage_smoke: CPUParticles3D = get_node_or_null("DamageSmoke")
+@onready var _sparks: CPUParticles3D = get_node_or_null("Sparks")
 @onready var _visual_root: Node3D = get_node_or_null("Visual")
 @onready var _debug_ui: CanvasLayer = get_node_or_null("DebugUI")
 @onready var _debug_label: Label = get_node_or_null("DebugUI/Panel/Margin/Label")
@@ -135,12 +102,6 @@ func _ready() -> void:
 	_init_swoop_triggers()
 	_init_danger_zones()
 	super._ready()
-
-	# Connect frame changes to lock eyes to head
-	if _body:
-		_body.frame_changed.connect(_sync_eyes_to_head)
-		_body.animation_changed.connect(_sync_eyes_to_head)
-		_sync_eyes_to_head()
 
 	if _debug_ui:
 		_debug_ui.visible = false
@@ -174,17 +135,7 @@ func _set_facing(f: float) -> void:
 	if not is_equal_approx(_facing, sign_val):
 		_facing = sign_val
 		if _visual_root:
-			_visual_root.scale.x = _facing
-		_sync_eyes_to_head()
-
-func _sync_eyes_to_head() -> void:
-	if not _eye_anchor or not _body:
-		return
-	var anim := _body.animation
-	var frames: Array = HEAD_OFFSETS.get(anim, HEAD_OFFSETS[&"fly"])
-	var idx := clampi(_body.frame, 0, frames.size() - 1)
-	var offset: Vector3 = frames[idx]
-	_eye_anchor.position = Vector3(offset.x, offset.y, offset.z)
+			_visual_root.scale.x = _facing   # the EyeAnchor is under Visual, so the eyes mirror too
 
 func _set_path_progress(p: float) -> void:
 	_progress = p
@@ -234,6 +185,16 @@ func reset_to_checkpoint(state: Dictionary = {}) -> void:
 		_smoke.emitting = false
 	reset_physics_interpolation()
 	print("[Shade] CHECKPOINT RESET to offset %.1f (child at %.1f, %s): state CHASE, timers cleared, resumes in %.1f s" % [target_prog, respawn_prog, shrine.name if shrine else "start", rewake_delay])
+
+## Visible damage: 0 = whole, 1 = torn wing, 2 = torn wing + smoke and sparks.
+func set_damage(level: int) -> void:
+	damage = clampi(level, 0, 2)
+	if _body:
+		_body.set(&"anim_suffix", "_torn" if damage >= 1 else "")
+	if _damage_smoke:
+		_damage_smoke.emitting = damage >= 2
+	if _sparks:
+		_sparks.emitting = damage >= 2
 
 func _reset() -> void:
 	super._reset()
@@ -407,6 +368,8 @@ func _flare_eyes(flare: bool) -> void:
 		_eye_2.modulate = color
 	if _eye_3:
 		_eye_3.modulate = color
+	if _eye_4:
+		_eye_4.modulate = color
 
 func _restore_eye_flare() -> void:
 	_flare_eyes(false)

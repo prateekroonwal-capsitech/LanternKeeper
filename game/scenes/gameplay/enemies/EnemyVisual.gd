@@ -26,6 +26,9 @@ extends AnimatedSprite3D
 ## Seconds a new looping animation (e.g. idle ↔ walk) must be wanted before it switches,
 ## so slow drifting doesn't flicker. One-shot animations (windup, lunge…) switch at once.
 @export var settle_time: float = 0.2
+## Appended to the chosen animation when that variant exists (e.g. "_torn" once the Shade's
+## wing is torn). Set by the owning creature.
+@export var anim_suffix: String = ""
 
 var _enemy: Enemy
 var _eyes: Array[Node3D] = []
@@ -50,6 +53,8 @@ func _process(delta: float) -> void:
 	var anim: StringName = anim_map.get(state, state)
 	if not sprite_frames.has_animation(anim):
 		anim = anim_map.get(&"idle", &"idle")
+	if anim_suffix != "" and sprite_frames.has_animation(StringName(String(anim) + anim_suffix)):
+		anim = StringName(String(anim) + anim_suffix)
 	if anim == animation:
 		_want = &""
 		if not is_playing() and sprite_frames.get_animation_loop(anim):

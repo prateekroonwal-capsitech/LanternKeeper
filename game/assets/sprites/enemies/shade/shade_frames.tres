@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" load_steps=25 format=3]
+[gd_resource type="SpriteFrames" load_steps=49 format=3]
 
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_00.png" id="fly_0"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_01.png" id="fly_1"]
@@ -24,6 +24,30 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/emerge_01.png" id="emerge_1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/emerge_02.png" id="emerge_2"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/emerge_03.png" id="emerge_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_torn_00.png" id="fly_torn_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_torn_01.png" id="fly_torn_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_torn_02.png" id="fly_torn_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_torn_03.png" id="fly_torn_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_torn_04.png" id="fly_torn_4"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_torn_05.png" id="fly_torn_5"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_torn_06.png" id="fly_torn_6"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_torn_07.png" id="fly_torn_7"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/glide_torn_00.png" id="glide_torn_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/glide_torn_01.png" id="glide_torn_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/glide_torn_02.png" id="glide_torn_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/glide_torn_03.png" id="glide_torn_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/swoop_torn_00.png" id="swoop_torn_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/swoop_torn_01.png" id="swoop_torn_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/swoop_torn_02.png" id="swoop_torn_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/swoop_torn_03.png" id="swoop_torn_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/screech_torn_00.png" id="screech_torn_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/screech_torn_01.png" id="screech_torn_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/screech_torn_02.png" id="screech_torn_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/screech_torn_03.png" id="screech_torn_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/emerge_torn_00.png" id="emerge_torn_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/emerge_torn_01.png" id="emerge_torn_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/emerge_torn_02.png" id="emerge_torn_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/emerge_torn_03.png" id="emerge_torn_3"]
 
 [resource]
 animations = [{
@@ -122,5 +146,102 @@ animations = [{
 }],
 "loop": false,
 "name": &"emerge",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("fly_torn_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_torn_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_torn_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_torn_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_torn_4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_torn_5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_torn_6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_torn_7")
+}],
+"loop": true,
+"name": &"fly_torn",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("glide_torn_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("glide_torn_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("glide_torn_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("glide_torn_3")
+}],
+"loop": true,
+"name": &"glide_torn",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("swoop_torn_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("swoop_torn_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("swoop_torn_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("swoop_torn_3")
+}],
+"loop": false,
+"name": &"swoop_torn",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("screech_torn_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("screech_torn_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("screech_torn_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("screech_torn_3")
+}],
+"loop": false,
+"name": &"screech_torn",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("emerge_torn_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("emerge_torn_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("emerge_torn_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("emerge_torn_3")
+}],
+"loop": false,
+"name": &"emerge_torn",
 "speed": 10.0
 }]
