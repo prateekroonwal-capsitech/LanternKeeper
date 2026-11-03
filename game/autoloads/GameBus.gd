@@ -45,6 +45,8 @@ signal lever_pulled(lever_id: StringName)
 signal trap_sprung(trap: Node3D)
 ## A creature was beaten for good (e.g. the Shade crushed in level 10). Gates with open_on_defeat == kind open.
 signal enemy_defeated(enemy_kind: String)
+## Something heavy landed: the camera shakes (strength in metres, seconds).
+signal camera_shake_requested(strength: float, duration: float)
 ## Show this world point together with the child for `duration` seconds (the camera frames both).
 signal camera_focus_requested(point: Vector3, duration: float)
 signal control_layout_changed(layout: StringName)

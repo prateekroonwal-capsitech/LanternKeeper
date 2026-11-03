@@ -15,7 +15,7 @@ extends Camera3D
 ## Sends: nothing.
 ## Receives: GameManager.get_player_visual_position() / get_player_facing() /
 ##   is_player_on_floor() (polled); GameBus.level_started, GameBus.player_respawned → snap;
-##   GameBus.player_died → light shake; GameBus.camera_focus_requested(point, duration) →
+##   GameBus.player_died → light shake; GameBus.camera_shake_requested → shake; GameBus.camera_focus_requested(point, duration) →
 ##   frames the child and that point together (pulls back as far as needed), then eases back.
 
 ## Camera position relative to the player's feet.
@@ -67,6 +67,7 @@ func inject_services(registry: Node) -> void:
 	_game.bus.level_started.connect(func(_id: String) -> void: _snap())
 	_game.bus.player_respawned.connect(_snap.call_deferred)
 	_game.bus.player_died.connect(func(_cause: String) -> void: shake(shake_strength, shake_duration))
+	_game.bus.camera_shake_requested.connect(shake)
 	_game.bus.camera_focus_requested.connect(func(point: Vector3, duration: float) -> void:
 		_focus_point = point
 		_focus_time = duration)

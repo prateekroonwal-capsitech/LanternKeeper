@@ -101,6 +101,7 @@ Located in `game/assets/sprites/single/` and `game/assets/sprites/backgrounds/`.
 | `sprites/single/environment/platform_stone.png` | 256 × 256 | `materials/platform_stone.tres` (all solid platforms) | Opaque, **must tile** both ways. Mapped world-triplanar, 2 m per tile. Dark silhouette stone. |
 | `sprites/single/environment/ghost_platform.png` | 256 × 64 | `GhostPlatform.tscn` shader `albedo_texture` | Semi-transparent, **must tile**. Tinted by shader `solid_color` when lit. |
 | `sprites/single/fx/dust_mote.png` | 16 × 16 | `Lantern.tscn` → Dust particles | Soft white dot on transparent; tinted amber by material. |
+| `sprites/single/fx/debris_chunk.png` | 32 × 32 | `FallFX.tscn` → Pebbles / ImpactChunks | White stone chip (tinted dark by the material). From `tools/generate_level_props.py`. |
 | `sprites/single/props/shrine.png` | 128 × 192 | `Shrine.tscn` → Sprite (`pixel_size` 0.0115) | Transparent. Pivot bottom-centre, offset (0, 96). Cold-blue crystal; dimmed by tint while dormant. |
 | `sprites/single/environment/decor_tree_a.png` | 256 × 512 | Level `Decor` Sprite3Ds (`pixel_size` 0.01) | Silhouette, transparent. Pivot bottom-centre (offset (0, 256)). |
 | `sprites/single/environment/decor_tree_b.png` | 192 × 384 | Level `Decor` | As above, offset (0, 192). |
@@ -168,6 +169,10 @@ Music and the heartbeat are looped in code, so no import setting is needed.
 | `audio/sfx/heartbeat.ogg` | 1 s loop | Dark meter below 45 % — louder and faster as it empties |
 | `audio/sfx/ui_button.ogg` | 0.07 s | Every UI button |
 | `audio/sfx/level_complete.ogg` | 1.8 s | Reaching the level exit |
+| `audio/sfx/fall_creak.ogg` | 0.55 s | Something is about to fall (FallFX warning: rock, ceiling, cracked plank) — `fall_creak` |
+| `audio/sfx/fall_thud.ogg` | 0.9 s | A falling object lands / a plank breaks (FallFX impact) — `fall_thud` |
+| `audio/sfx/rumble.ogg` | 1.6 s | A gate opens because a creature is defeated (the Shade) — `rumble` |
+| `audio/sfx/shade_screech.ogg` | 1.0 s | The Shade is crushed — `shade_screech` (`python tools/generate_audio.py falls` rebuilds only these four) |
 
 Buses (`default_bus_layout.tres`): **Master** ← Music, SFX. The settings sliders drive these.
 
@@ -184,6 +189,7 @@ Localization; it then appears in Settings → Language automatically.
 | `shaders/dark_overlay.gdshader` | `HUD.tscn` → DarkOverlay | Full-screen canvas_item vignette + desaturation driven by `darkness` (0..1) from `HUD.gd`. Vignette closes in and colours drain to grey as the dark meter empties. |
 | `shaders/light_glow.gdshader` | `Lantern.tscn` → Glow | Additive radial halo. Rim marks the gameplay light radius. Params: colour, intensity, falloff, core, rim, flicker. |
 | `shaders/enemy_silhouette.gdshader` + `materials/enemy_silhouette.tres` | Every enemy → Visual/Body | Dark body, cool rim light (width in screen pixels), red-channel detail lines. `EnemyVisual` feeds the current frame into `albedo_texture`. |
+| `scenes/gameplay/props/FallFX.tscn` (not a PNG) | RockTrap, CeilingCollapse, CollapsingPlatform | Falling feel: Trickle (dust) + Pebbles while it creaks and wobbles, Trail while it falls, ImpactDust + ImpactChunks on landing, a dark screen Pulse; size / timings / strengths are exports. Uses `dust_mote.png`, `debris_chunk.png` and the sounds above. |
 | `shaders/exit_swirl.gdshader` | `ExitPortal.tscn` → Swirl | Additive spiral in the door opening; `collapse` (0..1) is driven during the pull-in (tightens, speeds up, brightens). |
 | `shaders/ghost_platform.gdshader` | `GhostPlatform.tscn` → Visual | `solidity` (runtime), solid look (texture, colour, shimmer) and dark look (outline colour/alpha/width, dash length/speed). |
 | `materials/world_environment.tres` | Every level's WorldEnvironment | Near-black background, low cold ambient, glow on. |

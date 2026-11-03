@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://game/scenes/gameplay/props/CollapsingPlatform.gd" id="1_script"]
 [ext_resource type="Material" path="res://game/assets/materials/platform_cracked.tres" id="2_mat"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/FallFX.tscn" id="fx"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_body"]
 resource_local_to_scene = true
@@ -34,3 +35,9 @@ monitorable = false
 [node name="CollisionShape3D" type="CollisionShape3D" parent="FeetCheck"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 shape = SubResource("BoxShape3D_feet")
+
+[node name="FallFX" parent="." instance=ExtResource("fx")]
+size = 0.35
+anticipation_time = 0.5
+wobble_amount = 0.0
+pulse_strength = 0.0

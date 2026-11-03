@@ -26,6 +26,12 @@ extends Resource
 @export var enemy_wake: AudioStream
 @export var enemy_hiss: AudioStream
 
+@export_group("Falling objects and the Shade")
+@export var fall_creak: AudioStream
+@export var fall_thud: AudioStream
+@export var rumble: AudioStream
+@export var shade_screech: AudioStream
+
 @export_group("UI SFX")
 @export var ui_button: AudioStream
 

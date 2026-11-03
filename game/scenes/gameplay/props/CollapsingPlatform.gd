@@ -5,7 +5,8 @@ extends StaticBody3D
 ## CollapsingPlatform — a cracked plank bridge. Once the child stands on it, it shakes for
 ## `crumble_delay` seconds, then falls away (no collision) and stays down. It comes back
 ## when the child respawns at a checkpoint saved before it fell. Looks cracked so the
-## hazard reads before you reach it.
+## hazard reads before you reach it. Its FallFX (child) creaks and trickles dust while it
+## shakes, and bursts into dust and chips (with a crack and a small shake) as it gives way.
 ##
 ## Sends: nothing.
 ## Receives: checkpoint snapshot via capture_checkpoint_state() / reset_to_checkpoint()
@@ -33,6 +34,7 @@ var _rest: Vector3
 @onready var _visual: MeshInstance3D = $Visual
 @onready var _feet: Area3D = $FeetCheck
 @onready var _feet_shape: CollisionShape3D = $FeetCheck/CollisionShape3D
+@onready var _fx: FallFX = get_node_or_null("FallFX")
 
 func _ready() -> void:
 	_apply_size()
@@ -49,6 +51,8 @@ func _physics_process(delta: float) -> void:
 				if b.is_in_group(&"player"):
 					_state = State.CRUMBLING
 					_t = 0.0
+					if _fx:
+						_fx.anticipate(null)   # the plank shakes itself; FallFX adds creak and dust
 		State.CRUMBLING:
 			_t += delta
 			_visual.position = _rest + Vector3(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0), 0.0) * shake_amount
@@ -56,6 +60,9 @@ func _physics_process(delta: float) -> void:
 				_state = State.FALLEN
 				_t = 0.0
 				_shape.set_deferred(&"disabled", true)
+				if _fx:
+					_fx.fall()
+					_fx.impact()            # it breaks: dust burst, chips, crack, small shake
 		State.FALLEN:
 			_t = minf(_t + delta / maxf(fall_time, 0.01), 1.0)
 			_visual.position = _rest - Vector3(0.0, fall_distance * _t * _t, 0.0)
@@ -71,6 +78,8 @@ func reset_to_checkpoint(state: Dictionary = {}) -> void:
 	_shape.set_deferred(&"disabled", fallen)
 	_visual.visible = not fallen
 	_visual.position = _rest
+	if _fx:
+		_fx.stop()
 	reset_physics_interpolation()
 
 func _apply_size() -> void:

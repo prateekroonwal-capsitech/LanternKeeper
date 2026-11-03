@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://game/scenes/gameplay/props/FallingTrap.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/props/ceiling_slab.png" id="2_slab"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/FallFX.tscn" id="fx"]
 
 [sub_resource type="BoxShape3D" id="slab_shape"]
 size = Vector3(6, 1.2, 2)
@@ -26,3 +27,8 @@ pixel_size = 0.0158
 alpha_cut = 1
 texture_filter = 3
 texture = ExtResource("2_slab")
+
+[node name="FallFX" parent="Block" instance=ExtResource("fx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0.3)
+size = 1.8
+anticipation_time = 0.4

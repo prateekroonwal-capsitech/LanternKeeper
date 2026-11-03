@@ -14,6 +14,10 @@
 [ext_resource type="AudioStream" path="res://game/assets/audio/sfx/lantern_return.ogg" id="sfx_lantern_return"]
 [ext_resource type="AudioStream" path="res://game/assets/audio/sfx/enemy_wake.ogg" id="sfx_enemy_wake"]
 [ext_resource type="AudioStream" path="res://game/assets/audio/sfx/enemy_hiss.ogg" id="sfx_enemy_hiss"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/fall_creak.ogg" id="sfx_fall_creak"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/fall_thud.ogg" id="sfx_fall_thud"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/rumble.ogg" id="sfx_rumble"]
+[ext_resource type="AudioStream" path="res://game/assets/audio/sfx/shade_screech.ogg" id="sfx_shade_screech"]
 [ext_resource type="AudioStream" path="res://game/assets/audio/music/menu.ogg" id="mus_menu"]
 [ext_resource type="AudioStream" path="res://game/assets/audio/music/world_1_light.ogg" id="mus_world_1_light"]
 [ext_resource type="AudioStream" path="res://game/assets/audio/music/world_2_oil.ogg" id="mus_world_2_oil"]
@@ -37,3 +41,7 @@ heartbeat = ExtResource("sfx_heartbeat")
 lantern_return = ExtResource("sfx_lantern_return")
 enemy_wake = ExtResource("sfx_enemy_wake")
 enemy_hiss = ExtResource("sfx_enemy_hiss")
+fall_creak = ExtResource("sfx_fall_creak")
+fall_thud = ExtResource("sfx_fall_thud")
+rumble = ExtResource("sfx_rumble")
+shade_screech = ExtResource("sfx_shade_screech")

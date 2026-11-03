@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://game/scenes/gameplay/props/FallingTrap.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/props/rock_trap.png" id="2_rock"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/thread.png" id="3_rope"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/FallFX.tscn" id="fx"]
 
 [sub_resource type="BoxShape3D" id="rock_shape"]
 size = Vector3(1.5, 1.2, 1.5)
@@ -34,3 +35,8 @@ modulate = Color(0.55, 0.42, 0.3, 1)
 pixel_size = 0.015625
 texture_filter = 3
 texture = ExtResource("3_rope")
+
+[node name="FallFX" parent="Block" instance=ExtResource("fx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0.3)
+size = 1.0
+anticipation_time = 0.45

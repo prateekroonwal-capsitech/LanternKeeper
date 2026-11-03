@@ -130,6 +130,34 @@ def sfx_enemies() -> None:
     write("sfx/lantern_return.ogg", chime * swell * (1 + 0.4 * np.sin(2 * np.pi * 14 * t)), SR_SFX)
 
 
+def sfx_falls() -> None:
+    """Falling objects (FallFX) and the Shade: creak, thud, rumble, screech. Own random
+    stream, so running this alone doesn't change any other sound."""
+    r = np.random.default_rng(23)
+    nz = lambda n: r.uniform(-1, 1, n)
+
+    t = t_axis(0.55)                                            # wood / stone creak + crack
+    creak = np.sin(2 * np.pi * (180 + 60 * np.sin(2 * np.pi * 3 * t)) * t) * env(t, 0.05, 0.35)
+    crack = lowpass(nz(len(t)), 2) * env(np.maximum(t - 0.38, 0), 0.001, 0.05) * (t >= 0.38)
+    grit = lowpass(nz(len(t)), 6) * 0.25 * env(t, 0.1, 0.4)
+    write("sfx/fall_creak.ogg", creak * 0.5 + crack * 0.9 + grit, SR_SFX)
+
+    t = t_axis(0.9)                                             # heavy thud + debris
+    boom = np.sin(2 * np.pi * (70 * np.exp(-t * 4) + 38) * t) * env(t, 0.002, 0.35)
+    debris = lowpass(nz(len(t)), 3) * env(t, 0.005, 0.25) * 0.6
+    write("sfx/fall_thud.ogg", boom + debris, SR_SFX)
+
+    t = t_axis(1.6)                                             # low rumble (gate / cave)
+    rumble = lowpass(nz(len(t)), 40) * 3.0 * np.clip(t / 0.25, 0, 1) * np.exp(-np.maximum(t - 0.6, 0) / 0.5)
+    write("sfx/rumble.ogg", rumble + np.sin(2 * np.pi * 42 * t) * 0.3 * np.exp(-t), SR_SFX)
+
+    t = t_axis(1.0)                                             # the Shade's screech
+    f = 900 + 500 * np.sin(2 * np.pi * 5 * t) - 400 * t
+    screech = np.sin(2 * np.pi * np.cumsum(f) / SR_SFX) * env(t, 0.02, 0.5)
+    rasp = (nz(len(t)) - lowpass(nz(len(t)), 8)) * env(t, 0.02, 0.4) * 0.5
+    write("sfx/shade_screech.ogg", screech * 0.6 + rasp, SR_SFX)
+
+
 # ── Music (seamless loops) ────────────────────────────────────────────────
 def note(n: float) -> float:
     return 440.0 * 2 ** ((n - 69) / 12)
@@ -189,6 +217,11 @@ def music() -> None:
 
 
 if __name__ == "__main__":
-    sfx()
-    music()
-    sfx_enemies()
+    import sys
+    if sys.argv[1:] == ["falls"]:
+        sfx_falls()                     # only the falling-object / Shade sounds
+    else:
+        sfx()
+        music()
+        sfx_enemies()
+        sfx_falls()

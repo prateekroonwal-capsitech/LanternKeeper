@@ -74,6 +74,9 @@ enum Act { IDLE, ARRIVE, RUN, FLY_OFF, PERCH, LURE, ATTACK, PINNED, PATROL, HOVE
 @export var dive_time: float = 0.5
 @export var hold_time: float = 1.1
 @export var eye_fade_time: float = 1.5
+## Slow motion when it is crushed (time scale, real seconds).
+@export var crush_slow_scale: float = 0.4
+@export var crush_slow_time: float = 0.3
 
 @export_group("Flight")
 @export var fly_speed: float = 9.0
@@ -241,6 +244,13 @@ func _on_trap_sprung(trap: Node3D) -> void:
 		_set_act(Act.CRUSHED)
 		_set_hurtbox_active(false)
 		print("[Shade] CRUSHED under %s, its eyes fade" % trap.name)
+		if _game.audio:
+			_game.audio.play_event(&"shade_screech")
+		if _damage_smoke:
+			_damage_smoke.direction = Vector3(0.0, 1.0, 0.0)   # smoke rising from under the rubble
+			_damage_smoke.emitting = true
+		global_position.z = -0.6   # under the slab: the rubble covers it, its eyes and smoke show
+		_game.report_slow_motion(crush_slow_scale, crush_slow_time)
 	else:
 		global_position.y = trap.get_ground_point().y + 0.9
 		_set_act(Act.PINNED)

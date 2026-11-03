@@ -6,6 +6,7 @@ Output: game/assets/sprites/single/props/
   crate.png           128 x 128  wooden crate (Crate.tscn → Sprite)
   pressure_plate.png  160 x 48   stone plate in a frame (PressurePlate.tscn → Plate)
   crevice.png         160 x 288  dark hiding crevice in the cave wall (Crevice.tscn → Sprite)
+  ../fx/debris_chunk.png  32 x 32  a stone chip (FallFX.tscn → Pebbles / ImpactChunks)
 
 Usage:  python tools/generate_level_props.py
 """
@@ -106,6 +107,15 @@ def crevice():
     save(img, "crevice.png")
 
 
+def debris_chunk():
+    r = random.Random(13)
+    img = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+    pts = [(16 + math.cos(a) * r.uniform(9, 14), 16 + math.sin(a) * r.uniform(8, 13)) for a in [k * math.tau / 7 for k in range(7)]]
+    ImageDraw.Draw(img).polygon(pts, fill=(255, 255, 255, 255))   # white: tinted in the material
+    img.save(os.path.join(OUT, "..", "fx", "debris_chunk.png"))
+    print("wrote debris_chunk.png", img.size)
+
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     boulder()
@@ -113,3 +123,4 @@ if __name__ == "__main__":
     crate()
     plate()
     crevice()
+    debris_chunk()

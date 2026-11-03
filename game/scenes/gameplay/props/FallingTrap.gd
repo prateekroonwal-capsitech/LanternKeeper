@@ -3,7 +3,9 @@ extends Node3D
 
 ## FallingTrap — something heavy held up until a lever / plate releases it: a rock on a rope
 ## (RockTrap.tscn) or a cracked ceiling slab (CeilingCollapse.tscn). When `lever_id` fires it
-## drops `drop_height` metres in `fall_time`; anything under it is hit. The child is crushed;
+## creaks and wobbles for its FallFX's anticipation time (dust and pebbles trickle), then drops
+## `drop_height` metres in `fall_time` (accelerating); anything under it is hit. FallFX does the
+## impact (dust, debris, thud, shake). The child is crushed;
 ## creatures ask is_in_kill_zone() when they hear trap_sprung. If `rearm_time` > 0 and nothing
 ## was caught, it is hauled back up, `rearm_lever` is reset and `rearm_crate` slides back to its
 ## start, so it can be tried again (never a soft-lock).
@@ -26,7 +28,7 @@ extends Node3D
 ## Seconds the camera keeps the landing spot in view after the fall (0 = no camera focus).
 @export var focus_hold: float = 2.6
 
-enum State { HELD, FALLING, DOWN, RISING }
+enum State { HELD, FALLING, DOWN, RISING, WARNING }
 
 var _game: GameManager
 var _state: State = State.HELD
@@ -36,6 +38,8 @@ var _rest_y: float = 0.0
 
 @onready var _block: AnimatableBody3D = $Block
 @onready var _rope: Node3D = get_node_or_null("Rope")
+@onready var _fx: FallFX = get_node_or_null("Block/FallFX")
+@onready var _sprite: Node3D = get_node_or_null("Block/Sprite")
 
 func _ready() -> void:
 	add_to_group(&"resettables")
@@ -63,15 +67,24 @@ func mark_caught() -> void:
 func _on_lever_pulled(id: StringName) -> void:
 	if id != lever_id or _state != State.HELD:
 		return
-	_state = State.FALLING
+	_state = State.WARNING if _fx else State.FALLING
 	_t = 0.0
 	_caught = false
 	print("[FallingTrap] %s released" % name)
+	if _fx:
+		_fx.anticipate(_sprite)
 	if _game and focus_hold > 0.0:
-		_game.report_camera_focus(get_ground_point() + Vector3(0.0, 1.2, 0.0), fall_time + focus_hold)
+		var warn: float = _fx.anticipation_time if _fx else 0.0
+		_game.report_camera_focus(get_ground_point() + Vector3(0.0, 1.2, 0.0), warn + fall_time + focus_hold)
 
 func _physics_process(delta: float) -> void:
 	match _state:
+		State.WARNING:
+			_t += delta
+			if _t >= _fx.anticipation_time:
+				_state = State.FALLING
+				_t = 0.0
+				_fx.fall()
 		State.FALLING:
 			_t += delta
 			var u := clampf(_t / maxf(fall_time, 0.01), 0.0, 1.0)
@@ -87,6 +100,8 @@ func _physics_process(delta: float) -> void:
 				_state = State.DOWN
 				_t = 0.0
 				print("[FallingTrap] %s landed" % name)
+				if _fx:
+					_fx.impact()
 				if _game:
 					_game.report_trap_sprung(self)
 		State.DOWN:
@@ -113,6 +128,8 @@ func capture_checkpoint_state() -> Dictionary:
 
 func reset_to_checkpoint(state: Dictionary = {}) -> void:
 	_state = State.DOWN if state.get("state", State.HELD) == State.DOWN else State.HELD
+	if _fx:
+		_fx.stop()
 	_caught = state.get("caught", false)
 	_t = 0.0
 	_block.position.y = _rest_y - (drop_height if _state == State.DOWN else 0.0)

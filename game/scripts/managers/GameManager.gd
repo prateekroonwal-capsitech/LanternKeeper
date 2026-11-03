@@ -31,6 +31,8 @@ extends Node
 ##   report_hiding_spot(spot, inside) / is_player_hidden()      — Crevice
 ##   report_player_pushing(direction)                           — Crate
 ##   report_camera_focus(point, duration)                       — FallingTrap (so the hit is seen)
+##   report_fall_warning() / report_impact(point, size)         — FallFX (creak; thud, shake, vibration)
+##   report_slow_motion(scale, duration)                        — Shade (crushed)
 ##   report_menu_ready()                                        — HomeScene (menu backdrop)
 ##   start_level(id), restart_level(), go_to_next_level(), go_to_level_select(),
 ##   go_to_main_menu(), quit_game(), pause()/resume()           — menus
@@ -39,7 +41,7 @@ extends Node
 ##   dark_meter_changed, dark_meter_emptied, dark_meter_recovered, lantern_place_requested,
 ##   lantern_placed, lantern_picked_up, platform_lost, player_died, player_respawned,
 ##   level_reset, checkpoint_saved, checkpoint_activated, enemy_woke, enemies_wake_requested,
-##   trap_sprung, lever_pulled, camera_focus_requested, enemy_defeated,
+##   trap_sprung, lever_pulled, camera_focus_requested, enemy_defeated, camera_shake_requested,
 ##   game_paused, game_resumed, game_started, game_over
 ##
 ## Checkpoints: at level start and at every new shrine GameManager saves a snapshot —
@@ -688,14 +690,41 @@ func report_enemy_repelled(_enemy: Node3D) -> void:
 		_last_hiss_at = _now()
 		audio.play_event(&"enemy_hiss", true)
 
-## A creature is beaten for good: gates waiting for it open (GameBus.enemy_defeated).
+## A creature is beaten for good: gates waiting for it open (GameBus.enemy_defeated), with a
+## rumble and a shake.
 func report_enemy_defeated(enemy: Node3D) -> void:
 	var kind: String = enemy.get("enemy_kind") if enemy.get("enemy_kind") else "enemy"
 	print("[GameManager] enemy defeated: %s" % kind)
 	if audio:
-		audio.play_event(&"shrine")
+		audio.play_event(&"rumble")
 	if bus:
+		bus.camera_shake_requested.emit(0.18, 0.9)
 		bus.enemy_defeated.emit(kind)
+
+## Something is about to fall (FallFX anticipation): creak / crack.
+func report_fall_warning() -> void:
+	if audio and state == State.PLAYING:
+		audio.play_event(&"fall_creak", true)
+
+## Something heavy landed at `point`; `size` (≈0.3 plank … 2 ceiling) scales the shake.
+func report_impact(_point: Vector3, size: float) -> void:
+	if state != State.PLAYING and state != State.DEAD:
+		return
+	if audio:
+		audio.play_event(&"fall_thud", true)
+	if bus:
+		bus.camera_shake_requested.emit(0.12 + 0.18 * size, 0.25 + 0.15 * size)
+	if haptics:
+		if size >= 1.0:
+			haptics.heavy()
+		else:
+			haptics.medium()
+
+## A brief slow-motion moment (Engine.time_scale), e.g. when the Shade is crushed.
+func report_slow_motion(scale: float, duration: float) -> void:
+	Engine.time_scale = clampf(scale, 0.05, 1.0)
+	await get_tree().create_timer(duration, true, false, true).timeout
+	Engine.time_scale = 1.0
 
 func report_player_caught(enemy: Node3D) -> void:
 	if state != State.PLAYING:
