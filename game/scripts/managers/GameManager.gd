@@ -36,7 +36,8 @@ extends Node
 ##   report_menu_ready()                                        — HomeScene (menu backdrop)
 ##   start_level(id), restart_level(), go_to_next_level(), go_to_level_select(),
 ##   go_to_main_menu(), quit_game(), pause()/resume()           — menus
-##   set_volume(bus, v), set_control_layout(l), set_locale(code) — Settings
+##   set_volume(bus, v), set_control_layout(l), set_locale(code),
+##   set_fullscreen(on) / is_fullscreen() / can_toggle_fullscreen() — Settings
 ## Sends (GameBus): game_state_changed, level_started, level_completed, oil_changed,
 ##   dark_meter_changed, dark_meter_emptied, dark_meter_recovered, lantern_place_requested,
 ##   lantern_placed, lantern_picked_up, platform_lost, player_died, player_respawned,
@@ -122,6 +123,7 @@ var _heartbeat: float = 0.0
 ## Seconds between reaching the exit and the Level Complete screen.
 const _LEVEL_COMPLETE_DELAY := 0.8
 const _MASTER_VOLUME_KEY := "master_volume"
+const _FULLSCREEN_KEY := "fullscreen"
 
 func configure(p_logger: Node, p_bus: Node) -> void:
 	logger = p_logger
@@ -836,9 +838,30 @@ func set_locale(locale: String) -> void:
 		save.settings.mark_dirty()
 		save.save_game()
 
+## Fullscreen or a resizable window (PC). Phones are always fullscreen; a game embedded in
+## the editor's Game tab keeps the editor's sizing.
+func set_fullscreen(on: bool) -> void:
+	if save:
+		save.set_value(_FULLSCREEN_KEY, on)
+		save.save_game()
+	_apply_window_mode(on)
+
+func is_fullscreen() -> bool:
+	var mode := DisplayServer.window_get_mode()
+	return mode == DisplayServer.WINDOW_MODE_FULLSCREEN or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN
+
+func can_toggle_fullscreen() -> bool:
+	return not OS.has_feature("mobile") and not Engine.is_embedded_in_editor()
+
+func _apply_window_mode(fullscreen: bool) -> void:
+	if not can_toggle_fullscreen():
+		return
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if fullscreen else DisplayServer.WINDOW_MODE_WINDOWED)
+
 func _apply_saved_settings() -> void:
 	if save == null:
 		return
+	_apply_window_mode(bool(save.get_value(_FULLSCREEN_KEY, true)))
 	if audio:
 		audio.set_bus_volume(&"Master", float(save.get_value(_MASTER_VOLUME_KEY, 1.0)))
 		if save.settings_data:

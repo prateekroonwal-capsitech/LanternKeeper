@@ -118,6 +118,17 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_layout")
 text = "SETTINGS_CONTROLS_CLASSIC"
 
+[node name="FullscreenLabel" type="Label" parent="Center/Panel/Column/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "SETTINGS_FULLSCREEN"
+horizontal_alignment = 0
+
+[node name="FullscreenToggle" type="CheckButton" parent="Center/Panel/Column/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 90)
+layout_mode = 2
+
 [node name="LanguageLabel" type="Label" parent="Center/Panel/Column/Rows"]
 layout_mode = 2
 text = "SETTINGS_LANGUAGE"

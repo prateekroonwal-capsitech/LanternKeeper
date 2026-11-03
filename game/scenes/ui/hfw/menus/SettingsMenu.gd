@@ -2,12 +2,14 @@ class_name SettingsMenu
 extends MenuScreen
 
 ## SettingsMenu — Master / Music / SFX volume, touch-control layout (gestures or
-## buttons) and language. Every change is applied and saved immediately.
+## buttons), fullscreen / windowed (PC only) and language. Every change is applied and
+## saved immediately.
 ## Languages are whatever translations are loaded (game/assets/localization/strings.csv).
 ##
-## Sends: GameManager.set_volume(), set_control_layout(), set_locale();
+## Sends: GameManager.set_volume(), set_control_layout(), set_fullscreen(), set_locale();
 ##   UIManager.close_menu() (Back).
-## Receives: GameManager.get_volume(), GameManager.input.control_layout (on open).
+## Receives: GameManager.get_volume(), is_fullscreen(), can_toggle_fullscreen(),
+##   GameManager.input.control_layout (on open).
 
 @onready var _master: HSlider = %MasterSlider
 @onready var _music: HSlider = %MusicSlider
@@ -15,6 +17,8 @@ extends MenuScreen
 @onready var _gestures: Button = %GesturesButton
 @onready var _classic: Button = %ClassicButton
 @onready var _language: OptionButton = %LanguageOption
+@onready var _fullscreen: CheckButton = %FullscreenToggle
+@onready var _fullscreen_label: Label = %FullscreenLabel
 @onready var _back: Button = %BackButton
 
 var _locales: PackedStringArray = PackedStringArray()
@@ -27,6 +31,9 @@ func _on_menu_ready() -> void:
 	_gestures.pressed.connect(_game_manager.set_control_layout.bind(InputManager.LAYOUT_GESTURES))
 	_classic.pressed.connect(_game_manager.set_control_layout.bind(InputManager.LAYOUT_CLASSIC))
 	_language.item_selected.connect(_on_language_selected)
+	_fullscreen.toggled.connect(func(on: bool) -> void:
+		if not _filling:
+			_game_manager.set_fullscreen(on))
 	_back.pressed.connect(_ui_manager.close_menu)
 
 func _on_shown() -> void:
@@ -34,6 +41,10 @@ func _on_shown() -> void:
 	_master.value = _game_manager.get_volume(&"Master")
 	_music.value = _game_manager.get_volume(&"Music")
 	_sfx.value = _game_manager.get_volume(&"SFX")
+	var can_toggle := _game_manager.can_toggle_fullscreen()
+	_fullscreen.visible = can_toggle
+	_fullscreen_label.visible = can_toggle
+	_fullscreen.button_pressed = _game_manager.is_fullscreen()
 	var classic := _game_manager.input.control_layout == InputManager.LAYOUT_CLASSIC
 	_classic.button_pressed = classic
 	_gestures.button_pressed = not classic
