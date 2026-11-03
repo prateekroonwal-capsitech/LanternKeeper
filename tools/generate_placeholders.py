@@ -145,11 +145,12 @@ def layer(rel: str, color: tuple, base: float, waves: list, trees: int = 0) -> N
         x = random.randint(0, w - 1)
         y = int(top[x])
         th = random.randint(60, 140)
-        d.line((x, y, x, y - th), fill=color, width=6)
-        for _ in range(4):
-            by = y - random.randint(th // 3, th)
-            dx = random.choice((-1, 1)) * random.randint(15, 40)
-            d.line((x, by, x + dx, by - random.randint(10, 30)), fill=color, width=3)
+        branches = [(y - random.randint(th // 3, th), random.choice((-1, 1)) * random.randint(15, 40),
+                     random.randint(10, 30)) for _ in range(4)]
+        for ox in (-w, 0, w):            # drawn wrapped, so the layer tiles without a seam
+            d.line((x + ox, y, x + ox, y - th), fill=color, width=6)
+            for by, dx, dy in branches:
+                d.line((x + ox, by, x + ox + dx, by - dy), fill=color, width=3)
     save(img, rel)
 
 

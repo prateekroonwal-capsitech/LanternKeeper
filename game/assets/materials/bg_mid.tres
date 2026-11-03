@@ -6,6 +6,6 @@
 transparency = 2
 shading_mode = 0
 albedo_texture = ExtResource("1_tex")
-uv1_scale = Vector3(4, 1, 1)
+uv1_scale = Vector3(12, 1, 1)
 texture_filter = 2
 disable_receive_shadows = true
