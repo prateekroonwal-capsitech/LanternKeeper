@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/FallingTrap.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/props/rock_trap.png" id="2_rock"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/thread.png" id="3_rope"]
+
+[sub_resource type="BoxShape3D" id="rock_shape"]
+size = Vector3(1.5, 1.2, 1.5)
+
+[node name="RockTrap" type="Node3D"]
+script = ExtResource("1_script")
+lever_id = &"rock_a"
+drop_height = 5.4
+fall_time = 0.45
+kill_half_width = 1.1
+kill_height = 2.6
+
+[node name="Block" type="AnimatableBody3D" parent="."]
+sync_to_physics = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Block"]
+shape = SubResource("rock_shape")
+
+[node name="Sprite" type="Sprite3D" parent="Block"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.2)
+pixel_size = 0.0095
+alpha_cut = 1
+texture_filter = 3
+texture = ExtResource("2_rock")
+
+[node name="Rope" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 3.5, 0, 0, 0, 1, 0, 2.4, -0.25)
+modulate = Color(0.55, 0.42, 0.3, 1)
+pixel_size = 0.015625
+texture_filter = 3
+texture = ExtResource("3_rope")

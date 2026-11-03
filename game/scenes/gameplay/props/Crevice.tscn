@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/Crevice.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/props/crevice.png" id="2_crevice"]
+
+[sub_resource type="BoxShape3D" id="crevice_area"]
+size = Vector3(1.0, 2.4, 2)
+
+[node name="Crevice" type="Area3D"]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+shape = SubResource("crevice_area")
+
+[node name="Sprite" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+offset = Vector2(0, 144)
+pixel_size = 0.0095
+alpha_cut = 2
+texture_filter = 3
+texture = ExtResource("2_crevice")

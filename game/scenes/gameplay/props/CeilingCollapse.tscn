@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/FallingTrap.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/props/ceiling_slab.png" id="2_slab"]
+
+[sub_resource type="BoxShape3D" id="slab_shape"]
+size = Vector3(6, 1.2, 2)
+
+[node name="CeilingCollapse" type="Node3D"]
+script = ExtResource("1_script")
+lever_id = &"ceiling_a"
+drop_height = 4.7
+fall_time = 0.35
+kill_half_width = 3.0
+kill_height = 3.0
+
+[node name="Block" type="AnimatableBody3D" parent="."]
+sync_to_physics = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Block"]
+shape = SubResource("slab_shape")
+
+[node name="Sprite" type="Sprite3D" parent="Block"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, -0.1)
+pixel_size = 0.0158
+alpha_cut = 1
+texture_filter = 3
+texture = ExtResource("2_slab")

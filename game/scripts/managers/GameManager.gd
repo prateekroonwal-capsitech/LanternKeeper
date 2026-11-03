@@ -26,6 +26,10 @@ extends Node
 ##   report_player_caught(enemy) / report_wake_trigger(group)   — enemies, WakeTrigger
 ##   report_player_jumped() / report_player_landed(speed)       — Player (sound)
 ##   report_tutorial_trigger(hint_id)                           — TutorialTrigger
+##   report_trap_sprung(trap)                                   — FallingTrap (rock, ceiling)
+##   report_hiding_spot(spot, inside) / is_player_hidden()      — Crevice
+##   report_player_pushing(direction)                           — Crate
+##   report_camera_focus(point, duration)                       — FallingTrap (so the hit is seen)
 ##   report_menu_ready()                                        — HomeScene (menu backdrop)
 ##   start_level(id), restart_level(), go_to_next_level(), go_to_level_select(),
 ##   go_to_main_menu(), quit_game(), pause()/resume()           — menus
@@ -34,6 +38,7 @@ extends Node
 ##   dark_meter_changed, dark_meter_emptied, dark_meter_recovered, lantern_place_requested,
 ##   lantern_placed, lantern_picked_up, platform_lost, player_died, player_respawned,
 ##   level_reset, checkpoint_saved, checkpoint_activated, enemy_woke, enemies_wake_requested,
+##   trap_sprung, lever_pulled, camera_focus_requested,
 ##   game_paused, game_resumed, game_started, game_over
 ##
 ## Checkpoints: at level start and at every new shrine GameManager saves a snapshot —
@@ -101,6 +106,7 @@ var _checkpoint_enemies: Dictionary = {}
 var _checkpoint_triggers: Dictionary = {}
 var _checkpoint_resettables: Dictionary = {}
 var _hook_in_reach: Node3D = null
+var _hiding_spots: Array[Node3D] = []
 var _last_hiss_at: float = -100.0
 var _light_sources: Array[Node3D] = []
 var _dark_emptied: bool = false
@@ -218,6 +224,7 @@ func report_level_unloaded(level_root: LevelRoot) -> void:
 	_checkpoint_triggers.clear()
 	_checkpoint_resettables.clear()
 	_hook_in_reach = null
+	_hiding_spots.clear()
 	set_physics_process(false)
 	_set_heartbeat(0.0)
 	state = State.MENU
@@ -619,6 +626,40 @@ func report_lever_pulled(lever_id: StringName) -> void:
 		audio.play_event(&"lantern_place", true)
 	if bus:
 		bus.lever_pulled.emit(lever_id)
+
+## A falling trap landed. Creatures listening to trap_sprung ask the trap whether they were
+## under it (trap.is_in_kill_zone(point)).
+func report_trap_sprung(trap: Node3D) -> void:
+	if state != State.PLAYING:
+		return
+	if haptics:
+		haptics.medium()
+	if audio:
+		audio.play_event(&"land", true)
+	if bus:
+		bus.trap_sprung.emit(trap)
+
+## Something important happens away from the child (a trap falling on a creature): the
+## camera frames both for `duration` seconds.
+func report_camera_focus(point: Vector3, duration: float) -> void:
+	if bus and state == State.PLAYING:
+		bus.camera_focus_requested.emit(point, duration)
+
+## A hiding spot (Crevice) tells us the child went in / came out.
+func report_hiding_spot(spot: Node3D, inside: bool) -> void:
+	if inside and not _hiding_spots.has(spot):
+		_hiding_spots.append(spot)
+	elif not inside:
+		_hiding_spots.erase(spot)
+
+## True while the child is inside a hiding spot (creatures that hunt by sight can't see them).
+func is_player_hidden() -> bool:
+	return not _hiding_spots.is_empty()
+
+## A crate is being pushed (1) / pulled (-1) by the child, or not (0): drives the push animation.
+func report_player_pushing(direction: int) -> void:
+	if is_instance_valid(_player) and _player.has_method("set_push_state"):
+		_player.set_push_state(direction)
 
 # ── Enemies ───────────────────────────────────────────────────────────────
 

@@ -1,0 +1,115 @@
+"""Placeholder art for the level 10 trap props (replace each PNG with final art of the same size).
+
+Output: game/assets/sprites/single/props/
+  rock_trap.png       192 x 160  boulder hanging on a rope (RockTrap.tscn → Block/Sprite)
+  ceiling_slab.png    384 x 128  cracked ceiling slab (CeilingCollapse.tscn → Block/Sprite)
+  crate.png           128 x 128  wooden crate (Crate.tscn → Sprite)
+  pressure_plate.png  160 x 48   stone plate in a frame (PressurePlate.tscn → Plate)
+  crevice.png         160 x 288  dark hiding crevice in the cave wall (Crevice.tscn → Sprite)
+
+Usage:  python tools/generate_level_props.py
+"""
+import math
+import os
+import random
+
+from PIL import Image, ImageDraw, ImageFilter
+
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "game", "assets", "sprites", "single", "props")
+STONE = (24, 24, 30, 255)
+STONE_HI = (52, 52, 62, 255)
+DARK = (6, 6, 9, 255)
+
+
+def save(img, name):
+    img.save(os.path.join(OUT, name))
+    print("wrote", name, img.size)
+
+
+def boulder():
+    r = random.Random(3)
+    w, h = 192, 160
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    pts = []
+    for k in range(18):
+        a = k / 18 * math.tau
+        rad = 1.0 + r.uniform(-0.08, 0.08)
+        pts.append((w / 2 + math.cos(a) * 88 * rad, h / 2 + 6 + math.sin(a) * 66 * rad))
+    d.polygon(pts, fill=STONE)
+    for k in range(5):                                      # cracks / facets
+        x0, y0 = r.uniform(40, 150), r.uniform(40, 120)
+        d.line((x0, y0, x0 + r.uniform(-30, 30), y0 + r.uniform(10, 30)), fill=DARK, width=3)
+    d.arc((20, 18, 172, 150), 200, 320, fill=STONE_HI, width=4)  # rim highlight
+    d.rectangle((90, 0, 102, 22), fill=(40, 34, 28, 255))   # rope knot
+    save(img, "rock_trap.png")
+
+
+def slab():
+    r = random.Random(5)
+    w, h = 384, 128
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    top = [(0, 0), (w, 0)]
+    bottom = [(w - x, 100 + r.uniform(-6, 18)) for x in range(0, w + 1, 24)]
+    d.polygon(top + bottom, fill=STONE)
+    for k in range(7):                                      # cracks running through it
+        x = r.uniform(20, w - 20)
+        pts = [(x, 0)]
+        for _ in range(5):
+            pts.append((pts[-1][0] + r.uniform(-16, 16), pts[-1][1] + r.uniform(14, 24)))
+        d.line(pts, fill=DARK, width=4)
+    for x in range(10, w, 40):                              # hanging grit
+        d.line((x, 100, x + 2, 116 + r.uniform(0, 8)), fill=STONE, width=3)
+    save(img, "ceiling_slab.png")
+
+
+def crate():
+    w = h = 128
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    wood, dark, edge = (58, 40, 26, 255), (30, 20, 13, 255), (84, 60, 38, 255)
+    d.rectangle((2, 2, w - 3, h - 3), fill=wood, outline=dark, width=6)
+    for y in (42, 84):
+        d.line((6, y, w - 6, y), fill=dark, width=3)
+    d.line((10, 10, w - 10, h - 10), fill=edge, width=10)   # cross brace
+    d.line((10, 10, w - 10, h - 10), fill=dark, width=2)
+    for x, y in ((12, 12), (w - 12, 12), (12, h - 12), (w - 12, h - 12)):
+        d.ellipse((x - 4, y - 4, x + 4, y + 4), fill=dark)
+    save(img, "crate.png")
+
+
+def plate():
+    w, h = 160, 48
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.rectangle((0, 18, w - 1, h - 1), fill=DARK)            # frame in the floor
+    d.rectangle((10, 6, w - 11, 26), fill=STONE_HI)          # the plate
+    d.line((14, 10, w - 15, 10), fill=(80, 80, 92, 255), width=2)
+    for x in (30, 80, 130):                                 # rune notches
+        d.line((x, 12, x + 6, 22), fill=DARK, width=3)
+    save(img, "pressure_plate.png")
+
+
+def crevice():
+    w, h = 160, 288
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    r = random.Random(9)
+    pts = [(w / 2 + math.sin(y / 30.0) * 8 - 44 + r.uniform(-6, 6), y) for y in range(0, h + 1, 24)]
+    pts += [(w / 2 + math.sin(y / 26.0) * 8 + 44 + r.uniform(-6, 6), y) for y in range(h, -1, -24)]
+    d.polygon(pts, fill=(2, 2, 3, 255))
+    img = img.filter(ImageFilter.GaussianBlur(5))           # soft, deep shadow edges
+    core = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    ImageDraw.Draw(core).polygon([(p[0] * 0.8 + w * 0.1, p[1]) for p in pts], fill=(0, 0, 0, 255))
+    img.alpha_composite(core)
+    save(img, "crevice.png")
+
+
+if __name__ == "__main__":
+    os.makedirs(OUT, exist_ok=True)
+    boulder()
+    slab()
+    crate()
+    plate()
+    crevice()

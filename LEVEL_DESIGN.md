@@ -18,7 +18,7 @@ Status legend — **Solvable**: completed end-to-end by the route bot in the run
 | 7 | Followed (Prompt 4, medium) | Solvable | proof bot PASS — exit in 23 s; 60 % of dark meter used; hesitating kills; shortcut blocked |
 | 8 | Lost Light | Solvable | route bot PASS (13.2 s) |
 | 9 | Holes (remade) | Solvable | proof bot PASS — solution, carrying the lantern can't grab the rope |
-| 10 | The Chase (hard) | Solvable | proof bot PASS — exit in 62.5 s with no attack, swoops miss; standing / going back gets caught; resets at each checkpoint |
+| 10 | The Shade (hard) | Solvable | proof bot PASS — each encounter solved, failed and reset; full run start to exit |
 
 All 10 levels are solvable. Levels 3, 5, 6, 7 and 9 follow the remake brief; levels 1, 2,
 4, 8 and 10 are still the original Phase 5 layouts (solvable, not yet reworked to the brief).
@@ -131,34 +131,60 @@ switch/chain/lever state of that checkpoint; pits have kill zones; bounds sealed
 2. Pick it up; cross the ghost bridges it lights.
 3. Drop to the floor; set the lantern down ≥ 4.5 m before the ghost wall; walk through.
 
-## 1-10 The Chase — final test of World 1 (HARD but fair) — *Prompt 4 design (updated with The Shade)*
-**Idea:** everything learned, under pressure: carry the light, read ghost paths, keep moving.
-**Layout:** three ≈ 20 s segments, each ending at a shrine. The Shade (flying shadow chaser) wakes behind you
-(hint: "Run") and chases along a 3D flight path at 4.6 m/s with swoops over gaps — slower than the child's 5.2 m/s run, so a clean run
-always escapes. Ghost bridges and ghost stepping stones appear in the carried light as you
-reach them; cracked plank bridges collapse 0.5 s after you step on them (so you can't stop on
-them). At the end, the exit gate opens only while the lantern sits on its plate.
-**Solution:**
-1. Run right; hop the gaps; cross ghost bridges and stones in your own light.
-2. Cross each cracked plank bridge without stopping.
-3. Shrines at x 2, 104 and 206 (≈ every 20 s). After a death the Shade restarts at that
-   checkpoint's path offset (`checkpoint_offsets`) with every timer cleared, waits 1 s, then
-   resumes the chase; collapsed planks and ghost paths reset to the checkpoint.
-4. Final segment: set the lantern on the exit plate (x 292) — the gate (x 295) opens — walk
-   through to the exit (x 300).
-**The Shade's rules:** it flies the `ChasePath` about 6 m behind you and never closes in by
-itself, so a child who keeps moving is never attacked. It attacks only when you're stuck:
-less than 1 m forward in 3 s (time in the air doesn't count), more than 2 m back, or closer
-than 2 m. Then: warning 1.5 s (screech, eyes flare, it closes in a little; moving forward
-cancels it) → pull-up 0.5 s → dive at where you are (+ velocity × 0.3) → caught, or it climbs
-back and waits 2.5 s. Three scripted swoops dip over the stepping stones (x 60) and the ghost
-bridges (x 164, x 248) just after you pass; standing still in a swoop's danger zone
-(`SwoopDangerZone1-3`) as it dips gets you caught.
-**Difficulty:** hard — no stopping on planks, chained jumps, and the Shade attacks if you
-hesitate; every hazard is on screen ≈ 8 m before you reach it; all jumps ≤ 2.4 m (touch-friendly).
-**Soft-lock checks:** every pit has a kill zone; the lantern never leaves your hand until the
-exit plate (placed there, the gate opens; take it back and it shuts — place it again); planks
-reset with checkpoints; bounds sealed by walls.
+## 1-10 The Shade — four encounters (HARD) — final test of World 1
+**Idea:** the Shade, a large flying shadow, meets the child four times. Each meeting is one
+clear puzzle under pressure; failing it is death. The child beats it three times and it comes
+back each time more damaged (torn wing after 2, smoke and sparks in 4) until the ceiling
+crushes it. Lantern light means nothing to it — only the level's traps hurt it. Touching it
+is death. A shrine sits right before each encounter; dying resets that encounter completely
+(Shade, traps, crate, lantern, collapsing planks, triggers). Bounds are walled, pits have a
+kill zone, and the dark meter is off in this level (the Shade is the threat).
+
+**1 · Run** (shrine x 2, trigger x 12). The Shade bursts in from behind and follows its own
+`RunPath` at 4.6 m/s (the child runs 5.2 m/s) — it never waits.
+1. Run right across the bridge over the pit: ghost platforms (they need the carried light)
+   alternate with cracked planks that drop 0.5 s after you step on them.
+2. Jump the 2.4 m gap at the end (the last planks fall behind you). The Shade loses you
+   (trigger x 56) and flies off.
+- Fail: hesitating on the bridge → it catches you; missing a jump → the pit.
+- Shortcut / soft-lock: the pit spans the whole bridge; planks and the trigger reset with
+  the shrine; the light never leaves your hand.
+
+**2 · Trap** (shrine x 61, trigger x 70). It perches at x 93 and attacks anything within
+4.5 m, blocking the way.
+1. Hang the lantern on the bait hook (x 82.5), right under a rock on a rope (x 80).
+2. Run back left at once and climb the step (x 58) to the high ledge — it is too high and
+   too far for the Shade (25 m away).
+3. The Shade is drawn under the rock. Walk into the lever (x 55): the rock drops and pins it.
+   The camera pulls back so you see it: wing torn, screech, it flees.
+4. Climb down, jump over the rock, take the lantern from the hook, walk on.
+- Fail: walking near it without bait → caught.
+- Soft-lock: pulling the lever with no Shade under the rock → the rock misses, is hauled
+  back up after 3 s and the lever re-arms. Taking the bait back sends it back to its perch.
+
+**3 · Hide** (shrine x 108, trigger x 120). A dark cave; the Shade sweeps a set path
+(x 124–168) back and forth at 7 m/s, pausing 1.2 s at each end.
+1. Hang the lantern on the cradle (x 114.5) — the cave gate (x 117) only opens while it hangs
+   there, so the light stays behind.
+2. Hide in the dark crevices (x 129, 140, 151, 162). Move to the next one while it is
+   sweeping away from you.
+3. Past its range (trigger x 173) it gives up and flies off. Walk into the lever (x 176.5):
+   the cradle rides its rail through the cave and brings the lantern to you (5 s).
+- Fail: in the open within 3.5 m of it as it passes → spotted, dives, kills; carrying the
+  light (only possible if you never left it) → spotted from 12 m.
+- Soft-lock: the gate closes behind you once you take the lantern; no route back is needed.
+
+**4 · Final** (shrine x 188, trigger x 192). A cavern with a cracked ceiling slab (x 200–206).
+The Shade (smoking, sparking) repeats: hover 2.2 s → screech 0.8 s (eyes flare) → dive under
+the slab (0.5 s) → search there 1.1 s → lunge at the child.
+1. Stand at the crate (x 208.6), left of the pressure plate (x 211.4).
+2. When it screeches, push the crate onto the plate (≈1.2 s of pushing): the slab falls on
+   it while it searches under the ceiling. Its eyes fade; the exit gate (x 222) opens.
+3. Jump over the crate and walk into the exit portal (x 232).
+- Fail: pushing too early → the slab falls on nothing and its next dive kills; too late →
+  it lunges first. Window ≈ 1.5 s (touch-friendly).
+- Soft-lock: the crate only moves between its start and the plate; dying resets crate,
+  plate and slab.
 
 ---
 

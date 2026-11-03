@@ -1,419 +1,450 @@
 class_name Shade
 extends Enemy
 
-## Shade — a massive flying creature of shadow that pursues the child across Level 10.
-## Follows a Path3D using a PathFollow3D, pacing itself to the player's path progress
-## to maintain a steady chase gap behind the child without attacking as long as they advance.
+## Shade — the flying shadow of level 10. It meets the child in four encounters; each one is
+## started by a WakeTrigger group and played out on paths / markers placed in the level.
+## Touching its body is death. Lantern light means nothing to it — only the level's traps
+## (FallingTrap) can hurt it. It comes back from each encounter more damaged:
+## after encounter 2 one wing is torn, from encounter 4 it also smokes and sparks.
 ##
-## It holds `chase_gap` behind the child's path progress, never closer than `min_gap`, and
-## never passes them. Touching it is death (its hurtbox matches the body, not the wings or
-## the smoke). It ignores lantern light.
+##  1 RUN    (`run_group`): bursts in and follows `run_follow` (PathFollow3D) at `run_speed`,
+##           a little slower than the child, never waiting. `run_end_group` → it loses the
+##           child and flies off to `run_exit`.
+##  2 TRAP   (`trap_group`): perches at `perch_point`; anything within `reach` is attacked.
+##           A lantern hung on hook `bait_hook_id` lures it (after `lure_delay`) to hover at
+##           `lure_point`, under the rock trap. If the rock lands on it: pinned, wing torn,
+##           screech, then it flees to `flee_point`. Bait removed → back to the perch.
+##  3 HIDE   (`hide_group`): sweeps `patrol_follow` back and forth (`patrol_speed`, pausing
+##           `patrol_pause` at each end). It spots the child in the open within
+##           `spot_range`, or carrying the light within `light_spot_range` → attack.
+##           `hide_end_group` → flies off to `hide_exit`.
+##  4 FINAL  (`final_group`): flies to `hover_point`, then repeats: hover `hover_time`,
+##           screech `screech_time` (eyes flare), dive to `low_point` (`dive_time`, under the
+##           cracked ceiling), search there for `hold_time`, then lunge at the child.
+##           If the ceiling trap lands on it: crushed, eyes fade, it reports `defeat_lever_id`.
 ##
-## Scripted swoops: when the child reaches a marked path offset the Shade sweeps forward
-## and dips lowest at that offset. A moving child is already past it; only a child standing
-## still inside that swoop's danger zone (an Area3D in the level) is caught.
-##
-## Sends: GameManager.report_player_caught(self), GameManager.report_enemy_woke(self).
-## Receives: GameBus signals via Enemy base class.
+## Sends: GameManager.report_player_caught(self), report_enemy_woke(self),
+##   report_lever_pulled(defeat_lever_id).
+## Receives: GameBus.enemies_wake_requested(group), lantern_hook_changed(id, hung),
+##   trap_sprung(trap); GameManager.is_player_hidden() / is_lantern_carried() (polled);
+##   checkpoint snapshot (group "enemies").
 
-enum AttackState { CHASE, SWOOP }
+enum Act { IDLE, ARRIVE, RUN, FLY_OFF, PERCH, LURE, ATTACK, PINNED, PATROL, HOVER, SCREECH, DIVE, HOLD, CRUSHED }
 
-@export_group("Paced Chase")
-## Desired following gap behind the player along the path (metres).
-@export var chase_gap: float = 6.0
-## It never comes closer than this behind the child along the path (metres).
-@export var min_gap: float = 2.5
-## Normal flight speed when matching pace along the path (m/s).
-@export var base_speed: float = 4.6
-## Maximum surge speed when player pulls far ahead (m/s).
-@export var surge_speed: float = 6.5
-## Amplitude of the gentle sine bob on Y (metres).
-@export var bob_amplitude: float = 0.35
-## Frequency of the vertical sine bob (radians/sec).
+@export_group("1 Run")
+@export var run_group: StringName = &"shade_run"
+@export var run_end_group: StringName = &"shade_run_end"
+@export var run_follow: PathFollow3D
+@export var run_speed: float = 4.6
+@export var run_exit: Marker3D
+
+@export_group("2 Trap")
+@export var trap_group: StringName = &"shade_trap"
+@export var perch_point: Marker3D
+@export var lure_point: Marker3D
+@export var flee_point: Marker3D
+@export var bait_hook_id: StringName = &"shade_bait"
+@export var lure_delay: float = 1.0
+## Anything this close (m) to it while it perches or hovers at the bait is attacked.
+@export var reach: float = 4.5
+@export var pinned_time: float = 1.6
+
+@export_group("3 Hide")
+@export var hide_group: StringName = &"shade_hide"
+@export var hide_end_group: StringName = &"shade_hide_end"
+@export var patrol_follow: PathFollow3D
+@export var patrol_speed: float = 7.0
+@export var patrol_pause: float = 1.2
+## It starts sweeping from this end of the path (true = the far end).
+@export var patrol_start_at_end: bool = true
+@export var spot_range: float = 3.5
+@export var light_spot_range: float = 12.0
+@export var hide_exit: Marker3D
+
+@export_group("4 Final")
+@export var final_group: StringName = &"shade_final"
+@export var hover_point: Marker3D
+@export var low_point: Marker3D
+@export var hover_time: float = 2.2
+@export var screech_time: float = 0.8
+@export var dive_time: float = 0.5
+@export var hold_time: float = 1.1
+@export var defeat_lever_id: StringName = &"shade_defeated"
+@export var eye_fade_time: float = 1.5
+
+@export_group("Flight")
+@export var fly_speed: float = 9.0
+@export var attack_speed: float = 11.0
+@export var bob_amplitude: float = 0.2
 @export var bob_frequency: float = 2.4
-## Pitch/tilt angle forward when cruising (radians).
-@export var tilt_amount: float = 0.12
-## Stops chasing here (path progress).
-@export var end_offset: float = 330.0
 
-@export_group("Swoops")
-## Path offsets of the scripted swoops (where the dip is deepest, over each danger zone).
-@export var swoop_offsets: PackedFloat32Array = PackedFloat32Array([84.0, 188.0, 273.0])
-## The swoop starts when the child's progress is this close before its offset (metres).
-@export var swoop_trigger_lead: float = 2.0
-## How far past the swoop offset the sweep carries on before climbing back (metres).
-@export var swoop_exit: float = 3.0
-## Duration of the dramatic fly-by swoop (seconds).
-@export var swoop_duration: float = 1.4
-## Maximum depth dipped below normal flight path during scripted swoop (metres).
-@export var swoop_depth: float = 1.8
-## Half-length of the dip along the path, centred on the swoop offset (metres).
-@export var swoop_dip_width: float = 5.0
-## Pre-placed Area3D danger zones in the level corresponding to each marked swoop offset.
-@export var swoop_danger_zones: Array[NodePath] = []
-
-@export_group("Checkpoints")
-## Path progress restart offsets: [0]=Spawn/Shrine1, [1]=Shrine2 (x=92), [2]=Shrine3 (x=194).
-@export var checkpoint_offsets: PackedFloat32Array = PackedFloat32Array([0.0, 116.1, 218.7])
-## Delay after respawn before the Shade resumes chasing (seconds).
-@export var rewake_delay: float = 1.0
-
-@export_group("References")
-## PathFollow3D node driving position along the chase route.
-@export var path_follow: PathFollow3D
-
-## Visible damage level (see set_damage).
+var act: Act = Act.IDLE
+## Visible damage: 0 whole, 1 torn wing, 2 torn wing + smoke and sparks.
 var damage: int = 0
-var _progress: float = 0.0
+var _t: float = 0.0
 var _bob_t: float = 0.0
-var _rewake_t: float = -1.0
 var _facing: float = 1.0
-
-# Progress tracking
-var _player_progress: float = 0.0
-
-# Attack state machine variables
-var _attack_state: AttackState = AttackState.CHASE
-var _shade_timer: float = 0.0
-var _swoop_index: int = -1
-var _swoop_phase: int = 0 # 0=telegraph, 1=flyby
-var _swoop_from: float = 0.0
-var _triggered_swoops: Array[bool] = []
-var _danger_zones: Array[Area3D] = []
+var _target: Vector3
+var _after_arrive: Act = Act.IDLE
+var _patrol_dir: float = -1.0
+var _patrol_wait: float = 0.0
+var _bait_hung: bool = false
+var _dive_from: Vector3
+var _encounter: int = 0
+var _defeated: bool = false
 
 @onready var _smoke: CPUParticles3D = get_node_or_null("SmokeTrail")
 @onready var _body: AnimatedSprite3D = get_node_or_null("Visual/Body")
-@onready var _eye_anchor: Marker3D = get_node_or_null("Visual/EyeAnchor")
-@onready var _eye_1: Sprite3D = get_node_or_null("Visual/EyeAnchor/Eye1")
-@onready var _eye_2: Sprite3D = get_node_or_null("Visual/EyeAnchor/Eye2")
-@onready var _eye_3: Sprite3D = get_node_or_null("Visual/EyeAnchor/Eye3")
-@onready var _eye_4: Sprite3D = get_node_or_null("Visual/EyeAnchor/Eye4")
+@onready var _eye_anchor: Node3D = get_node_or_null("Visual/EyeAnchor")
 @onready var _damage_smoke: CPUParticles3D = get_node_or_null("DamageSmoke")
 @onready var _sparks: CPUParticles3D = get_node_or_null("Sparks")
-@onready var _visual_root: Node3D = get_node_or_null("Visual")
 @onready var _debug_ui: CanvasLayer = get_node_or_null("DebugUI")
 @onready var _debug_label: Label = get_node_or_null("DebugUI/Panel/Margin/Label")
 
 func _ready() -> void:
 	ignores_light = true
 	enemy_kind = "shade"
-	if wake_group == &"":
-		wake_group = &"chase"
-	_init_swoop_triggers()
-	_init_danger_zones()
 	super._ready()
-
 	if _debug_ui:
 		_debug_ui.visible = false
+	_go_idle()
 
-func _init_danger_zones() -> void:
-	_danger_zones.clear()
-	for p in swoop_danger_zones:
-		var zone := get_node_or_null(p) as Area3D
-		if zone:
-			_danger_zones.append(zone)
+func inject_services(registry: Node) -> void:
+	super.inject_services(registry)
+	if _game:
+		_game.bus.lantern_hook_changed.connect(_on_hook_changed)
+		_game.bus.trap_sprung.connect(_on_trap_sprung)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not OS.is_debug_build():
+	if OS.is_debug_build() and event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F3 and _debug_ui:
+		_debug_ui.visible = not _debug_ui.visible
+
+# ── Encounter starts / ends (WakeTrigger groups) ──────────────────────────
+
+func _on_wake_requested(group: StringName) -> void:
+	if group == &"":
 		return
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_F3:
-			if _debug_ui:
-				_debug_ui.visible = not _debug_ui.visible
+	match group:
+		run_group:
+			if act == Act.IDLE and run_follow:
+				_begin(1)
+				run_follow.progress = 0.0
+				global_position = run_follow.global_position
+				_set_act(Act.RUN)
+		run_end_group:
+			if act == Act.RUN:
+				_fly_off(run_exit)
+		trap_group:
+			if act == Act.IDLE and perch_point:
+				_begin(2)
+				global_position = perch_point.global_position + Vector3(0.0, 8.0, 0.0)
+				_arrive(perch_point.global_position, Act.PERCH)
+		hide_group:
+			if act == Act.IDLE and patrol_follow:
+				_begin(3)
+				var length := _path_length(patrol_follow)
+				patrol_follow.progress = length if patrol_start_at_end else 0.0
+				_patrol_dir = -1.0 if patrol_start_at_end else 1.0
+				global_position = patrol_follow.global_position + Vector3(0.0, 6.0, 0.0)
+				_arrive(patrol_follow.global_position, Act.PATROL)
+		hide_end_group:
+			if act == Act.PATROL:
+				_fly_off(hide_exit)
+		final_group:
+			if act == Act.IDLE and hover_point:
+				_begin(4)
+				set_damage(2)
+				global_position = hover_point.global_position + Vector3(-12.0, 3.0, 0.0)
+				_arrive(hover_point.global_position, Act.HOVER)
 
-func _init_swoop_triggers() -> void:
-	_triggered_swoops.clear()
-	_triggered_swoops.resize(swoop_offsets.size())
-	_triggered_swoops.fill(false)
+func _begin(encounter: int) -> void:
+	_encounter = encounter
+	mode = Mode.HUNT
+	_visual.visible = true
+	_set_body_visible(true)
+	_set_hurtbox_active(true)
+	if _smoke:
+		_smoke.emitting = true
+	_eye_alpha(1.0)
+	_game.report_enemy_woke(self)
+	print("[Shade] encounter %d starts" % encounter)
 
-func _reset_swoop_triggers(current_prog: float) -> void:
-	for i in range(swoop_offsets.size()):
-		_triggered_swoops[i] = current_prog >= swoop_offsets[i]
-
-func _set_facing(f: float) -> void:
-	var sign_val := -1.0 if f < 0.0 else 1.0
-	if not is_equal_approx(_facing, sign_val):
-		_facing = sign_val
-		if _visual_root:
-			_visual_root.scale.x = _facing   # the EyeAnchor is under Visual, so the eyes mirror too
-
-func _set_path_progress(p: float) -> void:
-	_progress = p
-	if path_follow:
-		path_follow.progress = p
-
-func _get_path_position() -> Vector3:
-	if path_follow:
-		return path_follow.global_position + Vector3(0.0, sin(_bob_t) * bob_amplitude, 0.0)
-	return global_position
-
-func _get_path_curve() -> Curve3D:
-	if path_follow and path_follow.get_parent() is Path3D:
-		return (path_follow.get_parent() as Path3D).curve
-	return null
-
-func reset_to_checkpoint(state: Dictionary = {}) -> void:
-	super.reset_to_checkpoint(state)
-	var shrine: Shrine = _game.get_active_shrine() as Shrine if _game else null
-	var target_prog: float = 0.0
-
-	if shrine != null:
-		if shrine.name == "Shrine3" and checkpoint_offsets.size() > 2:
-			target_prog = checkpoint_offsets[2]
-		elif shrine.name == "Shrine2" and checkpoint_offsets.size() > 1:
-			target_prog = checkpoint_offsets[1]
-		elif not checkpoint_offsets.is_empty():
-			target_prog = checkpoint_offsets[0]
-	elif not checkpoint_offsets.is_empty():
-		target_prog = checkpoint_offsets[0]
-
-	_clear_chase_state()
-	var curve := _get_path_curve()
-	var respawn_prog := curve.get_closest_offset(_game.get_respawn_position()) if curve and _game else target_prog
-	_player_progress = respawn_prog
-	_reset_swoop_triggers(respawn_prog)
-	_set_path_progress(target_prog)
-
-	var start_pos := _get_path_position()
-	global_position = start_pos
-	_home = start_pos   # it emerges here, not back at the level start
-	rotation.z = 0.0
-
+func _go_idle() -> void:
+	act = Act.IDLE
 	mode = Mode.DORMANT
-	_rewake_t = rewake_delay
+	_visual.visible = false
+	_set_body_visible(false)
+	_set_hurtbox_active(false)
 	if _smoke:
 		_smoke.emitting = false
-	reset_physics_interpolation()
-	print("[Shade] CHECKPOINT RESET to offset %.1f (child at %.1f, %s): state CHASE, timers cleared, resumes in %.1f s" % [target_prog, respawn_prog, shrine.name if shrine else "start", rewake_delay])
+	set_damage(damage)
+
+func _set_act(a: Act) -> void:
+	if a != act:
+		print("[Shade] %s -> %s" % [Act.keys()[act], Act.keys()[a]])
+	act = a
+	_t = 0.0
+
+func _arrive(target: Vector3, then: Act) -> void:
+	_target = target
+	_after_arrive = then
+	_set_act(Act.ARRIVE)
+
+func _fly_off(exit: Marker3D) -> void:
+	_target = exit.global_position if exit else global_position + Vector3(0.0, 15.0, 0.0)
+	_set_act(Act.FLY_OFF)
 
 ## Visible damage: 0 = whole, 1 = torn wing, 2 = torn wing + smoke and sparks.
 func set_damage(level: int) -> void:
 	damage = clampi(level, 0, 2)
 	if _body:
 		_body.set(&"anim_suffix", "_torn" if damage >= 1 else "")
+	var smoking := damage >= 2 and act != Act.IDLE
 	if _damage_smoke:
-		_damage_smoke.emitting = damage >= 2
+		_damage_smoke.emitting = smoking
 	if _sparks:
-		_sparks.emitting = damage >= 2
+		_sparks.emitting = smoking
 
-func _reset() -> void:
-	super._reset()
-	_rewake_t = -1.0
-	_clear_chase_state()
-	_init_swoop_triggers()
+# ── Bait and traps ────────────────────────────────────────────────────────
 
-## Swoop state and effects back to a calm chase.
-func _clear_chase_state() -> void:
-	_attack_state = AttackState.CHASE
-	_shade_timer = 0.0
-	_swoop_index = -1
-	_swoop_phase = 0
-	_restore_eye_flare()
-	if _smoke:
-		_smoke.amount = 36
-		_smoke.initial_velocity_min = 1.2
-		_smoke.initial_velocity_max = 2.8
+func _on_hook_changed(hook_id: StringName, hung: bool) -> void:
+	if hook_id != bait_hook_id:
+		return
+	_bait_hung = hung
+	if hung and act == Act.PERCH:
+		_set_act(Act.LURE)                 # _t counts the lure delay, then it flies over
+	elif not hung and act == Act.LURE:
+		_arrive(perch_point.global_position, Act.PERCH)
+
+func _on_trap_sprung(trap: Node3D) -> void:
+	if act == Act.IDLE or act == Act.CRUSHED or act == Act.PINNED:
+		return
+	if not trap.has_method("is_in_kill_zone") or not trap.is_in_kill_zone(global_position):
+		print("[Shade] trap %s missed it (at %s)" % [trap.name, global_position])
+		return
+	trap.mark_caught()
+	if _encounter == 4:
+		_set_act(Act.CRUSHED)
+		_set_hurtbox_active(false)
+		print("[Shade] CRUSHED under %s, its eyes fade" % trap.name)
+	else:
+		global_position.y = trap.get_ground_point().y + 0.9
+		_set_act(Act.PINNED)
+		_set_hurtbox_active(false)
+		set_damage(maxi(damage, 1))
+		_flare(true)
+		if _game.audio:
+			_game.audio.play_event(&"enemy_hiss")
+		print("[Shade] PINNED under %s: wing torn, screeching" % trap.name)
+
+# ── Frame update ──────────────────────────────────────────────────────────
 
 func _physics_process(delta: float) -> void:
-	if _rewake_t > 0.0 and _game and _game.is_playing():
-		_rewake_t -= delta
-		if _rewake_t <= 0.0:
-			mode = Mode.DORMANT
-			wake()
-			if _smoke:
-				_smoke.emitting = true
-
-	super._physics_process(delta)
-
-	if _debug_ui and _debug_ui.visible:
-		_update_debug_readout()
-
-func _update_debug_readout() -> void:
-	if not _debug_label:
-		return
-	var state_str: String = String(AttackState.keys()[_attack_state])
-	_debug_label.text = "SHADE CHASE (F3)\nPlayer Prog: %.1f m\nShade Prog:  %.1f m\nCurrent Gap:  %.1f m\nState:        %s" % [
-		_player_progress,
-		_progress,
-		_player_progress - _progress,
-		state_str
-	]
-
-func _hunt(delta: float) -> void:
-	if not _game or not _game.is_playing():
-		return
-
+	_time += delta
+	_t += delta
 	_bob_t += delta * bob_frequency
-
-	match _attack_state:
-		AttackState.CHASE:
-			_update_chase(delta)
-		AttackState.SWOOP:
-			_update_scripted_swoop(delta)
-
-func _update_chase(delta: float) -> void:
-	var curve := _get_path_curve()
-	var p_pos := _game.get_player_position()
-	_player_progress = curve.get_closest_offset(p_pos) if curve else p_pos.x
-
-	# Pacing: target position is (player_progress - chase_gap)
-	var desired_progress := _player_progress - chase_gap
-	var dist_to_target := desired_progress - _progress
-
-	# Holds the gap: full pace when behind its spot, surging when far behind, easing to a
-	# hover at its spot. It never comes closer than min_gap and never passes the child.
-	var speed := 0.0
-	if dist_to_target > 2.0:
-		var t := clampf((dist_to_target - 2.0) / 8.0, 0.0, 1.0)
-		speed = lerpf(base_speed, surge_speed, t)
-	elif dist_to_target > 0.0:
-		speed = base_speed * dist_to_target / 2.0
-
-	var limit := minf(_player_progress - min_gap, end_offset)
-	_progress = maxf(_progress, minf(_progress + speed * delta, limit))   # holds its spot; never backs away
-	_set_path_progress(_progress)
-
-	var target_pos := _get_path_position()
-	global_position = global_position.lerp(target_pos, 1.0 - exp(-12.0 * delta))
-
-	var target_tilt := -tilt_amount if speed > 0.5 else 0.0
-	rotation.z = lerpf(rotation.z, target_tilt, 1.0 - exp(-8.0 * delta))
-	_move_dir = 1.0
-	_speed_now = speed * delta
-	_set_facing(1.0)
-
-	# Scripted swoops: start when the child reaches a marked point
-	for i in range(swoop_offsets.size()):
-		if not _triggered_swoops[i] and _player_progress >= swoop_offsets[i] - swoop_trigger_lead:
-			_triggered_swoops[i] = true
-			if _progress < swoop_offsets[i]:
-				_start_scripted_swoop(i)
-				return
-
-func _start_scripted_swoop(idx: int) -> void:
-	_attack_state = AttackState.SWOOP
-	_swoop_index = idx
-	_shade_timer = 0.0
-	_swoop_phase = 0
-	_swoop_from = _progress
-	_flare_eyes(true)
-	if _game and _game.audio:
-		_game.audio.play_event(&"enemy_hiss")
-	print("[Shade] SWOOP %d: screech at progress %.1f (child at %.1f), dip at %.1f" % [idx + 1, _progress, _player_progress, swoop_offsets[idx]])
-
-func _update_scripted_swoop(delta: float) -> void:
-	_shade_timer += delta
-	if _swoop_phase == 0:
-		# Swoop telegraph: pull up slightly and spread wings for 0.4s
-		var u := clampf(_shade_timer / 0.4, 0.0, 1.0)
-		var pull_up := sin(u * PI * 0.5) * 0.4
-		var path_pos := _get_path_position()
-		global_position = path_pos + Vector3(0.0, pull_up, 0.0)
-		rotation.z = lerpf(rotation.z, 0.18, 1.0 - exp(-10.0 * delta))
-		if _shade_timer >= 0.4:
-			_swoop_phase = 1
-			_shade_timer = 0.0
-			_restore_eye_flare()
-			if _smoke:
-				_smoke.amount = 56
-	else:
-		# Fly-by: sweeps from where it was to just past the marked point, deepest over the zone
-		var u := clampf(_shade_timer / swoop_duration, 0.0, 1.0)
-		var off := swoop_offsets[_swoop_index]
-		var curve := _get_path_curve()
-		if curve:
-			_player_progress = curve.get_closest_offset(_game.get_player_position())
-		_progress = minf(lerpf(_swoop_from, off + swoop_exit, smoothstep(0.0, 1.0, u)), end_offset)
-		_set_path_progress(_progress)
-
-		var path_pos := _get_path_position()
-		var k := clampf(1.0 - absf(_progress - off) / swoop_dip_width, 0.0, 1.0)
-		var dip := -swoop_depth * k * k * (3.0 - 2.0 * k)
-		var floor_y := _sample_terrain_floor_y(path_pos.x, path_pos.y)
-		global_position = Vector3(path_pos.x, maxf(path_pos.y + dip, floor_y + 0.6), path_pos.z)
-
-		var tilt := -0.35 * k * (1.0 if off > _progress else -1.0)
-		rotation.z = lerpf(rotation.z, tilt, 1.0 - exp(-12.0 * delta))
-
-		_check_swoop_danger_zone(_swoop_index)
-
-		if _shade_timer >= swoop_duration:
-			if _smoke:
-				_smoke.amount = 36
-			_attack_state = AttackState.CHASE
-			_shade_timer = 0.0
-			print("[Shade] SWOOP %d done -> CHASE" % [_swoop_index + 1])
-
-func _check_swoop_danger_zone(idx: int) -> void:
-	# Only near the bottom of the dip, and only a child standing still inside the zone.
-	if idx < 0 or idx >= _danger_zones.size() or absf(_progress - swoop_offsets[idx]) > swoop_dip_width * 0.6:
+	_speed_now = 0.0
+	if _game == null or not _game.is_playing() or act == Act.IDLE or _defeated:
 		return
-	var zone := _danger_zones[idx]
-	var p_node := _get_player_node()
-	if not is_instance_valid(zone) or not p_node:
+	var p := _game.get_player_position()
+	var chest := p + Vector3(0.0, 0.7, 0.0)
+	match act:
+		Act.ARRIVE:
+			if _fly_to(_target, fly_speed, delta):
+				_set_act(_after_arrive)
+		Act.RUN:
+			run_follow.progress += run_speed * delta
+			_move_to(run_follow.global_position + _bob(), delta)
+			if run_follow.progress_ratio >= 0.999:
+				_fly_off(run_exit)
+		Act.FLY_OFF:
+			if _fly_to(_target, fly_speed * 1.2, delta):
+				print("[Shade] gone (encounter %d over)" % _encounter)
+				_go_idle()
+		Act.PERCH:
+			_hover_at(perch_point.global_position, delta)
+			_face(p.x - global_position.x)
+			if global_position.distance_to(chest) <= reach:
+				_attack()
+		Act.LURE:
+			if _t < lure_delay:
+				_hover_at(perch_point.global_position, delta)
+			elif _fly_to(lure_point.global_position + _bob(), fly_speed, delta) and global_position.distance_to(chest) <= reach:
+				_attack()
+		Act.ATTACK:
+			_fly_to(chest, attack_speed, delta)
+		Act.PINNED:
+			if _t >= pinned_time:
+				_flare(false)
+				_fly_off(flee_point)
+		Act.PATROL:
+			_patrol(delta)
+			var seen_open := not _game.is_player_hidden() and absf(p.x - global_position.x) <= spot_range
+			var seen_light := _game.is_lantern_carried() and global_position.distance_to(chest) <= light_spot_range
+			if seen_open or seen_light:
+				print("[Shade] SPOTTED the child (%s) at x=%.1f" % ["carrying the light" if seen_light else "in the open", p.x])
+				_attack()
+		Act.HOVER:
+			_hover_at(hover_point.global_position, delta)
+			_face(p.x - global_position.x)
+			if _t >= hover_time:
+				_set_act(Act.SCREECH)
+				_flare(true)
+				if _game.audio:
+					_game.audio.play_event(&"enemy_hiss")
+		Act.SCREECH:
+			_hover_at(hover_point.global_position + Vector3(0.0, 0.4, 0.0), delta)
+			if _t >= screech_time:
+				_flare(false)
+				_dive_from = global_position
+				_set_act(Act.DIVE)
+		Act.DIVE:
+			var u := clampf(_t / maxf(dive_time, 0.01), 0.0, 1.0)
+			var to := low_point.global_position
+			global_position = _dive_from.lerp(to, u * u * (3.0 - 2.0 * u)) + Vector3(0.0, sin(u * PI) * 0.6, 0.0)
+			_face(to.x - _dive_from.x)
+			if u >= 1.0:
+				_set_act(Act.HOLD)
+		Act.HOLD:
+			_hover_at(low_point.global_position, delta)
+			_face(p.x - global_position.x)
+			if _t >= hold_time:
+				_attack()
+		Act.CRUSHED:
+			_eye_alpha(1.0 - clampf(_t / maxf(eye_fade_time, 0.01), 0.0, 1.0))
+			if _t >= eye_fade_time:
+				print("[Shade] defeated: the way out opens")
+				_defeated = true    # stays defeated (hidden) until a checkpoint before it
+				_game.report_lever_pulled(defeat_lever_id)
+				_go_idle()
+				act = Act.CRUSHED
+	_check_catch()
+	_animate(delta)
+	if _debug_ui and _debug_ui.visible and _debug_label:
+		_debug_label.text = "SHADE (F3)\nEncounter: %d\nAct: %s\nDamage: %d\nHidden: %s" % [_encounter, Act.keys()[act], damage, _game.is_player_hidden()]
+
+func _attack() -> void:
+	if act != Act.ATTACK:
+		print("[Shade] ATTACK from %s" % Act.keys()[act])
+		_set_act(Act.ATTACK)
+
+func _patrol(delta: float) -> void:
+	if _patrol_wait > 0.0:
+		_patrol_wait -= delta
+		_move_to(patrol_follow.global_position + _bob(), delta)
 		return
-	var standing: bool = p_node.is_on_floor() and absf(p_node.velocity.x) < 0.5
-	if standing and zone.overlaps_body(p_node):
-		print("[Shade] SWOOP %d HIT: the child stood still in its danger zone at %s" % [idx + 1, p_node.global_position])
-		_game.report_player_caught(self)
+	var length := _path_length(patrol_follow)
+	patrol_follow.progress = clampf(patrol_follow.progress + _patrol_dir * patrol_speed * delta, 0.0, length)
+	if patrol_follow.progress <= 0.0 or patrol_follow.progress >= length:
+		_patrol_dir = -_patrol_dir
+		_patrol_wait = patrol_pause
+	_move_to(patrol_follow.global_position + _bob(), delta)
 
-func _flare_eyes(flare: bool) -> void:
-	var color := Color(6.0, 0.45, 0.25, 1.0) if flare else Color(2.6, 0.18, 0.12, 1.0)
-	var scale_target := Vector3.ONE * (1.35 if flare else 1.0)
-	if _eye_anchor:
-		_eye_anchor.scale = scale_target
-	if _eye_1:
-		_eye_1.modulate = color
-	if _eye_2:
-		_eye_2.modulate = color
-	if _eye_3:
-		_eye_3.modulate = color
-	if _eye_4:
-		_eye_4.modulate = color
+# ── Movement helpers ──────────────────────────────────────────────────────
 
-func _restore_eye_flare() -> void:
-	_flare_eyes(false)
+func _bob() -> Vector3:
+	return Vector3(0.0, sin(_bob_t) * bob_amplitude, 0.0)
 
-func _sample_terrain_floor_y(x: float, ref_y: float) -> float:
-	var space := get_world_3d().direct_space_state if is_inside_tree() else null
-	if space:
-		var from := Vector3(x, ref_y + 2.0, 0.0)
-		var to := Vector3(x, ref_y - 6.0, 0.0)
-		var query := PhysicsRayQueryParameters3D.create(from, to, 1 | 4) # level geometry + solid ghost platforms
-		var result := space.intersect_ray(query)
-		if result:
-			return result.position.y
-	return -10.0
+func _hover_at(point: Vector3, delta: float) -> void:
+	_move_to(point + _bob(), delta)
 
-func _get_player_node() -> CharacterBody3D:
-	if _game and _game.current_level:
-		return _game.current_level.get_node_or_null("Player") as CharacterBody3D
-	return null
+func _move_to(point: Vector3, delta: float) -> void:
+	var before := global_position
+	global_position = global_position.lerp(point, 1.0 - exp(-10.0 * delta))
+	var dx := global_position.x - before.x
+	if absf(dx) > 0.002:
+		_face(dx)
+	_speed_now = (global_position - before).length()
 
-func get_visual_state() -> StringName:
-	if mode == Mode.DORMANT:
-		return &"idle"
-	if mode == Mode.EMERGING:
-		return &"emerge"
-	match _attack_state:
-		AttackState.SWOOP:
-			return &"windup" if _swoop_phase == 0 else &"lunge"
-		AttackState.CHASE:
-			return &"move"
-	return super.get_visual_state()
+## Straight flight; true once there.
+func _fly_to(point: Vector3, speed: float, delta: float) -> bool:
+	var to := point - global_position
+	var dist := to.length()
+	if dist < 0.15:
+		return true
+	var step := minf(speed * delta, dist)
+	global_position += to / dist * step
+	if absf(to.x) > 0.05:
+		_face(to.x)
+	_speed_now = step
+	return dist - step < 0.15
+
+func _face(dx: float) -> void:
+	if absf(dx) < 0.01:
+		return
+	_facing = 1.0 if dx > 0.0 else -1.0
+	_move_dir = _facing
+
+func _path_length(f: PathFollow3D) -> float:
+	var path := f.get_parent() as Path3D
+	return path.curve.get_baked_length() if path and path.curve else 0.0
+
+func _flare(on: bool) -> void:
+	if not _eye_anchor:
+		return
+	_eye_anchor.scale = Vector3.ONE * (1.35 if on else 1.0)
+	for e in _eye_anchor.get_children():
+		if e is Sprite3D:
+			var a: float = e.modulate.a
+			e.modulate = Color(6.0, 0.45, 0.25, a) if on else Color(2.6, 0.18, 0.12, a)
+
+func _eye_alpha(a: float) -> void:
+	if not _eye_anchor:
+		return
+	for e in _eye_anchor.get_children():
+		if e is Sprite3D:
+			e.modulate.a = a
+
+# ── Catching the child ────────────────────────────────────────────────────
 
 func _check_catch() -> void:
-	# Touching its body is death (the hurtbox does the same; this covers fast passes).
-	if mode == Mode.DORMANT or not _game or not _game.is_playing():
+	if act in [Act.IDLE, Act.PINNED, Act.CRUSHED, Act.FLY_OFF] or not _game.is_playing():
 		return
-	var chest := _game.get_player_position() + Vector3(0.0, 0.7, 0.0)
-	if global_position.distance_to(chest) <= catch_radius:
-		print("[Shade] caught the child at ", global_position)
+	if global_position.distance_to(_game.get_player_position() + Vector3(0.0, 0.7, 0.0)) <= catch_radius:
+		print("[Shade] caught the child (%s)" % Act.keys()[act])
 		_game.report_player_caught(self)
 
 func _on_hurtbox_body_entered(body: Node3D) -> void:
-	if mode == Mode.DORMANT or not _game or not _game.is_playing():
+	if act in [Act.IDLE, Act.PINNED, Act.CRUSHED, Act.FLY_OFF] or _game == null or not _game.is_playing():
 		return
 	if body.is_in_group(&"player"):
-		print("[Shade] hurtbox touched the child at ", global_position)
+		print("[Shade] hurtbox touched the child (%s)" % Act.keys()[act])
 		_game.report_player_caught(self)
+
+# ── Visual state for EnemyVisual ──────────────────────────────────────────
+
+func get_visual_state() -> StringName:
+	match act:
+		Act.SCREECH, Act.PINNED:
+			return &"windup"            # screech
+		Act.DIVE, Act.ATTACK:
+			return &"lunge"             # swoop
+		Act.PERCH, Act.HOVER, Act.HOLD, Act.LURE:
+			return &"idle"              # glide
+		Act.ARRIVE:
+			return &"emerge" if _t < 0.4 else &"move"
+	return &"move"                      # fly
+
+# ── Checkpoints: each encounter fully resets ──────────────────────────────
+
+func capture_checkpoint_state() -> Dictionary:
+	return { "act": act, "damage": damage, "encounter": _encounter }
+
+func reset_to_checkpoint(state: Dictionary = {}) -> void:
+	var a: int = state.get("act", Act.IDLE)
+	damage = state.get("damage", 0)
+	_encounter = state.get("encounter", 0)
+	_t = 0.0
+	_bait_hung = false
+	_patrol_wait = 0.0
+	_flare(false)
+	_eye_alpha(1.0)
+	_go_idle()
+	_defeated = a == Act.CRUSHED
+	if _defeated:
+		act = Act.CRUSHED
+	print("[Shade] checkpoint reset: %s, damage %d" % [Act.keys()[act], damage])
+	reset_physics_interpolation()
+
+func _reset() -> void:
+	reset_to_checkpoint({})
