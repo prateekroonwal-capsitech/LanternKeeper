@@ -29,17 +29,34 @@ var _rewake_t: float = -1.0
 
 func _ready() -> void:
 	ignores_light = true
+	if wake_group == &"":
+		wake_group = &"chase"
 	super._ready()
 
-func _reset() -> void:
-	super._reset()
-	var start := _game.get_respawn_position().x - restart_gap * direction
-	if (start - _home.x) * direction > 0.0:
-		global_position.x = start
+func reset_to_checkpoint(state: Dictionary = {}) -> void:
+	super.reset_to_checkpoint(state)
+	var shrine: Shrine = _game.get_active_shrine() as Shrine if _game else null
+	var restart_pos: Vector3 = _home
+	var should_rewake := false
+	if shrine and shrine.get_shadow_restart_point() != null:
+		restart_pos = shrine.get_shadow_restart_point().global_position
+		should_rewake = true
+	elif _game and (_game.get_respawn_position().x - _home.x) * direction > restart_gap:
+		restart_pos = Vector3(_game.get_respawn_position().x - restart_gap * direction, _game.get_respawn_position().y + follow_height, _home.z)
+		should_rewake = true
+
+	if should_rewake:
+		_home = restart_pos
+		global_position = restart_pos
+		mode = Mode.DORMANT
 		_rewake_t = rewake_delay
 	else:
 		_rewake_t = -1.0
 	reset_physics_interpolation()
+
+func _reset() -> void:
+	super._reset()
+	_rewake_t = -1.0
 
 func _physics_process(delta: float) -> void:
 	if _rewake_t > 0.0 and _game and _game.is_playing():

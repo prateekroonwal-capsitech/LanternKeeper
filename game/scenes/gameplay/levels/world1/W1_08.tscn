@@ -18,6 +18,8 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_rocks.png" id="16_rocks"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_grass.png" id="17_grass"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_post.png" id="18_post"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Crawler.tscn" id="19_crawler"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/WakeTrigger.tscn" id="20_wake"]
 
 [node name="W1_08" type="Node3D" node_paths=PackedStringArray("spawn_point")]
 script = ExtResource("1_level")
@@ -153,3 +155,15 @@ size = Vector3(134, 4, 4)
 
 [node name="LevelExit" parent="." instance=ExtResource("10_exit")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57, 0, 0)
+
+[node name="WakeDark" parent="." instance=ExtResource("20_wake")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.5, 1.5, 0)
+wake_group = &"floor_crawler"
+trigger_on_player = true
+trigger_on_lantern = false
+size = Vector3(3, 4, 2)
+
+[node name="Crawler" parent="." instance=ExtResource("19_crawler")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 0.05, 0)
+wake_group = &"floor_crawler"
+emerge_offset = Vector3(0, 0.35, 0)

@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://es8qy7gttqni"
 path.s3tc="res://.godot/imported/bg_mid.png-8640fc73a8f8cb2654116b068657171d.s3tc.ctex"
+path.etc2="res://.godot/imported/bg_mid.png-8640fc73a8f8cb2654116b068657171d.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://game/assets/sprites/backgrounds/bg_mid.png"
-dest_files=["res://.godot/imported/bg_mid.png-8640fc73a8f8cb2654116b068657171d.s3tc.ctex"]
+dest_files=["res://.godot/imported/bg_mid.png-8640fc73a8f8cb2654116b068657171d.s3tc.ctex", "res://.godot/imported/bg_mid.png-8640fc73a8f8cb2654116b068657171d.etc2.ctex"]
 
 [params]
 

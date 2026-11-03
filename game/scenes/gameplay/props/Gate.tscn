@@ -1,0 +1,22 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/Gate.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/props/gate_bars.png" id="2_bars"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bars"]
+size = Vector3(0.4, 3, 2)
+
+[node name="Gate" type="AnimatableBody3D"]
+collision_mask = 0
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("BoxShape3D_bars")
+
+[node name="Sprite" type="Sprite3D" parent="."]
+offset = Vector2(0, 128)
+pixel_size = 0.0118
+alpha_cut = 1
+texture_filter = 3
+texture = ExtResource("2_bars")

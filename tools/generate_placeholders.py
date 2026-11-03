@@ -413,3 +413,47 @@ def hints() -> None:
 
 
 hints()
+
+
+# ── Mechanisms: hook, gate, lever (Fix pass 3) ───────────────────────────
+def mechanisms() -> None:
+    iron = (12, 12, 16, 255)
+    hook = Image.new("RGBA", (48, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(hook)
+    d.rectangle((6, 0, 42, 8), fill=iron)                 # wall plate
+    d.line((24, 8, 24, 40), fill=iron, width=5)           # stem
+    d.arc((12, 30, 36, 58), 0, 200, fill=iron, width=5)   # hook curl
+    save(hook, "single/props/hook.png")
+
+    bars = Image.new("RGBA", (96, 256), (0, 0, 0, 0))
+    d = ImageDraw.Draw(bars)
+    for x in range(8, 96, 20):
+        d.rectangle((x, 0, x + 7, 256), fill=iron)
+        d.polygon([(x - 2, 256), (x + 3, 242), (x + 9, 256)], fill=iron)
+    for y in (24, 128, 230):
+        d.rectangle((0, y, 96, y + 8), fill=iron)
+    save(bars, "single/props/gate_bars.png")
+
+    base = Image.new("RGBA", (64, 40), (0, 0, 0, 0))
+    ImageDraw.Draw(base).rounded_rectangle((4, 10, 60, 40), radius=8, fill=iron)
+    save(base, "single/props/lever_base.png")
+    handle = Image.new("RGBA", (16, 80), (0, 0, 0, 0))
+    hd = ImageDraw.Draw(handle)
+    hd.rectangle((6, 10, 10, 80), fill=iron)
+    hd.ellipse((1, 0, 15, 14), fill=(60, 40, 30, 255))
+    save(handle, "single/props/lever_handle.png")
+
+
+mechanisms()
+
+
+def plate() -> None:
+    img = Image.new("RGBA", (96, 48), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.rectangle((10, 18, 86, 48), fill=(12, 12, 16, 255))          # pedestal
+    d.rectangle((2, 10, 94, 20), fill=(16, 16, 22, 255))           # plate
+    d.ellipse((38, 4, 58, 16), outline=(90, 140, 220, 255), width=3)   # cold-blue rune: a switch
+    save(img, "single/props/lantern_plate.png")
+
+
+plate()

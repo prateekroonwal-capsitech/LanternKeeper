@@ -4,9 +4,26 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/enemy_eyes.png" id="eyes"]
 [ext_resource type="SpriteFrames" path="res://game/assets/sprites/enemies/crawler_frames.tres" id="frames"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/lair_crack.png" id="crack"]
+[ext_resource type="Material" path="res://game/assets/materials/enemy_silhouette.tres" id="mat"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/fx/dust_mote.png" id="dust"]
 
 [sub_resource type="BoxShape3D" id="shape"]
 size = Vector3(0.9, 0.5, 0.6)
+
+[sub_resource type="BoxShape3D" id="hurt_shape"]
+size = Vector3(1.0, 0.6, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="dust_mat"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.04, 0.04, 0.06, 0.6)
+albedo_texture = ExtResource("dust")
+billboard_mode = 3
+
+[sub_resource type="QuadMesh" id="dust_mesh"]
+material = SubResource("dust_mat")
+size = Vector2(0.08, 0.08)
 
 [node name="Crawler" type="CharacterBody3D"]
 collision_layer = 16
@@ -21,9 +38,36 @@ body_radius = 0.35
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
 shape = SubResource("shape")
 
+[node name="Hurtbox" type="Area3D" parent="."]
+collision_layer = 16
+collision_mask = 2
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hurtbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("hurt_shape")
+
+[node name="DarkParticles" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+emitting = false
+amount = 12
+lifetime = 1.2
+mesh = SubResource("dust_mesh")
+emission_shape = 1
+emission_sphere_radius = 0.35
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, 0.05, 0)
+initial_velocity_min = 0.05
+initial_velocity_max = 0.2
+scale_amount_min = 0.5
+scale_amount_max = 1.2
+
 [node name="Visual" type="Node3D" parent="."]
 
 [node name="Body" type="AnimatedSprite3D" parent="Visual"]
+material_override = ExtResource("mat")
 offset = Vector2(0, 48)
 pixel_size = 0.009
 alpha_cut = 1
@@ -52,3 +96,5 @@ texture = ExtResource("crack")
 enabled = false
 target_position = Vector3(0, -1, 0)
 collision_mask = 5
+
+[connection signal="body_entered" from="Hurtbox" to="." method="_on_hurtbox_body_entered"]

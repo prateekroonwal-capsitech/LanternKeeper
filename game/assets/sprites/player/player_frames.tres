@@ -18,8 +18,9 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/player/player_pull.png" id="16_pull"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/player/player_place.png" id="17_place"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/player/player_raise_carry.png" id="18_raise_carry"]
-[ext_resource type="Texture2D" path="res://game/assets/sprites/player/player_death.png" id="19_death"]
-[ext_resource type="Texture2D" path="res://game/assets/sprites/player/player_respawn.png" id="20_respawn"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/player/player_raise_walk_carry.png" id="19_raise_walk_carry"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/player/player_death.png" id="20_death"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/player/player_respawn.png" id="21_respawn"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_idle_0"]
 atlas = ExtResource("1_idle")
@@ -349,52 +350,84 @@ region = Rect2(384, 0, 192, 192)
 atlas = ExtResource("18_raise_carry")
 region = Rect2(576, 0, 192, 192)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_raise_walk_carry_0"]
+atlas = ExtResource("19_raise_walk_carry")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_raise_walk_carry_1"]
+atlas = ExtResource("19_raise_walk_carry")
+region = Rect2(192, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_raise_walk_carry_2"]
+atlas = ExtResource("19_raise_walk_carry")
+region = Rect2(384, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_raise_walk_carry_3"]
+atlas = ExtResource("19_raise_walk_carry")
+region = Rect2(576, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_raise_walk_carry_4"]
+atlas = ExtResource("19_raise_walk_carry")
+region = Rect2(768, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_raise_walk_carry_5"]
+atlas = ExtResource("19_raise_walk_carry")
+region = Rect2(960, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_raise_walk_carry_6"]
+atlas = ExtResource("19_raise_walk_carry")
+region = Rect2(1152, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_raise_walk_carry_7"]
+atlas = ExtResource("19_raise_walk_carry")
+region = Rect2(1344, 0, 192, 192)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_death_0"]
-atlas = ExtResource("19_death")
+atlas = ExtResource("20_death")
 region = Rect2(0, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_death_1"]
-atlas = ExtResource("19_death")
+atlas = ExtResource("20_death")
 region = Rect2(192, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_death_2"]
-atlas = ExtResource("19_death")
+atlas = ExtResource("20_death")
 region = Rect2(384, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_death_3"]
-atlas = ExtResource("19_death")
+atlas = ExtResource("20_death")
 region = Rect2(576, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_death_4"]
-atlas = ExtResource("19_death")
+atlas = ExtResource("20_death")
 region = Rect2(768, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_death_5"]
-atlas = ExtResource("19_death")
+atlas = ExtResource("20_death")
 region = Rect2(960, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_respawn_0"]
-atlas = ExtResource("20_respawn")
+atlas = ExtResource("21_respawn")
 region = Rect2(0, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_respawn_1"]
-atlas = ExtResource("20_respawn")
+atlas = ExtResource("21_respawn")
 region = Rect2(192, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_respawn_2"]
-atlas = ExtResource("20_respawn")
+atlas = ExtResource("21_respawn")
 region = Rect2(384, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_respawn_3"]
-atlas = ExtResource("20_respawn")
+atlas = ExtResource("21_respawn")
 region = Rect2(576, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_respawn_4"]
-atlas = ExtResource("20_respawn")
+atlas = ExtResource("21_respawn")
 region = Rect2(768, 0, 192, 192)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_respawn_5"]
-atlas = ExtResource("20_respawn")
+atlas = ExtResource("21_respawn")
 region = Rect2(960, 0, 192, 192)
 
 [resource]
@@ -734,6 +767,35 @@ animations = [{
 "loop": true,
 "name": &"raise_carry",
 "speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_raise_walk_carry_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_raise_walk_carry_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_raise_walk_carry_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_raise_walk_carry_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_raise_walk_carry_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_raise_walk_carry_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_raise_walk_carry_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_raise_walk_carry_7")
+}],
+"loop": true,
+"name": &"raise_walk_carry",
+"speed": 9.0
 }, {
 "frames": [{
 "duration": 1.0,

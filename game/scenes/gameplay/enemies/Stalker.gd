@@ -41,3 +41,12 @@ func _light_radius_at(center: Vector3) -> float:
 	while r < 12.0 and _game.is_point_lit(center + Vector3(r, 0.0, 0.0)):
 		r += 0.25
 	return r
+
+func _perform_lunge_step(spd: float, delta: float) -> void:
+	var target := _game.get_player_position() + Vector3(0.0, hover_height * 0.5, 0.0)
+	var to := _flat(target - global_position)
+	if to.length_squared() > 0.001:
+		_float_step(to.normalized() * spd * delta)
+
+func _perform_retreat_step(away: float, spd: float, delta: float) -> void:
+	_float_step(Vector3(away * spd * delta, 0.5 * delta, 0.0))

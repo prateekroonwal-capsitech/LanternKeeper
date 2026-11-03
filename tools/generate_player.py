@@ -5,9 +5,10 @@ glowing eyes — drawn from a small 2D skeleton so every pose stays on-model.
 
 Output (game/assets/sprites/player/):
   player_<anim>.png        horizontal strip of FRAME x FRAME frames
-  player_<anim>_carry.png  same poses without the near (lantern) arm — the game draws
-                           that arm (player_arm.png) and aims it at the lantern handle
-  player_arm.png           lantern arm, shoulder at x = 4, vertically centred
+  player_<anim>_carry.png  same poses with the near arm holding the lantern: short, bent,
+                           the hand always at HAND_CARRY (raise_* frames: HAND_RAISE).
+                           The game hangs the lantern's handle on Player/HandMarker,
+                           which sits exactly at that hand point.
   player_frames.tres       SpriteFrames used by Player.tscn → Body
 
 Replace any strip with final art of the same size and frame count.
@@ -32,8 +33,13 @@ HEAD_R = 19
 UPPER_ARM, FOREARM = 20, 19
 ARM_LEN = UPPER_ARM + FOREARM
 
-BLACK = (6, 6, 8, 255)
-EYE = (255, 246, 214, 255)
+# Fixed hand points while carrying, in px: (forward of centre, above the frame bottom).
+# Player.gd mirrors these into HandMarker (x 0.009 m per px).
+HAND_CARRY = (15, 66)
+HAND_RAISE = (16, 128)
+
+BLACK = (0, 0, 0, 255)
+EYE = (255, 255, 255, 255)
 TAU = math.tau
 
 
@@ -128,6 +134,25 @@ def draw_head(d, j, s, blink=False):
             d.ellipse((ex - 2.4, ey - 2.4, ex + 2.4, ey + 2.4), fill=EYE)
 
 
+def draw_carry_arm(d, j, s, hand_px):
+    """Near arm reaching a fixed hand point (two-bone IK, elbow bent back and down)."""
+    sh = to_img(j["shoulder"], s)
+    tx, ty = CENTER_X + hand_px[0], FRAME - hand_px[1]
+    dx, dy = tx - sh[0], ty - sh[1]
+    dist = min(math.hypot(dx, dy), UPPER_ARM + FOREARM - 0.5)
+    base = math.atan2(dy, dx)
+    cos_a = (UPPER_ARM ** 2 + dist ** 2 - FOREARM ** 2) / (2 * UPPER_ARM * dist)
+    a = math.acos(max(-1.0, min(1.0, cos_a)))
+    # Two elbow solutions; pick the one further back (smaller x) so the arm bends naturally.
+    e1 = (sh[0] + math.cos(base + a) * UPPER_ARM, sh[1] + math.sin(base + a) * UPPER_ARM)
+    e2 = (sh[0] + math.cos(base - a) * UPPER_ARM, sh[1] + math.sin(base - a) * UPPER_ARM)
+    elbow = e1 if e1[0] < e2[0] else e2
+    hand = (sh[0] + math.cos(base) * dist, sh[1] + math.sin(base) * dist)
+    capsule(d, sh, elbow, 7)
+    capsule(d, elbow, hand, 6)
+    d.ellipse((hand[0] - 3.5, hand[1] - 3.5, hand[0] + 3.5, hand[1] + 3.5), fill=BLACK)
+
+
 def render(pose, carry):
     img = Image.new("RGBA", (FRAME, FRAME), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -140,6 +165,8 @@ def render(pose, carry):
     draw_head(d, j, s, pose.get("blink", False))
     if not carry:
         draw_arm(d, j["arms"][1], s)
+    else:
+        draw_carry_arm(d, j, s, HAND_RAISE if pose.get("hand") == "raise" else HAND_CARRY)
     alpha = pose.get("alpha", 1.0)
     if alpha < 1.0:
         a = img.split()[3].point(lambda v: int(v * alpha))
@@ -203,8 +230,10 @@ ANIMS = {
                {"lean": 36, "legs": [(50, 95), (55, 100)], "arms": [(18, 18), (14, 0)]},
                {"lean": 12, "legs": [(22, 40), (26, 44)], "arms": [(4, 12), (8, 12)]}],
               12.0, False, False, False),
-    "raise": ([{"lean": -6 - b, "head": -14 - b, "legs": [(-6, 2), (6, 3)], "arms": [(-6, 12), (0, 0)]}
+    "raise": ([{"lean": -6 - b, "head": -14 - b, "legs": [(-6, 2), (6, 3)], "arms": [(-6, 12), (0, 0)], "hand": "raise"}
                for b in (0.0, 0.8, 1.2, 0.8)], 6.0, True, False, True),
+    "raise_walk": ([dict(p, hand="raise", lean=-3, head=-10) for p in gait(8, 20, 6, 28, 16, 14, 3, 1.5)],
+                   9.0, True, False, True),
     "death": ([{"lean": -12, "head": -10, "legs": [(-6, 6), (8, 10)], "arms": [(125, 20), (105, 25)]},
                {"lean": 8, "head": 15, "legs": [(28, 66), (36, 76)], "arms": [(40, 30), (30, 30)]},
                {"lean": 22, "head": 25, "legs": [(78, 150), (84, 155)], "arms": [(30, 20), (20, 20)]},
@@ -220,15 +249,6 @@ def strip(poses, carry):
     img = Image.new("RGBA", (FRAME * len(poses), FRAME), (0, 0, 0, 0))
     for i, p in enumerate(poses):
         img.paste(render(p, carry), (i * FRAME, 0))
-    return img
-
-
-def arm_sprite():
-    w, h = 48, 14
-    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    capsule(d, (4, h / 2), (ARM_LEN, h / 2), 6)
-    d.ellipse((ARM_LEN - 4, h / 2 - 4, ARM_LEN + 4, h / 2 + 4), fill=BLACK)
     return img
 
 
@@ -260,7 +280,6 @@ def main():
             strip(poses, carry).save(os.path.join(OUT_DIR, file))
             entries.append((anim, file, len(poses), fps, loop))
             print(f"wrote {file:28s} {len(poses)} frames  {FRAME * len(poses)}x{FRAME}")
-    arm_sprite().save(os.path.join(OUT_DIR, "player_arm.png"))
     write_frames(entries)
     j = solve(idle()[0])
     s = ground_shift(j, 0)

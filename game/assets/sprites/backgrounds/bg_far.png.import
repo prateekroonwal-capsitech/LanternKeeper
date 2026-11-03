@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://mcal40mnqyvy"
 path.s3tc="res://.godot/imported/bg_far.png-2eba214c51397a933c8a5ea08bde3f00.s3tc.ctex"
+path.etc2="res://.godot/imported/bg_far.png-2eba214c51397a933c8a5ea08bde3f00.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://game/assets/sprites/backgrounds/bg_far.png"
-dest_files=["res://.godot/imported/bg_far.png-2eba214c51397a933c8a5ea08bde3f00.s3tc.ctex"]
+dest_files=["res://.godot/imported/bg_far.png-2eba214c51397a933c8a5ea08bde3f00.s3tc.ctex", "res://.godot/imported/bg_far.png-2eba214c51397a933c8a5ea08bde3f00.etc2.ctex"]
 
 [params]
 

@@ -3,9 +3,9 @@ class_name TutorialTrigger
 extends Area3D
 
 ## TutorialTrigger — invisible box that asks for a one-time hint when the player
-## walks in. Place it in the first levels of a world. The hint text comes from the
-## translation table (HINT_<ID>, or HINT_<ID>_KEYS / _TOUCH / _CLASSIC).
-## Built-in ids: move, jump, ghost, place, raise, oil, dark, shrine, shadow.
+## walks in. Place it in the first levels of a world. Only "move", "jump", "place",
+## "raise" show anything (wordless ghost-hand / key-icon hint via GestureHint).
+## Other ids are ignored.
 ##
 ## Sends: GameManager.report_tutorial_trigger(hint_id)
 ## Receives: nothing.

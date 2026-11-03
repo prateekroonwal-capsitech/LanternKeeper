@@ -8,8 +8,11 @@ extends CharacterBody3D
 ##
 ## Animation (Body = AnimatedSprite3D, game/assets/sprites/player/player_frames.tres):
 ##   idle, walk, run, jump_start, jump_rise, fall, land — each with a "_carry" twin drawn
-##   without the lantern arm; while carrying, ArmPivot/Arm is aimed at the lantern handle.
-##   raise_carry (light held high), place, push, pull, death, respawn.
+##   where the near arm is drawn into the frames holding the lantern (hand at hip height,
+##   always at the same pixel). raise_carry / raise_walk_carry hold it overhead.
+##   place, push, pull, death, respawn.
+##   HandMarker sits exactly on that hand point (flipped with facing, squashed with the
+##   body); the lantern hangs its handle from it.
 ##
 ## Sends: GameManager.register_player(self), report_player_jumped(), report_player_landed(speed)
 ## Receives: input state from GameManager.input; GameManager.is_lantern_carried(),
@@ -17,6 +20,7 @@ extends CharacterBody3D
 ##   GameBus.player_respawned → teleport + respawn animation; GameBus.player_died → death pose;
 ##   GameBus.lantern_placed → place pose. find_lantern_spot() is called by GameManager.
 ##   set_push_state() is for pushable objects (crates) to drive push / pull.
+##   attach_to_rope(rope) is called by GameManager when the child grabs a Rope; jump lets go.
 
 @export_group("Run")
 @export var run_speed: float = 5.2
@@ -57,12 +61,14 @@ extends CharacterBody3D
 ## Input is ignored for this long while the respawn animation plays.
 @export var respawn_lock_time: float = 0.3
 
-@export_group("Lantern arm")
-## Shoulder position relative to the feet (metres, facing right).
-@export var shoulder_offset: Vector2 = Vector2(0.005, 0.816)
-## Arm length in metres at scale 1 (player_arm.png).
-@export var arm_length: float = 0.315
-@export var arm_stretch_range: Vector2 = Vector2(0.7, 1.35)
+@export_group("Lantern hand")
+## Hand point in the carry frames, metres from the feet (facing right).
+## = HAND_CARRY px in tools/generate_player.py × pixel_size 0.009.
+@export var hand_carry_point: Vector2 = Vector2(0.135, 0.594)
+## Hand point in the raise_* frames.
+@export var hand_raise_point: Vector2 = Vector2(0.144, 1.152)
+## How far in front of the body the lantern hangs (towards the camera).
+@export var hand_depth: float = 0.06
 
 @export_group("Lost lantern")
 ## Side distances tried when putting a lost lantern down beside the child.
@@ -84,11 +90,16 @@ var _place_timer: float = 0.0
 var _respawn_timer: float = 0.0
 var _dead_pose: bool = false
 var _push_state: int = 0
+var _rope: Node3D = null
+var _rope_cooldown: float = 0.0
 
 @onready var _body: AnimatedSprite3D = $Body
 @onready var _body_base_scale: Vector3 = _body.scale
-@onready var _arm_pivot: Node3D = $ArmPivot
 @onready var _probe: RayCast3D = $LanternProbe
+@onready var _hand_marker: Marker3D = $HandMarker
+
+func get_hand_marker_position() -> Vector3:
+	return _hand_marker.global_position
 
 func _ready() -> void:
 	set_physics_process(false)
@@ -113,6 +124,9 @@ func _physics_process(delta: float) -> void:
 	_tick_timers(delta)
 	if not _game.is_playing():
 		_update_visual(delta)
+		return
+	if is_instance_valid(_rope):
+		_hang_on_rope(delta)
 		return
 	var input := _game.input
 	var on_floor := is_on_floor()
@@ -167,7 +181,29 @@ func _physics_process(delta: float) -> void:
 	_was_on_floor = is_on_floor()
 	_update_visual(delta)
 
+## Called by GameManager when the child jumps into a rope (and isn't carrying the lantern).
+func can_grab_rope() -> bool:
+	return _rope == null and _rope_cooldown <= 0.0 and not is_on_floor()
+
+func attach_to_rope(rope: Node3D) -> void:
+	_rope = rope
+	rope.grab(float(facing))
+	velocity = Vector3.ZERO
+
+## Hands at the rope end; the body hangs below. Jump lets go with the rope's speed.
+func _hang_on_rope(delta: float) -> void:
+	global_position = _rope.get_hang_point() - Vector3(0.0, 1.25, 0.0)
+	global_position.z = 0.0
+	if _game.input.jump_just_pressed:
+		velocity = _rope.release()
+		_rope = null
+		_rope_cooldown = 0.4
+		_jump_rising = false
+		_game.report_player_jumped()
+	_update_visual(delta)
+
 func _tick_timers(delta: float) -> void:
+	_rope_cooldown = maxf(_rope_cooldown - delta, 0.0)
 	_land_timer = maxf(_land_timer - delta, 0.0)
 	_place_timer = maxf(_place_timer - delta, 0.0)
 	_jump_start_timer = maxf(_jump_start_timer - delta, 0.0)
@@ -182,6 +218,9 @@ func _update_visual(delta: float) -> void:
 	_body.scale = Vector3(_body_base_scale.x * (1.0 + _squash), _body_base_scale.y * (1.0 - _squash), _body_base_scale.z)
 
 	var anim := _pick_animation()
+	# The hand is drawn at a fixed pixel in every carry frame — keep the marker on it.
+	var hand := hand_raise_point if anim.begins_with("raise") else hand_carry_point
+	_hand_marker.position = Vector3(hand.x * facing * (1.0 + _squash), hand.y * (1.0 - _squash), hand_depth)
 	if _body.animation != anim:
 		_body.play(anim)
 	var speed := absf(velocity.x)
@@ -191,7 +230,6 @@ func _update_visual(delta: float) -> void:
 		_body.speed_scale = clampf(speed / run_anim_reference_speed, 0.6, 1.4)
 	else:
 		_body.speed_scale = 1.0
-	_update_arm()
 
 func _pick_animation() -> StringName:
 	if _dead_pose:
@@ -204,7 +242,9 @@ func _pick_animation() -> StringName:
 	if _push_state != 0 and not carry:
 		return &"push" if _push_state > 0 else &"pull"
 	var base: String
-	if not is_on_floor():
+	if is_instance_valid(_rope):
+		base = "fall"          # arms up, hanging on
+	elif not is_on_floor():
 		if _jump_start_timer > 0.0:
 			base = "jump_start"
 		elif velocity.y > 0.3:
@@ -215,8 +255,10 @@ func _pick_animation() -> StringName:
 		base = "land"
 	else:
 		var speed := absf(velocity.x)
-		if speed < walk_anim_threshold:
-			base = "raise" if carry and _game.is_lantern_raised() else "idle"
+		if carry and _game.is_lantern_raised():
+			base = "raise" if speed < walk_anim_threshold else "raise_walk"
+		elif speed < walk_anim_threshold:
+			base = "idle"
 		elif speed < run_anim_threshold:
 			base = "walk"
 		else:
@@ -224,18 +266,6 @@ func _pick_animation() -> StringName:
 	if carry:
 		base += "_carry"
 	return StringName(base)
-
-func _update_arm() -> void:
-	var show := _game.is_lantern_carried() and not _dead_pose and _place_timer <= 0.0 and _respawn_timer <= 0.0
-	_arm_pivot.visible = show
-	if not show:
-		return
-	_arm_pivot.position = Vector3(shoulder_offset.x * facing, shoulder_offset.y * (1.0 - _squash), _arm_pivot.position.z)
-	var to := _game.get_lantern_handle_position() - (global_position + _arm_pivot.position)
-	var reach := Vector2(to.x, to.y)
-	_arm_pivot.rotation.z = atan2(reach.y, reach.x)
-	var stretch := clampf(reach.length() / maxf(arm_length, 0.01), arm_stretch_range.x, arm_stretch_range.y)
-	_arm_pivot.scale = Vector3(stretch, 1.0, 1.0)
 
 # ── Lost lantern: find solid ground beside the child ──────────────────────
 
@@ -263,6 +293,8 @@ func _on_player_died(cause: String) -> void:
 	_dead_pose = cause != "fall" and cause != "platform_lost"
 
 func _on_player_respawned() -> void:
+	_rope = null
+	_rope_cooldown = 0.0
 	global_position = _game.get_respawn_position()
 	velocity = Vector3.ZERO
 	facing = 1

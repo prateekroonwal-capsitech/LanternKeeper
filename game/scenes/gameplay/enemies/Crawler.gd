@@ -9,8 +9,6 @@ extends Enemy
 
 @export_group("Crawler")
 @export var crawl_speed: float = 2.2
-## Faster than the child runs, so it can't be cornered inside the light for long.
-@export var retreat_speed: float = 6.5
 @export var gravity: float = 25.0
 ## Stops following when the child is further than this.
 @export var lose_interest_distance: float = 18.0

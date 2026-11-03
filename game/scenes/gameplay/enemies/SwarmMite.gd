@@ -35,3 +35,12 @@ func _hunt(delta: float) -> void:
 	var p := _game.get_player_position() + Vector3(0.0, 0.6, 0.0)
 	var jitter := Vector3(sin(_time * jitter_speed), cos(_time * jitter_speed * 1.3), 0.0) * jitter_amount
 	_float_toward(p + jitter, _speed(skitter_speed), delta)
+
+func _perform_lunge_step(spd: float, delta: float) -> void:
+	var target := _game.get_player_position() + Vector3(0.0, 0.5, 0.0)
+	var to := _flat(target - global_position)
+	if to.length_squared() > 0.001:
+		_float_step(to.normalized() * spd * delta)
+
+func _perform_retreat_step(away: float, spd: float, delta: float) -> void:
+	_float_step(Vector3(away * spd * delta, 0.0, 0.0))

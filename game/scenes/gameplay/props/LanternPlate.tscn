@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/LanternHook.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/props/lantern_plate.png" id="2_plate"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_reach"]
+size = Vector3(2, 2.2, 2)
+
+[node name="LanternPlate" type="Area3D"]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("1_script")
+hook_id = &"plate_a"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+shape = SubResource("BoxShape3D_reach")
+
+[node name="HookPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, 0.06)
+
+[node name="Sprite" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.1)
+offset = Vector2(0, 24)
+pixel_size = 0.009
+alpha_cut = 1
+texture_filter = 3
+texture = ExtResource("2_plate")

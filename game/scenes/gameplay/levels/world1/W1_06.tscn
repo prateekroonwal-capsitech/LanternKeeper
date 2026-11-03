@@ -1,189 +1,145 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="1_level"]
-[ext_resource type="Environment" path="res://game/assets/materials/world_environment.tres" id="2_env"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/environment/Backdrop.tscn" id="3_backdrop"]
-[ext_resource type="Script" path="res://game/scripts/controllers/CameraController3D.gd" id="4_camera"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Player.tscn" id="5_player"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Lantern.tscn" id="6_lantern"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="7_platform"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/GhostPlatform.tscn" id="8_ghost"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="9_kill"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LevelExit.tscn" id="10_exit"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Shrine.tscn" id="11_shrine"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="12_hint"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/BigShadow.tscn" id="13_tide"]
-[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_a.png" id="14_tree_a"]
-[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_b.png" id="15_tree_b"]
-[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_rocks.png" id="16_rocks"]
-[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_grass.png" id="17_grass"]
-[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_post.png" id="18_post"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="level"]
+[ext_resource type="Environment" path="res://game/assets/materials/world_environment.tres" id="env"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/environment/Backdrop.tscn" id="backdrop"]
+[ext_resource type="Script" path="res://game/scripts/controllers/CameraController3D.gd" id="camera"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Player.tscn" id="player"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Lantern.tscn" id="lantern"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="platform"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/GhostPlatform.tscn" id="ghost"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="kill"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LevelExit.tscn" id="exit"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Shrine.tscn" id="shrine"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LanternHook.tscn" id="hook"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Gate.tscn" id="gate"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Lever.tscn" id="lever"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Crawler.tscn" id="crawler"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Dropper.tscn" id="dropper"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/WakeTrigger.tscn" id="wake"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Rope.tscn" id="rope"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LanternPlate.tscn" id="plate"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Stalker.tscn" id="stalker"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/SwarmMite.tscn" id="mite"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_a.png" id="tree_a"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_rocks.png" id="rocks"]
 
 [node name="W1_06" type="Node3D" node_paths=PackedStringArray("spawn_point")]
-script = ExtResource("1_level")
+script = ExtResource("level")
 level_id = "w1_06"
 spawn_point = NodePath("SpawnPoint")
 title_key = "LEVEL_W1_06"
 oil_enabled = false
-dark_meter_enabled = false
+dark_meter_time = 6.0
+kill_y = -10.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = ExtResource("2_env")
+environment = ExtResource("env")
 
-[node name="Backdrop" parent="." instance=ExtResource("3_backdrop")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52, 0, 0)
+[node name="Backdrop" parent="." instance=ExtResource("backdrop")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -56, 0, 0)
 
 [node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 5.2, 14)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3.5, 14)
 current = true
 fov = 45.0
-script = ExtResource("4_camera")
-min_y = -2
+script = ExtResource("camera")
 
 [node name="SpawnPoint" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 3.05, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.35, 0)
 
-[node name="Player" parent="." instance=ExtResource("5_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 3.05, 0)
+[node name="Player" parent="." instance=ExtResource("player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.35, 0)
 
-[node name="Lantern" parent="." instance=ExtResource("6_lantern")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.62, 3.28, 0.3)
+[node name="Lantern" parent="." instance=ExtResource("lantern")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.865, 1.9, 0.06)
 
 [node name="Geometry" type="Node3D" parent="."]
 
-[node name="Cliff" parent="Geometry" instance=ExtResource("7_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, -0.5, 0)
-size = Vector2(18, 7)
-
-[node name="WalkA" parent="Geometry" instance=ExtResource("7_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.5, 2.7, 0)
-size = Vector2(11, 0.6)
-
-[node name="CeilingA" parent="Geometry" instance=ExtResource("7_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.75, 8.2, 0)
-size = Vector2(6.5, 3.6)
-
-[node name="UndercroftA" parent="Geometry" instance=ExtResource("7_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, -2, 0)
-size = Vector2(27, 4)
-
-[node name="Landing" parent="Geometry" instance=ExtResource("7_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.25, -0.05, 0)
-size = Vector2(5.5, 7.9)
-
-[node name="WalkB" parent="Geometry" instance=ExtResource("7_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.5, 3.6, 0)
-size = Vector2(11, 0.6)
-
-[node name="CeilingB" parent="Geometry" instance=ExtResource("7_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.75, 9.15, 0)
-size = Vector2(6.5, 3.7)
-
-[node name="UndercroftB" parent="Geometry" instance=ExtResource("7_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, -1.55, 0)
-size = Vector2(28, 4.9)
-
-[node name="Exit" parent="Geometry" instance=ExtResource("7_platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.25, 0.4, 0)
-size = Vector2(13.5, 8.8)
-
-[node name="GhostPlatforms" type="Node3D" parent="."]
-
-[node name="BridgeA" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 2.8, 0)
-size = Vector2(3, 0.4)
-
-[node name="BridgeB" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.65, 2.8, 0)
-size = Vector2(2.7, 0.4)
-
-[node name="WallA" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5, 4.7, 0)
-size = Vector2(0.6, 3.4)
-
-[node name="StepA" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.5, 1.1, 0)
-size = Vector2(2, 0.4)
-
-[node name="StepB" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.5, 2.4, 0)
-size = Vector2(2, 0.4)
-
-[node name="BridgeC" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.5, 3.7, 0)
-size = Vector2(3, 0.4)
-
-[node name="BridgeD" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.65, 3.7, 0)
-size = Vector2(2.7, 0.4)
-
-[node name="WallB" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.5, 5.6, 0)
-size = Vector2(0.6, 3.4)
-
-[node name="StepC" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 59.5, 2, 0)
-size = Vector2(2, 0.4)
-
-[node name="StepD" parent="GhostPlatforms" instance=ExtResource("8_ghost")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62.5, 3.3, 0)
-size = Vector2(2, 0.4)
-
-[node name="Shrines" type="Node3D" parent="."]
-
-[node name="Shrine1" parent="Shrines" instance=ExtResource("11_shrine")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 3.9, 0)
-
 [node name="Decor" type="Node3D" parent="."]
 
-[node name="tree_b_1" type="Sprite3D" parent="Decor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3, -0.8)
-offset = Vector2(0, 192)
-flip_h = false
-pixel_size = 0.01
-alpha_cut = 1
-texture_filter = 3
-texture = ExtResource("15_tree_b")
+[node name="WallLeft" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 5, 0)
+size = Vector2(2, 18)
 
-[node name="rocks_2" type="Sprite3D" parent="Decor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -0.6)
-offset = Vector2(0, 48)
-flip_h = false
-pixel_size = 0.01
-alpha_cut = 1
-texture_filter = 3
-texture = ExtResource("16_rocks")
+[node name="LedgeStart" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, -1.35, 0)
+size = Vector2(26, 5.3)
 
-[node name="tree_a_3" type="Sprite3D" parent="Decor"]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 1, 34.5, 3.9, -0.8)
+[node name="GateCeiling" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.8, 6.65, 0)
+size = Vector2(2.4, 4.7)
+
+[node name="Stone1" parent="Geometry" instance=ExtResource("ghost")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.75, -0.2, 0)
+size = Vector2(2.5, 0.4)
+
+[node name="Stone2" parent="Geometry" instance=ExtResource("ghost")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.25, -0.2, 0)
+size = Vector2(2.5, 0.4)
+
+[node name="Stone3" parent="Geometry" instance=ExtResource("ghost")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.75, -0.2, 0)
+size = Vector2(2.5, 0.4)
+
+[node name="Stone4" parent="Geometry" instance=ExtResource("ghost")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.25, -0.2, 0)
+size = Vector2(2.5, 0.4)
+
+[node name="Stone5" parent="Geometry" instance=ExtResource("ghost")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.75, -0.2, 0)
+size = Vector2(2.5, 0.4)
+
+[node name="Stone6" parent="Geometry" instance=ExtResource("ghost")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.25, -0.2, 0)
+size = Vector2(2.5, 0.4)
+
+[node name="LedgeEnd" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51, -1.35, 0)
+size = Vector2(22, 5.3)
+
+[node name="WallRight" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63, 5, 0)
+size = Vector2(2, 18)
+
+[node name="Shrine1" parent="." instance=ExtResource("shrine")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1.3, 0)
+
+[node name="Shrine2" parent="." instance=ExtResource("shrine")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 1.3, 0)
+
+[node name="Cradle" parent="." instance=ExtResource("hook")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 1.3, 0)
+hook_id = &"lift6"
+move_when_hung = true
+travel_offset = Vector3(34, 0, 0)
+travel_time = 11.0
+
+[node name="Gate" parent="." instance=ExtResource("gate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2, 1.3, 0)
+hook_id = &"lift6"
+close_delay = 0.0
+close_time = 0.3
+
+[node name="tree_a_15" type="Sprite3D" parent="Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 1.3, -0.8)
 offset = Vector2(0, 256)
-flip_h = false
 pixel_size = 0.01
 alpha_cut = 1
 texture_filter = 3
-texture = ExtResource("14_tree_a")
+texture = ExtResource("tree_a")
 
-[node name="rocks_4" type="Sprite3D" parent="Decor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 0.9, -0.6)
+[node name="rocks_16" type="Sprite3D" parent="Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 1.3, -0.8)
 offset = Vector2(0, 48)
-flip_h = false
 pixel_size = 0.01
 alpha_cut = 1
 texture_filter = 3
-texture = ExtResource("16_rocks")
+texture = ExtResource("rocks")
 
-[node name="tree_b_5" type="Sprite3D" parent="Decor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 75, 4.8, -0.8)
-offset = Vector2(0, 192)
-flip_h = true
-pixel_size = 0.01
-alpha_cut = 1
-texture_filter = 3
-texture = ExtResource("15_tree_b")
+[node name="KillZone" parent="." instance=ExtResource("kill")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, -14, 0)
+size = Vector3(120, 4, 4)
 
-[node name="KillZone" parent="." instance=ExtResource("9_kill")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, -14, 0)
-size = Vector3(150, 4, 4)
-
-[node name="LevelExit" parent="." instance=ExtResource("10_exit")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 72, 4.8, 0)
+[node name="LevelExit" parent="." instance=ExtResource("exit")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 1.3, 0)

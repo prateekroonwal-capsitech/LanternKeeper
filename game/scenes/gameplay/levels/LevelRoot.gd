@@ -17,7 +17,7 @@ const DEV_BOOT_META := &"dev_boot_scene"
 @export var level_id: String = "test"
 ## World number (1–4): picks the music track.
 @export_range(1, 4) var world: int = 1
-## Translation key of the level's name, shown as a title card when it starts.
+## Translation key of the level's name (no longer shown — no HUD text).
 @export var title_key: String = ""
 ## Where the player starts and respawns until a shrine is lit.
 @export var spawn_point: Marker3D

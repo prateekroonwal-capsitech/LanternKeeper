@@ -7,6 +7,9 @@ extends CharacterBody3D
 ## Burns oil (3× while raised); its radius shrinks with the oil and it flickers harder
 ## when oil runs low.
 ##
+## Hooks: set down while the child is within a LanternHook's reach, it hangs from the hook
+## (no gravity, follows the hook if it rides a rail) instead of dropping.
+##
 ## Checkpoints: GameManager calls capture_state() when a checkpoint is saved and
 ## restore_state() on respawn, so a lantern that was placed is back where it was.
 ## A placed lantern that falls below the level's kill height reports report_lantern_lost();
@@ -41,14 +44,14 @@ extends CharacterBody3D
 @export var raise_burn_multiplier: float = 3.0
 
 @export_group("Carry")
-## Where the lantern's base sits relative to the player's feet; X is mirrored with facing.
-## The boy's arm is aimed at the handle, so keep the handle within arm's reach of the shoulder.
-@export var carry_offset: Vector3 = Vector3(0.32, 0.26, 0.3)
+## Where the lantern's handle sits relative to the player's feet (fallback if HandMarker missing).
+@export var carry_offset: Vector3 = Vector3(0.26, 0.64, 0.01)
 ## Added to carry_offset while the light is raised (X mirrored with facing).
-@export var raise_offset: Vector3 = Vector3(-0.12, 0.3, 0.0)
-## Height of the handle above the lantern's base (where the hand grips).
-@export var handle_height: float = 0.6
-@export var follow_speed: float = 22.0
+@export var raise_offset: Vector3 = Vector3(0.02, 0.31, 0.0)
+## Height of the handle relative to lantern origin (0.0 since pivot is at the handle).
+@export var handle_height: float = 0.0
+@export var max_sway_angle: float = 0.35
+@export var sway_speed: float = 10.0
 
 @export_group("Placed")
 @export var gravity: float = 25.0
@@ -72,6 +75,8 @@ var _awaiting_exit: bool = false
 var _time: float = 0.0
 var _flicker: float = 1.0
 var _appear: float = 1.0
+var _sway: float = 0.0
+var _hook: Node3D = null
 
 @onready var _light: OmniLight3D = $Light
 @onready var _glow: MeshInstance3D = $Glow
@@ -79,8 +84,12 @@ var _appear: float = 1.0
 @onready var _dust: CPUParticles3D = $Dust
 @onready var _sprite: Sprite3D = $Sprite
 @onready var _pickup_area: Area3D = $PickupArea
+@onready var _light_area: Area3D = $LightArea
+@onready var _light_area_shape: CollisionShape3D = $LightArea/CollisionShape3D
 
 func _ready() -> void:
+	# Run after the Player each physics tick, so the hand it follows is this tick's hand.
+	process_physics_priority = 10
 	carried = start_carried
 	set_physics_process(false)
 	set_process(false)
@@ -110,10 +119,10 @@ func _exit_tree() -> void:
 # ── Light-source API ──────────────────────────────────────────────────────
 
 func get_handle_position() -> Vector3:
-	return global_position + Vector3(0.0, handle_height, 0.0)
+	return global_position
 
 func get_light_position() -> Vector3:
-	return global_position + Vector3(0.0, 0.35, 0.0)
+	return global_position + Vector3(0.0, -0.2, 0.0)   # centre of the glass (pivot = handle)
 
 func get_light_radius() -> float:
 	return _radius * _appear
@@ -127,13 +136,20 @@ func is_raised() -> bool:
 # ── Checkpoint snapshot (called by GameManager) ───────────────────────────
 
 func capture_state() -> Dictionary:
-	return { "carried": carried, "position": global_position }
+	return { "carried": carried, "position": global_position,
+		"hook": _hook.get_path() if is_instance_valid(_hook) else NodePath() }
 
 func restore_state(state: Dictionary) -> void:
 	velocity = Vector3.ZERO
 	_raised = false
 	_appear = 1.0
-	if state.get("carried", true):
+	_release_hook()
+	var hook_path: NodePath = state.get("hook", NodePath())
+	if not hook_path.is_empty() and has_node(hook_path):
+		carried = false
+		_awaiting_exit = false
+		_hang_on(get_node(hook_path))
+	elif state.get("carried", true):
 		carried = true
 		_awaiting_exit = false
 		_snap_to_hand()
@@ -145,6 +161,7 @@ func restore_state(state: Dictionary) -> void:
 
 ## Puts a lost lantern down at `point` (on the ground) with a flicker-in.
 func respawn_at(point: Vector3) -> void:
+	_release_hook()
 	carried = false
 	_awaiting_exit = true
 	velocity = Vector3.ZERO
@@ -153,6 +170,7 @@ func respawn_at(point: Vector3) -> void:
 	_appear = 0.0
 
 func return_to_hand() -> void:
+	_release_hook()
 	carried = true
 	_awaiting_exit = false
 	velocity = Vector3.ZERO
@@ -183,15 +201,26 @@ func _simulate(delta: float) -> void:
 		_radius = 0.0
 
 	if carried:
-		var hand := _hand_position()
-		global_position = global_position.lerp(hand, 1.0 - exp(-follow_speed * delta))
+		# The handle sits exactly on the child's HandMarker; only the pendulum sway moves it.
+		global_position = _hand_position()
+		var p_vel := _game.get_player_velocity() if _game else Vector3.ZERO
+		var sway_target := -clampf(p_vel.x * 0.045, -max_sway_angle, max_sway_angle)
+		if absf(p_vel.x) < 0.1:
+			sway_target = sin(_time * 2.2) * 0.03
+		_sway = lerpf(_sway, sway_target, 1.0 - exp(-sway_speed * delta))
+		rotation.z = _sway
 	else:
+		_sway = lerpf(_sway, 0.0, 1.0 - exp(-sway_speed * delta))
+		rotation.z = _sway
 		_simulate_placed(delta)
 
 func _hand_position() -> Vector3:
-	var facing := _game.get_player_facing()
+	if _game and _game.has_player():
+		return _game.get_player_hand_position()
+	var facing := _game.get_player_facing() if _game else 1
 	var offset := carry_offset + (raise_offset if _raised else Vector3.ZERO)
-	return _game.get_player_position() + Vector3(offset.x * facing, offset.y, offset.z)
+	var p := _game.get_player_position() if _game else Vector3.ZERO
+	return p + Vector3(offset.x * facing, offset.y, offset.z)
 
 func _snap_to_hand() -> void:
 	if _game == null:
@@ -200,6 +229,15 @@ func _snap_to_hand() -> void:
 	reset_physics_interpolation()
 
 func _simulate_placed(delta: float) -> void:
+	if is_instance_valid(_hook):
+		global_position = _hook.get_hook_point()
+		velocity = Vector3.ZERO
+		# A hook that just stopped (end of its rail) with the child already underneath.
+		if not _awaiting_exit and not _hook.is_moving():
+			for b in _pickup_area.get_overlapping_bodies():
+				if b.is_in_group(&"player"):
+					_on_pickup_body_entered(b)
+		return
 	velocity.x = 0.0
 	velocity.z = 0.0
 	if is_on_floor():
@@ -207,7 +245,7 @@ func _simulate_placed(delta: float) -> void:
 	else:
 		velocity.y = maxf(velocity.y - gravity * delta, -max_fall_speed)
 	move_and_slide()
-	global_position.z = 0.0
+	global_position.z = 0.06
 	if global_position.y < _game.get_kill_y():
 		_game.report_lantern_lost()
 
@@ -215,6 +253,8 @@ func _simulate_placed(delta: float) -> void:
 func _update_transforms() -> void:
 	var r := maxf(get_light_radius(), 0.001)
 	_glow.scale = Vector3(r, r, 1.0)
+	if is_instance_valid(_light_area_shape) and _light_area_shape.shape is SphereShape3D:
+		(_light_area_shape.shape as SphereShape3D).radius = r
 
 # ── Visuals (non-transform) ───────────────────────────────────────────────
 
@@ -254,8 +294,16 @@ func _on_place_requested() -> void:
 	carried = false
 	_raised = false
 	_awaiting_exit = true
+	rotation.z = 0.0
+	_sway = 0.0
+	var hook := _game.get_hook_in_reach()
+	if is_instance_valid(hook):
+		_hang_on(hook)
+		return
 	var p := _game.get_player_position()
-	global_position = Vector3(p.x, p.y + 0.3, 0.0)
+	global_position = Vector3(p.x, p.y + 0.6, 0.06)
+	rotation.z = 0.0
+	_sway = 0.0
 	velocity = Vector3.ZERO
 	reset_physics_interpolation()
 	_game.report_lantern_placed(global_position)
@@ -263,9 +311,26 @@ func _on_place_requested() -> void:
 func _on_pickup_body_entered(body: Node3D) -> void:
 	if carried or _awaiting_exit or not body.is_in_group(&"player"):
 		return
+	if is_instance_valid(_hook) and _hook.is_moving():
+		return   # can't snatch it from a moving cradle
 	if _game and _game.is_playing():
 		carried = true
+		_release_hook()
 		_game.report_lantern_picked_up()
+
+func _hang_on(hook: Node3D) -> void:
+	_hook = hook
+	global_position = hook.get_hook_point()
+	velocity = Vector3.ZERO
+	reset_physics_interpolation()
+	_game.report_lantern_hung(hook)
+
+func _release_hook() -> void:
+	if is_instance_valid(_hook):
+		var h := _hook
+		_hook = null
+		_game.report_lantern_unhooked(h)
+	_hook = null
 
 func _on_pickup_body_exited(body: Node3D) -> void:
 	if body.is_in_group(&"player"):

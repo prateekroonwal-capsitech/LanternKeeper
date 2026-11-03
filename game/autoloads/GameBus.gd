@@ -39,6 +39,8 @@ signal checkpoint_saved(checkpoint_serial: int)
 signal lantern_returned
 signal enemies_wake_requested(group: StringName)
 signal enemy_woke(enemy: Node3D)
+signal lantern_hook_changed(hook_id: StringName, hung: bool)
+signal lever_pulled(lever_id: StringName)
 signal control_layout_changed(layout: StringName)
 signal tutorial_hint_requested(hint_id: String)
 

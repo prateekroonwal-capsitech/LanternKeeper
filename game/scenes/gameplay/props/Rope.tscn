@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/Rope.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/thread.png" id="2_line"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_grab"]
+resource_local_to_scene = true
+radius = 0.45
+height = 3.0
+
+[node name="Rope" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Line" type="Node3D" parent="."]
+
+[node name="Sprite" type="Sprite3D" parent="Line"]
+transform = Transform3D(2.5, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+offset = Vector2(0, -32)
+modulate = Color(0.25, 0.22, 0.2, 1)
+pixel_size = 0.015625
+texture_filter = 3
+texture = ExtResource("2_line")
+
+[node name="GrabZone" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GrabZone"]
+shape = SubResource("CapsuleShape3D_grab")

@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://game/assets/shaders/enemy_silhouette.gdshader" id="1_shader"]
+
+[resource]
+render_priority = -1
+shader = ExtResource("1_shader")
+shader_parameter/body_color = Color(0.04, 0.04, 0.06, 1)
+shader_parameter/rim_color = Color(0.3, 0.36, 0.46, 1)
+shader_parameter/rim_width = 1.5
+shader_parameter/rim_intensity = 0.7

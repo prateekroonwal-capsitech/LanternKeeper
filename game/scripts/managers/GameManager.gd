@@ -97,6 +97,10 @@ var _player: Node3D = null
 var _lantern: Node3D = null
 var _active_shrine: Node3D = null
 var _checkpoint_lantern: Dictionary = {}
+var _checkpoint_enemies: Dictionary = {}
+var _checkpoint_triggers: Dictionary = {}
+var _checkpoint_resettables: Dictionary = {}
+var _hook_in_reach: Node3D = null
 var _last_hiss_at: float = -100.0
 var _light_sources: Array[Node3D] = []
 var _dark_emptied: bool = false
@@ -210,6 +214,10 @@ func report_level_unloaded(level_root: LevelRoot) -> void:
 	_lantern = null
 	_active_shrine = null
 	_light_sources.clear()
+	_checkpoint_enemies.clear()
+	_checkpoint_triggers.clear()
+	_checkpoint_resettables.clear()
+	_hook_in_reach = null
 	set_physics_process(false)
 	_set_heartbeat(0.0)
 	state = State.MENU
@@ -307,9 +315,15 @@ func has_player() -> bool:
 func get_player_position() -> Vector3:
 	return _player.global_position if is_instance_valid(_player) else Vector3.ZERO
 
+func get_player_hand_position() -> Vector3:
+	return _player.get_hand_marker_position() if is_instance_valid(_player) and _player.has_method("get_hand_marker_position") else get_player_position()
+
 ## +1 facing right, -1 facing left.
 func get_player_facing() -> int:
 	return _player.facing if is_instance_valid(_player) else 1
+
+func get_player_velocity() -> Vector3:
+	return _player.velocity if is_instance_valid(_player) else Vector3.ZERO
 
 func is_player_on_floor() -> bool:
 	return _player.is_on_floor() if is_instance_valid(_player) else false
@@ -355,6 +369,17 @@ func _save_checkpoint() -> void:
 	if is_instance_valid(_lantern):
 		_checkpoint_lantern = _lantern.capture_state()
 	checkpoint_oil = oil
+	_checkpoint_enemies.clear()
+	for enemy in get_tree().get_nodes_in_group(&"enemies"):
+		if enemy.has_method("capture_checkpoint_state"):
+			_checkpoint_enemies[enemy.get_path()] = enemy.capture_checkpoint_state()
+	_checkpoint_triggers.clear()
+	for trigger in get_tree().get_nodes_in_group(&"wake_triggers"):
+		if trigger.has_method("capture_checkpoint_state"):
+			_checkpoint_triggers[trigger.get_path()] = trigger.capture_checkpoint_state()
+	_checkpoint_resettables.clear()
+	for node in get_tree().get_nodes_in_group(&"resettables"):
+		_checkpoint_resettables[node.get_path()] = node.capture_checkpoint_state()
 	if bus:
 		bus.checkpoint_saved.emit(checkpoint_serial)
 
@@ -370,8 +395,19 @@ func _respawn() -> void:
 		bus.player_respawned.emit()
 		bus.oil_changed.emit(oil, max_oil)
 		bus.dark_meter_changed.emit(1.0)
+	# Hooks, gates and levers first, so a lantern restored onto a hook re-opens its gate.
+	for node in get_tree().get_nodes_in_group(&"resettables"):
+		node.reset_to_checkpoint(_checkpoint_resettables.get(node.get_path(), {}))
 	if is_instance_valid(_lantern) and not _checkpoint_lantern.is_empty():
 		_lantern.restore_state(_checkpoint_lantern)
+	for enemy in get_tree().get_nodes_in_group(&"enemies"):
+		if enemy.has_method("reset_to_checkpoint"):
+			var st: Dictionary = _checkpoint_enemies.get(enemy.get_path(), {})
+			enemy.reset_to_checkpoint(st)
+	for trigger in get_tree().get_nodes_in_group(&"wake_triggers"):
+		if trigger.has_method("reset_to_checkpoint"):
+			var st: Dictionary = _checkpoint_triggers.get(trigger.get_path(), {})
+			trigger.reset_to_checkpoint(st)
 	state = State.PLAYING
 
 # ── Shrines (checkpoint + full oil) ───────────────────────────────────────
@@ -526,11 +562,62 @@ func get_nearest_light_position(point: Vector3) -> Vector3:
 			best = c
 	return best
 
+# ── Hooks & levers ────────────────────────────────────────────────────────
+
+func register_hook(_hook: Node3D) -> void:
+	pass
+
+func unregister_hook(hook: Node3D) -> void:
+	if _hook_in_reach == hook:
+		_hook_in_reach = null
+
+## A LanternHook tells us the child entered / left its reach.
+func report_hook_reach(hook: Node3D, inside: bool) -> void:
+	if inside:
+		_hook_in_reach = hook
+	elif _hook_in_reach == hook:
+		_hook_in_reach = null
+
+## The hook the lantern would hang on if set down now (or null).
+func get_hook_in_reach() -> Node3D:
+	return _hook_in_reach if is_instance_valid(_hook_in_reach) else null
+
+func report_lantern_hung(hook: Node3D) -> void:
+	if audio:
+		audio.play_event(&"lantern_place", true)
+	if bus:
+		bus.lantern_hook_changed.emit(hook.hook_id, true)
+	if hook.wake_group_on_hang != &"":
+		report_wake_trigger(hook.wake_group_on_hang)
+
+func report_lantern_unhooked(hook: Node3D) -> void:
+	if bus:
+		bus.lantern_hook_changed.emit(hook.hook_id, false)
+
+## A Rope's grab zone touched the child. Grab it if they're airborne and their hands are free.
+func report_rope_touched(rope: Node3D) -> void:
+	if state != State.PLAYING or not is_instance_valid(_player) or is_lantern_carried():
+		return
+	if _player.can_grab_rope():
+		_player.attach_to_rope(rope)
+		if audio:
+			audio.play_event(&"land", true)
+
+func report_lever_pulled(lever_id: StringName) -> void:
+	if audio:
+		audio.play_event(&"lantern_place", true)
+	if bus:
+		bus.lever_pulled.emit(lever_id)
+
 # ── Enemies ───────────────────────────────────────────────────────────────
 
-## True while the player holds a lit lantern: enemies can't touch them.
+## True while the player is inside any active lantern light radius (carried or placed): enemies can't touch them.
 func is_player_protected() -> bool:
-	return is_instance_valid(_lantern) and _lantern.carried and _lantern.is_light_active()
+	if not is_instance_valid(_lantern) or not _lantern.is_light_active():
+		return false
+	if _lantern.carried:
+		return true
+	return player_lit
 
 func report_wake_trigger(group: StringName) -> void:
 	if bus and state == State.PLAYING:

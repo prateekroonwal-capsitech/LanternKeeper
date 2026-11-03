@@ -18,6 +18,7 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_rocks.png" id="16_rocks"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_grass.png" id="17_grass"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_post.png" id="18_post"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/WakeTrigger.tscn" id="19_wake"]
 
 [node name="W1_10" type="Node3D" node_paths=PackedStringArray("spawn_point")]
 script = ExtResource("1_level")
@@ -103,8 +104,12 @@ size = Vector2(0.6, 3)
 
 [node name="Shrines" type="Node3D" parent="."]
 
-[node name="Shrine1" parent="Shrines" instance=ExtResource("11_shrine")]
+[node name="ShadowRestart1" type="Marker3D" parent="Shrines"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 2.4, 0)
+
+[node name="Shrine1" parent="Shrines" node_paths=PackedStringArray("shadow_restart_point") instance=ExtResource("11_shrine")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 2.4, 0)
+shadow_restart_point = NodePath("../ShadowRestart1")
 
 [node name="Hints" type="Node3D" parent="."]
 
@@ -116,7 +121,13 @@ hint_id = "tide"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 0, 0)
 chase_speed = 4.0
 end_x = 100
-wake_distance = 40.0
+wake_group = &"chase"
+wake_distance = 0.0
+
+[node name="WakeChase" parent="." instance=ExtResource("19_wake")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+wake_group = &"chase"
+size = Vector3(2, 4, 2)
 
 [node name="Decor" type="Node3D" parent="."]
 

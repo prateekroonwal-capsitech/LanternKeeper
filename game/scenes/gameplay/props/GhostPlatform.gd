@@ -61,6 +61,12 @@ func inject_services(registry: Node) -> void:
 		return
 	_game = registry.get_service(&"game") as GameManager
 	if _game:
+		_game.bus.level_reset.connect(func(_serial: int) -> void:
+			_solid = false
+			_solidity = 0.0
+			_set_solid(false)
+			_set_solidity_visual(0.0)
+		)
 		set_physics_process(true)
 
 func _physics_process(delta: float) -> void:

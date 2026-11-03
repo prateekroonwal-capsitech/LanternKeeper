@@ -4,9 +4,26 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/enemy_eyes.png" id="eyes"]
 [ext_resource type="SpriteFrames" path="res://game/assets/sprites/enemies/mite_frames.tres" id="frames"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/lair_hole.png" id="hole"]
+[ext_resource type="Material" path="res://game/assets/materials/enemy_silhouette.tres" id="mat"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/fx/dust_mote.png" id="dust"]
 
 [sub_resource type="SphereShape3D" id="shape"]
 radius = 0.2
+
+[sub_resource type="SphereShape3D" id="hurt_shape"]
+radius = 0.28
+
+[sub_resource type="StandardMaterial3D" id="dust_mat"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.04, 0.04, 0.06, 0.6)
+albedo_texture = ExtResource("dust")
+billboard_mode = 3
+
+[sub_resource type="QuadMesh" id="dust_mesh"]
+material = SubResource("dust_mat")
+size = Vector2(0.05, 0.05)
 
 [node name="SwarmMite" type="CharacterBody3D"]
 collision_layer = 16
@@ -19,9 +36,37 @@ emerge_time = 0.3
 body_radius = 0.2
 catch_radius = 0.35
 
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("shape")
+
+[node name="Hurtbox" type="Area3D" parent="."]
+collision_layer = 16
+collision_mask = 2
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hurtbox"]
+shape = SubResource("hurt_shape")
+
+[node name="DarkParticles" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 8
+lifetime = 1.0
+mesh = SubResource("dust_mesh")
+emission_shape = 1
+emission_sphere_radius = 0.2
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, 0.04, 0)
+initial_velocity_min = 0.02
+initial_velocity_max = 0.15
+scale_amount_min = 0.4
+scale_amount_max = 1.0
+
 [node name="Visual" type="Node3D" parent="."]
 
 [node name="Body" type="AnimatedSprite3D" parent="Visual"]
+material_override = ExtResource("mat")
 offset = Vector2(0, 0)
 pixel_size = 0.008
 alpha_cut = 1
@@ -45,3 +90,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.9)
 pixel_size = 0.006
 texture_filter = 3
 texture = ExtResource("hole")
+
+[connection signal="body_entered" from="Hurtbox" to="." method="_on_hurtbox_body_entered"]

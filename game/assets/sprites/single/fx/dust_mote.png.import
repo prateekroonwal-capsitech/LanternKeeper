@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dxsgn50hkcqyk"
 path.s3tc="res://.godot/imported/dust_mote.png-928c42812743401a51ed0084246981fc.s3tc.ctex"
+path.etc2="res://.godot/imported/dust_mote.png-928c42812743401a51ed0084246981fc.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://game/assets/sprites/single/fx/dust_mote.png"
-dest_files=["res://.godot/imported/dust_mote.png-928c42812743401a51ed0084246981fc.s3tc.ctex"]
+dest_files=["res://.godot/imported/dust_mote.png-928c42812743401a51ed0084246981fc.s3tc.ctex", "res://.godot/imported/dust_mote.png-928c42812743401a51ed0084246981fc.etc2.ctex"]
 
 [params]
 
