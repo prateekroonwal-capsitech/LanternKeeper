@@ -26,6 +26,7 @@
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/CollapsingPlatform.tscn" id="collapse"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/BigShadow.tscn" id="big"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="hint"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/lair_crack.png" id="crack"]
 
 [node name="W1_07" type="Node3D" node_paths=PackedStringArray("spawn_point")]
 script = ExtResource("level")
@@ -111,13 +112,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 0, 0)
 lever_id = &"lever7"
 
 [node name="Stalker" parent="." instance=ExtResource("stalker")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, -0.6)
 wake_group = &"stalk7"
 
 [node name="HintSomethingFollows" parent="." instance=ExtResource("hint")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -20, 0)
 hint_id = "something_follows"
 on_wake_group = &"stalk7"
+
+[node name="StalkerAlcove" type="Sprite3D" parent="Decor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, -0.8)
+offset = Vector2(0, 80)
+pixel_size = 0.014
+alpha_cut = 1
+texture_filter = 3
+texture = ExtResource("crack")
 
 [node name="tree_a_13" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -0.8)

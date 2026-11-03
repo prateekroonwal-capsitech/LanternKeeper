@@ -42,6 +42,22 @@ func _light_radius_at(center: Vector3) -> float:
 		r += 0.25
 	return r
 
+func _is_lit(point: Vector3) -> bool:
+	if ignores_light or _game == null:
+		return false
+	if _game.player_lit:
+		return _game.is_point_lit(point, body_radius + light_margin)
+	for source in _game.get_light_sources():
+		if not is_instance_valid(source) or not source.is_light_active():
+			continue
+		if source == _game.get_lantern() and _game.is_lantern_hung():
+			continue
+		var c: Vector3 = source.get_light_position()
+		var r: float = source.get_light_radius() + body_radius + light_margin
+		if Vector2(point.x - c.x, point.y - c.y).length_squared() <= r * r:
+			return true
+	return false
+
 func _perform_lunge_step(spd: float, delta: float) -> void:
 	var target := _game.get_player_position() + Vector3(0.0, hover_height * 0.5, 0.0)
 	var to := _flat(target - global_position)

@@ -133,6 +133,9 @@ func is_light_active() -> bool:
 func is_raised() -> bool:
 	return _raised
 
+func is_hung() -> bool:
+	return is_instance_valid(_hook)
+
 # ── Checkpoint snapshot (called by GameManager) ───────────────────────────
 
 func capture_state() -> Dictionary:

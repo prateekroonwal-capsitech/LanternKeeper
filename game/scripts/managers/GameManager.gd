@@ -470,6 +470,15 @@ func is_lantern_raised() -> bool:
 func is_lantern_carried() -> bool:
 	return _lantern.carried if is_instance_valid(_lantern) else false
 
+func is_lantern_hung() -> bool:
+	return _lantern.is_hung() if is_instance_valid(_lantern) else false
+
+func get_lantern() -> Node3D:
+	return _lantern
+
+func get_light_sources() -> Array[Node3D]:
+	return _light_sources
+
 ## World position of the lantern's handle (where the player's hand holds it).
 func get_lantern_handle_position() -> Vector3:
 	return _lantern.get_handle_position() if is_instance_valid(_lantern) else get_player_position()
