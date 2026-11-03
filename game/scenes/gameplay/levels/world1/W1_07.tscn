@@ -114,7 +114,12 @@ lever_id = &"lever7"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 1, 0)
 wake_group = &"stalk7"
 
-[node name="tree_a_12" type="Sprite3D" parent="Decor"]
+[node name="HintSomethingFollows" parent="." instance=ExtResource("hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -20, 0)
+hint_id = "something_follows"
+on_wake_group = &"stalk7"
+
+[node name="tree_a_13" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -0.8)
 offset = Vector2(0, 256)
 pixel_size = 0.01
@@ -122,7 +127,7 @@ alpha_cut = 1
 texture_filter = 3
 texture = ExtResource("tree_a")
 
-[node name="rocks_13" type="Sprite3D" parent="Decor"]
+[node name="rocks_14" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 0, -0.8)
 offset = Vector2(0, 48)
 pixel_size = 0.01
@@ -130,7 +135,7 @@ alpha_cut = 1
 texture_filter = 3
 texture = ExtResource("rocks")
 
-[node name="tree_a_14" type="Sprite3D" parent="Decor"]
+[node name="tree_a_15" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, 0, -0.8)
 offset = Vector2(0, 256)
 pixel_size = 0.01

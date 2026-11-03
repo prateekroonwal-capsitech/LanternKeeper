@@ -1,110 +1,79 @@
 class_name GestureHint
 extends UIController
 
-## GestureHint — the only tutorial: a wordless, one-time hint for the controls in the
-## first levels. Touch (gestures layout): a ghost hand shows the gesture on screen.
-## Keyboard / controller: a key icon. Classic touch buttons need no hint.
-## Hint ids: "move", "jump", "place", "raise" (TutorialTrigger.hint_id). Any other id is ignored.
-## TutorialManager decides "once only" and saves the seen flag.
+## GestureHint — the only tutorial: one short line of light text at the bottom of the
+## screen, shown once when something new is introduced. It fades in, stays `display_time`
+## seconds or until the player does the hint's action (after `min_time`), then fades out.
+## Wording differs for touch gestures (Android default), the classic touch-button layout
+## and keyboard / controller; TutorialManager.HINTS holds the data and decides "once only"
+## (it saves the seen flag). No popups, no boxes.
 ##
 ## Sends: nothing.
-## Receives: GameBus.tutorial_hint_requested(hint_id); GameBus.game_state_changed (hides).
+## Receives: GameBus.tutorial_hint_requested(hint_id); GameBus.lantern_placed (dismisses the
+##   "place" hint); GameBus.game_state_changed (hides). Polls GameManager.input.move_axis.
 
-@export var display_time: float = 3.6
-@export var fade_time: float = 0.35
-@export var hand_alpha: float = 0.55
-## Key icons, one per hint id (PC / controller).
-@export var key_icons: Dictionary = {}
+@export var display_time: float = 3.0
+## Seconds the line stays at least, even if the action is done straight away.
+@export var min_time: float = 0.8
+@export var fade_time: float = 0.4
+@export var text_alpha: float = 0.8
 
-@onready var _hand: TextureRect = %Hand
-@onready var _key: TextureRect = %KeyIcon
+@onready var _label: Label = %HintText
 
 var _tween: Tween
-
-const _HINTS := ["move", "jump", "place", "raise"]
+var _hint_id: String = ""
+var _shown_for: float = 0.0
+var _dismissed: bool = false
 
 func _on_ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hide()
+	set_process(false)
 	_game_manager.bus.tutorial_hint_requested.connect(_show_hint)
+	_game_manager.bus.lantern_placed.connect(func(_at: Vector3) -> void:
+		if _game_manager.tutorial.get_hint_action(_hint_id) == "place_lantern":
+			_dismissed = true)
 	_game_manager.bus.game_state_changed.connect(func(state: int) -> void:
 		if state != GameManager.State.PLAYING:
 			_stop())
 
 func _show_hint(hint_id: String) -> void:
-	if not _HINTS.has(hint_id):
-		return
-	var touch := DisplayServer.is_touchscreen_available()
-	if touch and _game_manager.input.control_layout == InputManager.LAYOUT_CLASSIC:
+	var device := "pc"
+	if DisplayServer.is_touchscreen_available():
+		device = "classic" if _game_manager.input.control_layout == InputManager.LAYOUT_CLASSIC else "touch"
+	var key := _game_manager.tutorial.get_hint_key(hint_id, device)
+	if key == "":
 		return
 	_stop()
+	_hint_id = hint_id
+	_shown_for = 0.0
+	_dismissed = false
+	_label.text = tr(key)
+	_label.modulate.a = 0.0
 	show()
-	if touch:
-		_play_hand(hint_id)
-	else:
-		_play_key(hint_id)
-
-func _play_key(hint_id: String) -> void:
-	var tex: Texture2D = key_icons.get(hint_id)
-	if tex == null:
-		hide()
-		return
-	_key.texture = tex
-	_key.show()
-	_hand.hide()
-	_key.modulate.a = 0.0
+	set_process(true)
 	_tween = create_tween()
-	_tween.tween_property(_key, "modulate:a", 0.85, fade_time)
-	_tween.tween_interval(display_time)
-	_tween.tween_property(_key, "modulate:a", 0.0, fade_time)
-	_tween.tween_callback(hide)
+	_tween.tween_property(_label, "modulate:a", text_alpha, fade_time)
 
-func _play_hand(hint_id: String) -> void:
-	_key.hide()
-	_hand.show()
-	var view := get_viewport_rect().size
-	var left := Vector2(view.x * 0.22, view.y * 0.68)
-	var right := Vector2(view.x * 0.75, view.y * 0.62)
-	var half := _hand.size * 0.5
-	_hand.modulate.a = 0.0
-	_hand.scale = Vector2.ONE
-	_hand.pivot_offset = half
+func _process(delta: float) -> void:
+	_shown_for += delta
+	if _game_manager.tutorial.get_hint_action(_hint_id) == "move" and absf(_game_manager.input.move_axis) > 0.1:
+		_dismissed = true
+	if _shown_for >= fade_time + display_time or (_dismissed and _shown_for >= min_time):
+		_fade_out()
+
+func _fade_out() -> void:
+	set_process(false)
+	_hint_id = ""
+	if _tween:
+		_tween.kill()
 	_tween = create_tween()
-	match hint_id:
-		"move":
-			_hand.position = left - half
-			_tween.tween_property(_hand, "modulate:a", hand_alpha, fade_time)
-			for i in 2:
-				_tween.tween_property(_hand, "position:x", left.x - half.x + 140.0, 0.5).set_trans(Tween.TRANS_SINE)
-				_tween.tween_property(_hand, "position:x", left.x - half.x - 140.0, 0.8).set_trans(Tween.TRANS_SINE)
-			_tween.tween_property(_hand, "position:x", left.x - half.x, 0.4)
-		"jump":
-			_hand.position = right - half
-			_tween.tween_property(_hand, "modulate:a", hand_alpha, fade_time)
-			for i in 3:
-				_tween.tween_property(_hand, "scale", Vector2(0.82, 0.82), 0.12)
-				_tween.tween_property(_hand, "scale", Vector2.ONE, 0.25)
-				_tween.tween_interval(0.35)
-		"place":
-			_hand.position = right - half - Vector2(0.0, 90.0)
-			_tween.tween_property(_hand, "modulate:a", hand_alpha, fade_time)
-			for i in 2:
-				_tween.tween_property(_hand, "position:y", right.y - half.y + 110.0, 0.35).set_ease(Tween.EASE_IN)
-				_tween.tween_interval(0.3)
-				_tween.tween_property(_hand, "position:y", right.y - half.y - 90.0, 0.01)
-				_tween.tween_interval(0.3)
-		"raise":
-			_hand.position = right - half
-			_tween.tween_property(_hand, "modulate:a", hand_alpha, fade_time)
-			for i in 2:
-				_tween.tween_property(_hand, "scale", Vector2(0.82, 0.82), 0.15)
-				_tween.tween_interval(0.9)
-				_tween.tween_property(_hand, "scale", Vector2.ONE, 0.2)
-				_tween.tween_interval(0.3)
-	_tween.tween_property(_hand, "modulate:a", 0.0, fade_time)
+	_tween.tween_property(_label, "modulate:a", 0.0, fade_time)
 	_tween.tween_callback(hide)
 
 func _stop() -> void:
+	set_process(false)
+	_hint_id = ""
 	if _tween:
 		_tween.kill()
 	hide()

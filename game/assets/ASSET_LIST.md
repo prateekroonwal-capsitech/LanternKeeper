@@ -102,11 +102,11 @@ Wordless hints are displayed via `GestureHint.tscn` when entering a `TutorialTri
 
 | File | Size (px) | Used by | Notes |
 |---|---|---|---|
-| `hint_hand.png` | 160 × 160 | `GestureHint.tscn` → Touch/Hand | Translucent ghost hand for touch / gesture tutorials (tap, drag). |
-| `key_move.png` | 216 × 104 | `GestureHint.tscn` → Keys/KeyImage | "A" / "D" keycap icon for keyboard move hint. |
-| `key_jump.png` | 268 × 104 | `GestureHint.tscn` → Keys/KeyImage | "SPACE" keycap icon for keyboard jump hint. |
-| `key_place.png` | 104 × 104 | `GestureHint.tscn` → Keys/KeyImage | "E" keycap icon for keyboard place lantern hint. |
-| `key_raise.png` | 208 × 104 | `GestureHint.tscn` → Keys/KeyImage | "SHIFT" keycap icon for keyboard raise lantern hint. |
+| `hint_hand.png` | 160 × 160 | *unused since Prompt 4 (hints are text now)* | Translucent ghost hand for touch / gesture tutorials (tap, drag). |
+| `key_move.png` | 216 × 104 | *unused since Prompt 4 (hints are text now)* | "A" / "D" keycap icon for keyboard move hint. |
+| `key_jump.png` | 268 × 104 | *unused since Prompt 4 (hints are text now)* | "SPACE" keycap icon for keyboard jump hint. |
+| `key_place.png` | 104 × 104 | *unused since Prompt 4 (hints are text now)* | "E" keycap icon for keyboard place lantern hint. |
+| `key_raise.png` | 208 × 104 | *unused since Prompt 4 (hints are text now)* | "SHIFT" keycap icon for keyboard raise lantern hint. |
 | `btn_pause.png` | 112 × 112 | HUD → PauseButton | Top-right, inside safe area. |
 | `touch_joystick_base.png` | 256 × 256 | TouchControls → Gestures/Joystick/Base | Centred on thumb. |
 | `touch_joystick_knob.png` | 128 × 128 | TouchControls → …/Knob/KnobImage | Centred. |

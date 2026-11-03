@@ -101,7 +101,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.4, -0.6, 0)
 wake_group = &"gate_crawlers"
 emerge_offset = Vector3(0, 0.65, 0)
 
-[node name="tree_a_9" type="Sprite3D" parent="Decor"]
+[node name="HintStayInLight" parent="." instance=ExtResource("hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, -20, 0)
+hint_id = "stay_in_light"
+on_wake_group = &"gate_crawlers"
+
+[node name="tree_a_10" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -0.8)
 offset = Vector2(0, 256)
 pixel_size = 0.01
@@ -109,7 +114,7 @@ alpha_cut = 1
 texture_filter = 3
 texture = ExtResource("tree_a")
 
-[node name="rocks_10" type="Sprite3D" parent="Decor"]
+[node name="rocks_11" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 0, -0.8)
 offset = Vector2(0, 48)
 pixel_size = 0.01

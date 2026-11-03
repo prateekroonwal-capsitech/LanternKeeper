@@ -1,13 +1,27 @@
 class_name TutorialManager
 extends Node
 
-## TutorialManager — one-time, wordless control hints (ghost hand on touch, key icon on
-## PC) in the first levels. Every other lesson is taught by level layout.
-## A hint is shown once, then its "seen" flag is saved (SaveManager → tutorials bucket).
-## GestureHint (UIRoot) draws it; this manager only decides.
+## TutorialManager — one short line of text, only when something new is introduced.
+## HINTS below is the data: per hint, the translation key for touch (Android gestures),
+## the classic touch-button layout and PC (strings.csv) and the action that dismisses it early. A hint is shown once per save,
+## then its "seen" flag is saved (SaveManager → tutorials bucket). GestureHint (UIRoot)
+## draws it; this manager only decides. Unknown ids are ignored (and not marked seen).
 ##
 ## Sends: GameBus.tutorial_hint_requested(hint_id); SaveManager.mark_tutorial_seen().
 ## Receives: request_hint(hint_id) — TutorialTrigger nodes via GameManager.report_tutorial_trigger().
+
+## id → { touch, classic, pc: translation keys (classic falls back to touch); action: InputMap action that hides it early ("" = none) }.
+## Placed by TutorialTrigger nodes (hint_id), in the level where the thing is introduced.
+const HINTS := {
+	"move":              { "touch": "HINT_MOVE_TOUCH", "classic": "HINT_MOVE_CLASSIC", "pc": "HINT_MOVE_PC", "action": "move" },      # 1-1 start
+	"ghost":             { "touch": "HINT_GHOST", "pc": "HINT_GHOST", "action": "" },                 # 1-1 first ghost platform
+	"place":             { "touch": "HINT_PLACE_TOUCH", "classic": "HINT_PLACE_CLASSIC", "pc": "HINT_PLACE_PC", "action": "place_lantern" },  # 1-2 first place spot
+	"stay_in_light":     { "touch": "HINT_STAY_IN_LIGHT", "pc": "HINT_STAY_IN_LIGHT", "action": "" }, # 1-3 crawlers wake
+	"danger_above":      { "touch": "HINT_DANGER_ABOVE", "pc": "HINT_DANGER_ABOVE", "action": "" },   # 1-5 first dropper
+	"something_follows": { "touch": "HINT_SOMETHING_FOLLOWS", "pc": "HINT_SOMETHING_FOLLOWS", "action": "" },  # 1-7 Stalker wakes
+	"seal_holes":        { "touch": "HINT_SEAL_HOLES", "pc": "HINT_SEAL_HOLES", "action": "" },       # 1-9 swarm wakes
+	"run":               { "touch": "HINT_RUN", "pc": "HINT_RUN", "action": "" },                     # 1-10 chase starts
+}
 
 var _logger: Node
 var _bus: Node
@@ -20,13 +34,23 @@ func configure(logger: Node, bus: Node, save: SaveManager) -> void:
 
 ## Shows a hint if it has not been seen yet. Returns true if it was shown.
 func request_hint(hint_id: String) -> bool:
-	if is_seen(hint_id):
+	if not HINTS.has(hint_id) or is_seen(hint_id):
 		return false
 	if _save:
 		_save.mark_tutorial_seen(hint_id)
 	if _bus:
 		_bus.tutorial_hint_requested.emit(hint_id)
 	return true
+
+## Translation key for this hint on the current device: device is "touch" (gestures),
+## "classic" (touch buttons) or "pc" (keyboard / controller).
+func get_hint_key(hint_id: String, device: String) -> String:
+	var data: Dictionary = HINTS.get(hint_id, {})
+	return data.get(device, data.get("touch", ""))
+
+## InputMap action that dismisses the hint early ("move" = either direction), or "".
+func get_hint_action(hint_id: String) -> String:
+	return HINTS.get(hint_id, {}).get("action", "")
 
 func is_seen(hint_id: String) -> bool:
 	return _save != null and _save.is_tutorial_seen(hint_id)

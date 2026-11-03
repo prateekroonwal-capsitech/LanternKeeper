@@ -151,3 +151,19 @@ hesitate; every hazard is on screen ≈ 8 m before you reach it; all jumps ≤ 2
 exit plate (placed there, the gate opens; take it back and it shuts — place it again); planks
 reset with checkpoints; bounds sealed by walls.
 
+---
+
+## Tutorial hints (Prompt 4)
+One line of light text at the bottom of the screen, once per save; data in
+`TutorialManager.HINTS`, text in `strings.csv` (touch gestures / classic touch buttons / PC).
+
+| Level | Trigger | Text (PC · Android gestures · Android buttons) | Placed |
+|---|---|---|---|
+| 1-1 | level start (`Hint_move`, at spawn) | A/D to move · Space to jump / Drag to move · Tap to jump / Buttons to move and jump | yes |
+| 1-1 | before the ghost bridge (`Hint_ghost`, x 12.5) | Light makes paths | yes |
+| 1-2 | before the place spot (`Hint_place`, x 9) | E to place lantern / Swipe down to place lantern / Lantern button to place it | yes |
+| 1-3 | crawlers wake (`HintStayInLight`, on_wake_group gate_crawlers) | Stay in the light | yes |
+| 1-5 | first dropper in view | Danger above | **to place:** TutorialTrigger, hint_id `danger_above`, a few metres before Dropper1 |
+| 1-7 | Stalker wakes (`HintSomethingFollows`, on_wake_group stalk7) | Something follows. Keep moving | yes |
+| 1-9 | swarm wakes | Light seals the holes | **to place:** TutorialTrigger, hint_id `seal_holes`, on_wake_group `swarm9` (position doesn't matter) |
+| 1-10 | chase starts (`HintRun`, on_wake_group chase) | Run | yes |

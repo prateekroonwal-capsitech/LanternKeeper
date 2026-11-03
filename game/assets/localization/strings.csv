@@ -37,3 +37,15 @@ LEVEL_W1_07,Undercroft
 LEVEL_W1_08,Lost Light
 LEVEL_W1_09,The Niche
 LEVEL_W1_10,The Dark Tide
+HINT_MOVE_TOUCH,"Drag to move · Tap to jump"
+HINT_MOVE_CLASSIC,"Buttons to move and jump"
+HINT_MOVE_PC,"A/D to move · Space to jump"
+HINT_GHOST,"Light makes paths"
+HINT_PLACE_TOUCH,"Swipe down to place lantern"
+HINT_PLACE_CLASSIC,"Lantern button to place it"
+HINT_PLACE_PC,"E to place lantern"
+HINT_STAY_IN_LIGHT,"Stay in the light"
+HINT_DANGER_ABOVE,"Danger above"
+HINT_SOMETHING_FOLLOWS,"Something follows. Keep moving"
+HINT_SEAL_HOLES,"Light seals the holes"
+HINT_RUN,"Run"
