@@ -1,0 +1,116 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/enemies/Shade.gd" id="script"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/enemies/EnemyVisual.gd" id="visual_script"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/enemy_eyes.png" id="eyes"]
+[ext_resource type="SpriteFrames" path="res://game/assets/sprites/enemies/shade/shade_frames.tres" id="frames"]
+[ext_resource type="Material" path="res://game/assets/materials/enemy_silhouette.tres" id="mat"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/fx/dust_mote.png" id="dust"]
+
+[sub_resource type="SphereShape3D" id="shape"]
+radius = 1.2
+
+[sub_resource type="BoxShape3D" id="hurt_shape"]
+size = Vector3(4.8, 3.6, 2.0)
+
+[sub_resource type="StandardMaterial3D" id="dust_mat"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.05, 0.05, 0.08, 0.75)
+albedo_texture = ExtResource("dust")
+billboard_mode = 3
+
+[sub_resource type="QuadMesh" id="dust_mesh"]
+material = SubResource("dust_mat")
+size = Vector2(0.4, 0.4)
+
+[node name="Shade" type="CharacterBody3D"]
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("script")
+enemy_kind = "shade"
+wake_group = &"chase"
+show_eyes_while_dormant = false
+catch_radius = 2.4
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("shape")
+
+[node name="Hurtbox" type="Area3D" parent="."]
+collision_layer = 16
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hurtbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.2, 0)
+shape = SubResource("hurt_shape")
+
+[node name="SmokeTrail" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.1, 0)
+emitting = true
+amount = 40
+lifetime = 1.4
+mesh = SubResource("dust_mesh")
+emission_shape = 1
+emission_sphere_radius = 0.9
+direction = Vector3(-1, 0.15, 0)
+spread = 30.0
+gravity = Vector3(0, 0.15, 0)
+initial_velocity_min = 1.2
+initial_velocity_max = 2.8
+scale_amount_min = 0.8
+scale_amount_max = 2.2
+color = Color(0.08, 0.08, 0.12, 0.8)
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Body" type="AnimatedSprite3D" parent="Visual"]
+material_override = ExtResource("mat")
+offset = Vector2(0, 16)
+pixel_size = 0.006
+alpha_cut = 1
+texture_filter = 3
+sprite_frames = ExtResource("frames")
+animation = &"fly"
+autoplay = "fly"
+script = ExtResource("visual_script")
+anim_map = {&"move": &"fly", &"idle": &"glide", &"lunge": &"swoop", &"windup": &"screech", &"emerge": &"emerge"}
+eye_nodes = Array[NodePath]([NodePath("../Eyes"), NodePath("../EyesB"), NodePath("../EyesC")])
+art_pixel_size = 0.006
+canvas_origin = Vector2(512, 400)
+eye_track = {
+"fly": [[Vector2(628.0, 371.8), Vector2(604.8, 359.8), Vector2(621.1, 384.4)], [Vector2(629.2, 388.9), Vector2(606.7, 375.7), Vector2(621.7, 401.1)], [Vector2(629.7, 395.9), Vector2(607.4, 382.3), Vector2(621.9, 408.1)], [Vector2(629.2, 388.9), Vector2(606.7, 375.7), Vector2(621.7, 401.1)], [Vector2(628.0, 371.8), Vector2(604.8, 359.8), Vector2(621.1, 384.4)], [Vector2(626.4, 354.8), Vector2(602.7, 343.9), Vector2(620.2, 367.8)], [Vector2(625.7, 347.8), Vector2(601.8, 337.4), Vector2(619.7, 360.9)], [Vector2(626.4, 354.8), Vector2(602.7, 343.9), Vector2(620.2, 367.8)]],
+"glide": [[Vector2(629.3, 377.9), Vector2(606.8, 364.7), Vector2(621.7, 390.2)], [Vector2(629.3, 385.9), Vector2(606.8, 372.7), Vector2(621.7, 398.2)], [Vector2(629.3, 377.9), Vector2(606.8, 364.7), Vector2(621.7, 390.2)], [Vector2(629.3, 369.9), Vector2(606.8, 356.7), Vector2(621.7, 382.2)]],
+"swoop": [[Vector2(630.6, 393.2), Vector2(613.0, 373.9), Vector2(619.8, 402.7)], [Vector2(623.2, 433.4), Vector2(611.1, 410.3), Vector2(610.3, 439.8)], [Vector2(626.6, 433.6), Vector2(612.5, 411.6), Vector2(614.2, 441.1)], [Vector2(631.1, 402.4), Vector2(610.4, 386.5), Vector2(622.1, 413.6)]],
+"screech": [[Vector2(618.7, 336.4), Vector2(593.4, 329.9), Vector2(614.8, 350.3)], [Vector2(623.7, 347.9), Vector2(599.2, 338.7), Vector2(618.3, 361.3)], [Vector2(618.7, 336.4), Vector2(593.4, 329.9), Vector2(614.8, 350.3)], [Vector2(612.5, 325.6), Vector2(586.7, 321.7), Vector2(610.0, 339.8)]],
+"emerge": [[Vector2(631.3, 425.0), Vector2(610.9, 408.6), Vector2(622.0, 436.0)], [Vector2(630.7, 407.2), Vector2(609.3, 392.2), Vector2(622.2, 418.8)], [Vector2(629.6, 389.4), Vector2(607.3, 375.9), Vector2(621.8, 401.6)], [Vector2(628.0, 371.8), Vector2(604.8, 359.8), Vector2(621.1, 384.4)]]
+}
+
+[node name="Eyes" type="Sprite3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.696, 0.169, 0.05)
+modulate = Color(2.6, 0.18, 0.12, 1)
+render_priority = 10
+pixel_size = 0.01
+no_depth_test = true
+texture_filter = 3
+texture = ExtResource("eyes")
+
+[node name="EyesB" type="Sprite3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.557, 0.241, 0.05)
+modulate = Color(2.6, 0.18, 0.12, 1)
+render_priority = 10
+pixel_size = 0.0065
+no_depth_test = true
+texture_filter = 3
+texture = ExtResource("eyes")
+
+[node name="EyesC" type="Sprite3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.655, 0.094, 0.05)
+modulate = Color(2.6, 0.18, 0.12, 1)
+render_priority = 10
+pixel_size = 0.006
+no_depth_test = true
+texture_filter = 3
+texture = ExtResource("eyes")
+
+[connection signal="body_entered" from="Hurtbox" to="." method="_on_hurtbox_body_entered"]

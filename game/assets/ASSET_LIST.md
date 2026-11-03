@@ -67,7 +67,8 @@ origin pixel; re-run the generator to rebuild everything.
 | `dropper/` | 512 × 512 | 256 | 256, 256 (centre) | hang 4, unfold 4, land 2, windup 3, lunge 3, flinch 3 | `Dropper.tscn` → Visual/Body | Bristled husk hanging on a thread, four folded limbs that open as it drops. |
 | `stalker/` | 640 × 1024 | 512 | 320, 784 (hover point) | idle 4, walk 6, windup 3, lunge 3, flinch 3 | `Stalker.tscn` → Visual/Body | Gaunt hunched hoverer: long-snouted head, very long arms with three fingers, frayed hem of tendrils. |
 | `mite/` | 512 × 512 | 128 | 256, 256 (centre) | fly 4, dive 3, flinch 2 | `SwarmMite.tscn` → Visual/Body | Bristling burr with two pairs of wings, stinger and dangling legs. |
-| `big_shadow/` | 1280 × 1024 | 640 | 693, 677 | idle 4, run 8, strike 4, emerge 4 | `BigShadow.tscn` → Visual/Body | Towering knuckle-walking mass: domed furred back, two huge clawed arms, long toothed jaw, three eyes, smoke ribbons trailing behind. |
+| `big_shadow/` | 1280 × 1024 | 640 | 693, 677 | idle 4, run 8, strike 4, emerge 4 | `BigShadow.tscn` → Visual/Body | Towering knuckle-walking mass: domed furred back, two huge clawed arms, long toothed jaw, three eyes, smoke ribbons trailing behind. (Legacy enemy kept in codebase; replaced in Level 10 by the Shade). |
+| `shade/` | 1024 × 768 | 512 | 512, 400 (core) | fly 8, glide 4, swoop 4, screech 4, emerge 4 | `Shade.tscn` → Visual/Body | Massive airborne shadow pursuer: dark ragged body, two huge tattered bat wings, trailing smoke ribbons, predatory jaw with fangs, three glowing eyes. |
 
 | `enemy_eyes.png` | 1 | 96 × 48 | All enemies → Eyes (moved per frame by `EnemyVisual`) | Pure **WHITE** shapes on transparent — tinted red / HDR in-game via `eye_color` modulate so they bloom. |
 | `lair_crack.png` | 1 | 96 × 160 | `Crawler.tscn` → Lair (`pixel_size` 0.009) | Vertical floor/wall crack a creature emerges from. |

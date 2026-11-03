@@ -1,0 +1,126 @@
+[gd_resource type="SpriteFrames" load_steps=25 format=3]
+
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_00.png" id="fly_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_01.png" id="fly_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_02.png" id="fly_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_03.png" id="fly_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_04.png" id="fly_4"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_05.png" id="fly_5"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_06.png" id="fly_6"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/fly_07.png" id="fly_7"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/glide_00.png" id="glide_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/glide_01.png" id="glide_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/glide_02.png" id="glide_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/glide_03.png" id="glide_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/swoop_00.png" id="swoop_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/swoop_01.png" id="swoop_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/swoop_02.png" id="swoop_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/swoop_03.png" id="swoop_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/screech_00.png" id="screech_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/screech_01.png" id="screech_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/screech_02.png" id="screech_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/screech_03.png" id="screech_3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/emerge_00.png" id="emerge_0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/emerge_01.png" id="emerge_1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/emerge_02.png" id="emerge_2"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/shade/emerge_03.png" id="emerge_3"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("fly_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("fly_7")
+}],
+"loop": true,
+"name": &"fly",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("glide_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("glide_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("glide_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("glide_3")
+}],
+"loop": true,
+"name": &"glide",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("swoop_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("swoop_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("swoop_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("swoop_3")
+}],
+"loop": false,
+"name": &"swoop",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("screech_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("screech_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("screech_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("screech_3")
+}],
+"loop": false,
+"name": &"screech",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("emerge_0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("emerge_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("emerge_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("emerge_3")
+}],
+"loop": false,
+"name": &"emerge",
+"speed": 10.0
+}]

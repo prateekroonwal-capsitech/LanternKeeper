@@ -24,7 +24,8 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_a.png" id="tree_a"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_rocks.png" id="rocks"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/CollapsingPlatform.tscn" id="collapse"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/BigShadow.tscn" id="big"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Shade.tscn" id="shade"]
+[ext_resource type="Curve3D" path="res://game/resources/chase_path_w1_10.tres" id="chase_curve"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="hint"]
 
 [node name="W1_10" type="Node3D" node_paths=PackedStringArray("spawn_point")]
@@ -246,13 +247,25 @@ shadow_restart_point = NodePath("../RestartB")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 206, 2.4, 0)
 shadow_restart_point = NodePath("../RestartC")
 
-[node name="BigShadow" parent="." instance=ExtResource("big")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 2.5, 0)
+[node name="ChasePath" type="Path3D" parent="."]
+curve = ExtResource("chase_curve")
+
+[node name="ChaseFollow" type="PathFollow3D" parent="ChasePath"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 3, 0)
+loop = false
+rotation_mode = 0
+
+[node name="Shade" parent="ChasePath/ChaseFollow" node_paths=PackedStringArray("path_follow") instance=ExtResource("shade")]
+path_follow = NodePath("..")
 wake_group = &"chase"
-chase_speed = 4.6
-end_x = 320.0
+base_speed = 4.6
+surge_speed = 6.0
+surge_distance = 16.0
+target_gap = 12.0
+catch_speed = 4.6
 rewake_delay = 1.0
-restart_gap = 12.0
+checkpoint_offsets = PackedFloat32Array(0, 116.1, 218.7)
+swoop_offsets = PackedFloat32Array(84, 188, 273)
 
 [node name="WakeChase" parent="." instance=ExtResource("wake")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)

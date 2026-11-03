@@ -195,8 +195,8 @@ func _set_body_visible(v: bool) -> void:
 
 func _set_hurtbox_active(active: bool) -> void:
 	if is_instance_valid(_hurtbox):
-		_hurtbox.monitoring = active
-		_hurtbox.monitorable = active
+		_hurtbox.set_deferred(&"monitoring", active)
+		_hurtbox.set_deferred(&"monitorable", active)
 		var col := _hurtbox.get_node_or_null("CollisionShape3D") as CollisionShape3D
 		if col:
 			col.set_deferred(&"disabled", not active)

@@ -530,6 +530,203 @@ def big_shadow(anim, i, n):
     return els + det, eyes
 
 
+def shade(anim, i, n):
+    O = (512.0, 400.0)
+    p = i / n
+
+    tilt = 0.0
+    jaw_open = 0.1
+    heave = 0.0
+    wing_phase = 0.0
+    wing_tuck = 0.0
+    wing_spread_bonus = 0.0
+    smoke_stream = 1.0
+    shroud = 0.0
+
+    if anim == "fly":
+        flap_angles = [-55, -30, 10, 45, 30, -10, -40, -60]
+        wing_phase = flap_angles[i]
+        heave = math.sin(TAU * p) * 16.0
+        tilt = -5.0 + math.sin(TAU * p) * 4.0
+    elif anim == "glide":
+        wing_phase = -15.0 + math.sin(TAU * p) * 5.0
+        heave = math.sin(TAU * p) * 8.0
+        tilt = -2.0
+    elif anim == "swoop":
+        dive_tilts = [15.0, 30.0, 25.0, 5.0]
+        dive_tucks = [0.6, 0.95, 0.9, 0.4]
+        tilt = dive_tilts[i]
+        wing_tuck = dive_tucks[i]
+        wing_phase = 40.0
+        heave = -20.0 + i * 10.0
+        smoke_stream = 1.6
+    elif anim == "screech":
+        tilt = -18.0 + math.sin(TAU * p) * 6.0
+        jaw_open = [0.6, 1.0, 0.9, 0.5][i]
+        wing_phase = -65.0
+        wing_spread_bonus = 25.0
+        heave = -10.0
+    elif anim == "emerge":
+        progress = (i + 1) / n
+        shroud = 1.0 - progress
+        wing_tuck = shroud * 0.8
+        wing_phase = lerp(60.0, -30.0, progress)
+        heave = (1.0 - progress) * 40.0
+        tilt = lerp(10.0, -5.0, progress)
+
+    def S(pt):
+        return add(add(O, (0.0, heave)), rot(pt, tilt))
+
+    els, det = [], []
+
+    num_ribbons = 6
+    for r in range(num_ribbons):
+        rb_root = S((-70.0 - r * 16.0, 20.0 + r * 14.0))
+        wave1 = math.sin(TAU * (p + r * 0.18)) * (24.0 / smoke_stream)
+        wave2 = math.cos(TAU * (p + r * 0.22)) * (32.0 / smoke_stream)
+        r_len = (260.0 + r * 28.0) * smoke_stream
+        p1 = add(rb_root, (-r_len * 0.35, wave1))
+        p2 = add(rb_root, (-r_len * 0.70, wave2))
+        p3 = add(rb_root, (-r_len, wave1 * 0.6))
+        rb_width = (36.0 - r * 3.5) * (1.2 if anim == "swoop" else 1.0)
+        els.append(taper([rb_root, p1, p2, p3], rb_width, 2.0, cap=False))
+
+    def make_wing(shoulder_pos, base_ang, is_far):
+        scale_fac = 0.85 if is_far else 1.0
+        sh = S(shoulder_pos)
+
+        eff_ang = base_ang + wing_phase * (0.8 if is_far else 1.0)
+        if wing_tuck > 0.0:
+            eff_ang = lerp(eff_ang, 35.0 if not is_far else 45.0, wing_tuck)
+
+        arm_len = (140.0 + wing_spread_bonus) * scale_fac
+        fore_len = (190.0 + wing_spread_bonus) * scale_fac
+
+        elbow = add(sh, polar(eff_ang - 40.0, arm_len))
+        wrist = add(elbow, polar(eff_ang + 15.0, fore_len * (1.0 - wing_tuck * 0.4)))
+
+        finger_lengths = [260.0 * scale_fac, 220.0 * scale_fac, 170.0 * scale_fac, 120.0 * scale_fac]
+        finger_spreads = [-25.0, 5.0, 30.0, 55.0]
+
+        tips = []
+        for flen, fspread in zip(finger_lengths, finger_spreads):
+            if wing_tuck > 0.0:
+                fang = eff_ang + 10.0 + fspread * (1.0 - wing_tuck * 0.7)
+                tips.append(add(wrist, polar(fang, flen * (1.0 - wing_tuck * 0.5))))
+            else:
+                fang = eff_ang + fspread
+                tips.append(add(wrist, polar(fang, flen)))
+
+        wing_els = []
+        wing_det = []
+
+        wing_els.append(taper([sh, elbow, wrist], 38.0 * scale_fac, 18.0 * scale_fac))
+        for tip in tips:
+            wing_els.append(taper([wrist, tip], 16.0 * scale_fac, 2.5 * scale_fac))
+
+        membrane_pts = [sh, elbow, wrist]
+        for t_idx, tip in enumerate(tips):
+            membrane_pts.append(tip)
+            if t_idx < len(tips) - 1:
+                next_tip = tips[t_idx + 1]
+                mid_notch = lerp2(tip, next_tip, 0.48)
+                scallop = lerp2(mid_notch, wrist, 0.42 + 0.08 * math.sin(t_idx + p * TAU))
+                membrane_pts.append(scallop)
+
+        wing_root_body = S(add(shoulder_pos, (-80.0, 40.0)))
+        membrane_pts.append(wing_root_body)
+
+        wing_els.append(blob(membrane_pts, rag=4.0, seed=12 if is_far else 24, spikes=12.0, every=3))
+
+        wing_det.append(line([sh, elbow, wrist], 4.0 * scale_fac))
+        for tip in tips[:3]:
+            wing_det.append(line([wrist, lerp2(wrist, tip, 0.7)], 2.5 * scale_fac))
+
+        wing_els.append(claw(wrist, eff_ang - 80.0, 24.0 * scale_fac))
+
+        return wing_els, wing_det
+
+    far_els, far_det = make_wing((-30.0, -40.0), -65.0, True)
+    els.extend(far_els)
+    det.extend(far_det)
+
+    body_pts = [
+        S((120.0, -10.0)),
+        S((80.0, -40.0)),
+        S((20.0, -50.0)),
+        S((-50.0, -42.0)),
+        S((-110.0, -15.0)),
+        S((-160.0, 25.0)),
+        S((-140.0, 65.0)),
+        S((-80.0, 75.0)),
+        S((0.0, 60.0)),
+        S((60.0, 35.0)),
+        S((95.0, 15.0)),
+    ]
+    els.append(blob(body_pts, rag=3.5, seed=42, spikes=16.0, every=2))
+
+    crest_base = S((40.0, -48.0))
+    crest_mid = S((-40.0, -85.0))
+    crest_tip = S((-100.0, -95.0))
+    els.append(taper([crest_base, crest_mid, crest_tip], 28.0, 2.0))
+
+    crest2_base = S((10.0, -45.0))
+    crest2_mid = S((-60.0, -75.0))
+    crest2_tip = S((-120.0, -80.0))
+    els.append(taper([crest2_base, crest2_mid, crest2_tip], 20.0, 2.0))
+
+    snout_top = S((135.0, -18.0))
+    snout_tip = S((160.0, -10.0))
+    jaw_pivot = S((105.0, 10.0))
+    jaw_tip = S((150.0 + jaw_open * 10.0, 15.0 + jaw_open * 35.0))
+
+    els.append(poly([S((85.0, -35.0)), snout_top, snout_tip, S((130.0, 2.0)), S((95.0, 0.0))]))
+    els.append(poly([jaw_pivot, S((125.0, 8.0 + jaw_open * 20.0)), jaw_tip, S((110.0, 20.0 + jaw_open * 30.0))]))
+
+    if jaw_open > 0.2:
+        t1 = S((142.0, -3.0))
+        t1_tip = S((144.0, 14.0))
+        els.append(poly([add(t1, (-4, 0)), t1_tip, add(t1, (4, 0))]))
+        t2 = S((130.0, -2.0))
+        t2_tip = S((132.0, 10.0))
+        els.append(poly([add(t2, (-3, 0)), t2_tip, add(t2, (3, 0))]))
+        b1_tip = add(jaw_tip, (-6, -18))
+        els.append(poly([add(jaw_tip, (-8, -4)), b1_tip, add(jaw_tip, (-2, -4))]))
+
+    foot_root = S((-10.0, 50.0))
+    foot_mid = S((15.0, 75.0))
+    foot_claw1 = add(foot_mid, polar(40.0, 30.0))
+    foot_claw2 = add(foot_mid, polar(70.0, 32.0))
+    foot_claw3 = add(foot_mid, polar(100.0, 26.0))
+    els.append(taper([foot_root, foot_mid], 24.0, 12.0))
+    els.append(taper([foot_mid, foot_claw1], 8.0, 2.0))
+    els.append(taper([foot_mid, foot_claw2], 9.0, 2.0))
+    els.append(taper([foot_mid, foot_claw3], 8.0, 2.0))
+
+    det.append(line([S((-40.0, -10.0)), S((-10.0, 15.0)), S((20.0, 12.0))], 5.0))
+    det.append(line([S((-60.0, 5.0)), S((-30.0, 30.0)), S((0.0, 25.0))], 4.5))
+    det.append(line([S((-80.0, 20.0)), S((-50.0, 45.0)), S((-20.0, 40.0))], 4.0))
+    det.append(line([S((80.0, -25.0)), S((105.0, -15.0)), S((130.0, -12.0))], 3.5))
+
+    near_els, near_det = make_wing((10.0, -15.0), -45.0, False)
+    els.extend(near_els)
+    det.extend(near_det)
+
+    eye_main = S((118.0, -18.0))
+    eye_upper = S((96.0, -32.0))
+    eye_side = S((110.0, -6.0))
+
+    eyes = [eye_main, eye_upper, eye_side]
+
+    if shroud > 0.05:
+        mask_h = 768.0 * (1.0 - shroud * 0.8)
+        clip = f'<clipPath id="emg"><rect x="0" y="{768.0 - mask_h:.0f}" width="1024" height="{mask_h:.0f}"/></clipPath>'
+        els = [clip, '<g clip-path="url(#emg)">'] + els + det + ["</g>"]
+        det = []
+
+    return els + det, eyes
+
+
 ENEMIES = {
     #  name         (canvas, origin, metres/px, draw fn, [(anim, frames, fps, loop)])
     "crawler": ((768, 512), (384, 480), 0.001875, crawler,
@@ -545,6 +742,9 @@ ENEMIES = {
              [("fly", 4, 12, True), ("dive", 3, 12, False), ("flinch", 2, 10, False)]),
     "big_shadow": ((1280, 1024), (693, 677), 0.0075, big_shadow,
                    [("idle", 4, 10, True), ("run", 8, 12, True), ("strike", 4, 12, True), ("emerge", 4, 10, False)]),
+    "shade": ((1024, 768), (512, 400), 0.006, shade,
+              [("fly", 8, 12, True), ("glide", 4, 10, True), ("swoop", 4, 12, False),
+               ("screech", 4, 10, False), ("emerge", 4, 10, False)]),
 }
 
 

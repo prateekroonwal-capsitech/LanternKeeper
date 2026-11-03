@@ -18,7 +18,7 @@ Status legend — **Solvable**: completed end-to-end by the route bot in the run
 | 7 | Followed (Prompt 4, medium) | Solvable | proof bot PASS — exit in 23 s; 60 % of dark meter used; hesitating kills; shortcut blocked |
 | 8 | Lost Light | Solvable | route bot PASS (13.2 s) |
 | 9 | Holes (remade) | Solvable | proof bot PASS — solution, carrying the lantern can't grab the rope |
-| 10 | The Chase (Prompt 4, hard) | Solvable | proof bot PASS — exit in 62.5 s, shadow ≥ 11 m behind; resets on death; hesitating kills |
+| 10 | The Chase (Prompt 4, hard) | Solvable | proof bot PASS — exit in 62.5 s, Shade ≥ 11 m behind; resets on death; hesitating kills |
 
 All 10 levels are solvable. Levels 3, 5, 6, 7 and 9 follow the remake brief; levels 1, 2,
 4, 8 and 10 are still the original Phase 5 layouts (solvable, not yet reworked to the brief).
@@ -131,18 +131,18 @@ switch/chain/lever state of that checkpoint; pits have kill zones; bounds sealed
 2. Pick it up; cross the ghost bridges it lights.
 3. Drop to the floor; set the lantern down ≥ 4.5 m before the ghost wall; walk through.
 
-## 1-10 The Chase — final test of World 1 (HARD but fair) — *Prompt 4 design*
+## 1-10 The Chase — final test of World 1 (HARD but fair) — *Prompt 4 design (updated with The Shade)*
 **Idea:** everything learned, under pressure: carry the light, read ghost paths, keep moving.
-**Layout:** three ≈ 20 s segments, each ending at a shrine. The Big Shadow wakes behind you
-(hint: "Run") and chases at 4.6 m/s — slower than the child's 5.2 m/s run, so a clean run
+**Layout:** three ≈ 20 s segments, each ending at a shrine. The Shade (flying shadow chaser) wakes behind you
+(hint: "Run") and chases along a 3D flight path at 4.6 m/s with swoops over gaps — slower than the child's 5.2 m/s run, so a clean run
 always escapes. Ghost bridges and ghost stepping stones appear in the carried light as you
 reach them; cracked plank bridges collapse 0.5 s after you step on them (so you can't stop on
 them). At the end, the exit gate opens only while the lantern sits on its plate.
 **Solution:**
 1. Run right; hop the gaps; cross ghost bridges and stones in your own light.
 2. Cross each cracked plank bridge without stopping.
-3. Shrines at x 2, 104 and 206 (≈ every 20 s). After a death the Big Shadow restarts 12 m
-   behind the shrine and waits 1 s; collapsed planks and ghost paths reset to the checkpoint.
+3. Shrines at x 2, 104 and 206 (≈ every 20 s). After a death The Shade restarts 12 m
+   behind the shrine on its flight path and waits 1 s; collapsed planks and ghost paths reset to the checkpoint.
 4. Final segment: set the lantern on the exit plate (x 292) — the gate (x 295) opens — walk
    through to the exit (x 300).
 **Difficulty:** hard — no stopping on planks, chained jumps, and the shadow closes in if you
