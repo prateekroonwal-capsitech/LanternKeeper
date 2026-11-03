@@ -1,8 +1,8 @@
 class_name Player
 extends CharacterBody3D
 
-## Player — the silhouette child. Run, jump (coyote time, jump buffer, one fixed height:
-## holding or releasing the button early changes nothing), no double jump. Movement is locked to the X/Y plane and happens only in _physics_process
+## Player — the silhouette child. Run, jump (coyote time, jump buffer, variable height),
+## no double jump. Movement is locked to the X/Y plane and happens only in _physics_process
 ## (physics interpolation smooths the rendering). Tuned to feel soft and weighty: gentle
 ## acceleration, a short landing recovery, eased squash.
 ##
@@ -30,12 +30,13 @@ extends CharacterBody3D
 @export var air_deceleration: float = 8.0
 
 @export_group("Jump")
-## Every jump rises exactly this high (m), whatever the control or how long it is held.
-@export var jump_height: float = 2.16
+@export var jump_velocity: float = 10.8
 @export var gravity: float = 27.0
 ## Gravity multiplier while falling.
 @export var fall_gravity_multiplier: float = 1.35
 @export var max_fall_speed: float = 20.0
+## Upward speed is multiplied by this when jump is released early (variable height).
+@export_range(0.0, 1.0) var jump_cut_multiplier: float = 0.5
 @export var coyote_time: float = 0.12
 @export var jump_buffer_time: float = 0.2
 
@@ -147,7 +148,7 @@ func _physics_process(delta: float) -> void:
 	_coyote_timer = coyote_time if on_floor else _coyote_timer - delta
 	_buffer_timer = jump_buffer_time if jump_pressed else _buffer_timer - delta
 	if _buffer_timer > 0.0 and _coyote_timer > 0.0:
-		velocity.y = sqrt(2.0 * gravity * jump_height)
+		velocity.y = jump_velocity
 		_buffer_timer = 0.0
 		_coyote_timer = 0.0
 		_jump_rising = true
@@ -155,6 +156,10 @@ func _physics_process(delta: float) -> void:
 		_squash_target = -jump_stretch
 		_game.report_player_jumped()
 
+	# Variable jump height
+	if _jump_rising and not input.jump_held and velocity.y > 0.0:
+		velocity.y *= jump_cut_multiplier
+		_jump_rising = false
 	if velocity.y <= 0.0:
 		_jump_rising = false
 
