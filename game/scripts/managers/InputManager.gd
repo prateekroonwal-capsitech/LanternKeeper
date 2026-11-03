@@ -35,7 +35,6 @@ var _bus: Node
 # Touch (virtual) inputs from TouchControls
 var _virtual_axis: float = 0.0
 var _virtual_jump_latch: bool = false
-var _virtual_jump_hold: float = 0.0
 var _virtual_raise: bool = false
 
 func configure(game: GameManager, save: SaveManager = null, bus: Node = null) -> void:
@@ -55,8 +54,7 @@ func _physics_process(delta: float) -> void:
 		_clear()
 		return
 	move_axis = clampf(Input.get_axis(&"move_left", &"move_right") + _virtual_axis, -1.0, 1.0)
-	_virtual_jump_hold = maxf(_virtual_jump_hold - delta, 0.0)
-	jump_held = Input.is_action_pressed(&"jump") or _virtual_jump_hold > 0.0
+	jump_held = Input.is_action_pressed(&"jump")
 	jump_just_pressed = Input.is_action_just_pressed(&"jump") or _virtual_jump_latch
 	_virtual_jump_latch = false
 	raise_held = Input.is_action_pressed(&"raise_light") or _virtual_raise
@@ -73,10 +71,10 @@ func _unhandled_input(event: InputEvent) -> void:
 func set_virtual_axis(value: float) -> void:
 	_virtual_axis = clampf(value, -1.0, 1.0)
 
-## A tap jump: one press, held for `hold_time` seconds (touch taps have no "hold").
-func trigger_virtual_jump(hold_time: float) -> void:
+## A touch jump (tap or swipe up): one press. Every jump is the same height, so there is
+## nothing to hold.
+func trigger_virtual_jump() -> void:
 	_virtual_jump_latch = true
-	_virtual_jump_hold = hold_time
 
 func trigger_virtual_place() -> void:
 	if _game:
@@ -88,7 +86,6 @@ func set_virtual_raise(held: bool) -> void:
 func clear_virtual() -> void:
 	_virtual_axis = 0.0
 	_virtual_jump_latch = false
-	_virtual_jump_hold = 0.0
 	_virtual_raise = false
 
 # ── Control layout ────────────────────────────────────────────────────────
