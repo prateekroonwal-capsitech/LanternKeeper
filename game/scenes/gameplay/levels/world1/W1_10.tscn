@@ -28,6 +28,9 @@
 [ext_resource type="Curve3D" path="res://game/resources/chase_path_w1_10.tres" id="chase_curve"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="hint"]
 
+[sub_resource type="BoxShape3D" id="swoop_danger_shape"]
+size = Vector3(8, 4, 3)
+
 [node name="W1_10" type="Node3D" node_paths=PackedStringArray("spawn_point")]
 script = ExtResource("level")
 level_id = "w1_10"
@@ -258,14 +261,43 @@ rotation_mode = 0
 [node name="Shade" parent="ChasePath/ChaseFollow" node_paths=PackedStringArray("path_follow") instance=ExtResource("shade")]
 path_follow = NodePath("..")
 wake_group = &"chase"
+chase_gap = 6.0
+danger_gap = 2.0
+min_progress = 1.0
+stuck_time = 2.0
+backtrack_limit = 2.0
+warning_time = 1.5
+attack_cooldown = 2.5
 base_speed = 4.6
-surge_speed = 6.0
-surge_distance = 16.0
-target_gap = 12.0
-catch_speed = 4.6
+surge_speed = 6.5
 rewake_delay = 1.0
 checkpoint_offsets = PackedFloat32Array(0, 116.1, 218.7)
 swoop_offsets = PackedFloat32Array(84, 188, 273)
+swoop_danger_zones = Array[NodePath]([NodePath("../../../SwoopDangerZone1"), NodePath("../../../SwoopDangerZone2"), NodePath("../../../SwoopDangerZone3")])
+
+[node name="SwoopDangerZone1" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 2, 0)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SwoopDangerZone1"]
+shape = SubResource("swoop_danger_shape")
+
+[node name="SwoopDangerZone2" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 188, 3, 0)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SwoopDangerZone2"]
+shape = SubResource("swoop_danger_shape")
+
+[node name="SwoopDangerZone3" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 273, 2, 0)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SwoopDangerZone3"]
+shape = SubResource("swoop_danger_shape")
 
 [node name="WakeChase" parent="." instance=ExtResource("wake")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)

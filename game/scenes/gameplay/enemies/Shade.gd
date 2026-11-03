@@ -2,27 +2,41 @@ class_name Shade
 extends Enemy
 
 ## Shade — a massive flying creature of shadow that pursues the child across Level 10.
-## Follows a Path3D using a PathFollow3D, maintaining a relentless airborne pursuit.
-## Executes a telegraphed swoop attack cycle (CHASE -> TELEGRAPH -> DIVE -> RECOVER)
-## that leaves the path, swoops through the player's predicted position, and pulls up.
-## Eyes are pinned to the head frame-by-frame via EyeAnchor with dedicated shade_eye textures.
+## Follows a Path3D using a PathFollow3D, pacing itself to the player's path progress
+## to maintain a steady chase gap behind the child without attacking as long as they advance.
+##
+## Attacks ONLY when the player is stuck (stopped for stuck_time, backtracking, or falling behind).
+## Escalates with a warning (1.5 s: screech, eye flare, closing gap, vignette pulse),
+## which cancels if the player resumes moving forward. If still stuck, it launches
+## an airborne Bezier swoop dive with hurtbox active only during the dive.
+##
+## Marked points on the path feature dramatic scripted fly-bys that pass cleanly
+## over a moving player, only hurting if the player stands still in the swoop's danger zone.
 ##
 ## Sends: GameManager.report_player_caught(self), GameManager.report_enemy_woke(self).
 ## Receives: GameBus signals via Enemy base class.
 
-enum AttackState { CHASE, TELEGRAPH, DIVE, RECOVER }
+enum AttackState { CHASE, WARNING, TELEGRAPH, DIVE, RECOVER, SWOOP }
 
-@export_group("Flight")
-## Normal chase speed when following the child along the Path3D (m/s).
+@export_group("Paced Chase")
+## Desired following gap behind the player along the path (metres).
+@export var chase_gap: float = 6.0
+## Distance threshold where player has fallen dangerously close to Shade (metres).
+@export var danger_gap: float = 2.0
+## Minimum forward progress required to reset the stuck timer (metres).
+@export var min_progress: float = 1.0
+## Seconds with less than min_progress before warning triggers (stopping time).
+@export var stuck_time: float = 2.0
+## Distance player can backtrack from their max forward progress before warning triggers (metres).
+@export var backtrack_limit: float = 2.0
+## Duration of the warning phase before an attack launches (seconds).
+@export var warning_time: float = 1.5
+## Cooldown after recovering before another warning/attack can trigger (seconds).
+@export var attack_cooldown: float = 2.5
+## Normal flight speed when matching pace along the path (m/s).
 @export var base_speed: float = 4.6
-## Speed when the child is far ahead to prevent falling off-screen (m/s).
-@export var surge_speed: float = 6.0
-## Distance ahead before surging kicks in (m).
-@export var surge_distance: float = 16.0
-## Desired following gap behind the player (m).
-@export var target_gap: float = 12.0
-## Minimum speed when close behind (m/s).
-@export var catch_speed: float = 4.6
+## Maximum surge speed when player pulls far ahead (m/s).
+@export var surge_speed: float = 6.5
 ## Amplitude of the gentle sine bob on Y (metres).
 @export var bob_amplitude: float = 0.35
 ## Frequency of the vertical sine bob (radians/sec).
@@ -33,10 +47,6 @@ enum AttackState { CHASE, TELEGRAPH, DIVE, RECOVER }
 @export var end_offset: float = 330.0
 
 @export_group("Attack Cycle")
-## Horizontal distance to player that triggers a dive attack (metres).
-@export var attack_range: float = 4.5
-## Cooldown after recovering before another attack can trigger (seconds).
-@export var attack_cooldown: float = 2.5
 ## Seconds the player's velocity is projected ahead to lead the dive target.
 @export var prediction_time: float = 0.3
 ## Duration of the screech telegraph before diving (seconds).
@@ -50,15 +60,21 @@ enum AttackState { CHASE, TELEGRAPH, DIVE, RECOVER }
 ## Path progress offsets where marked gap swoops occur along the path route.
 @export var swoop_offsets: PackedFloat32Array = PackedFloat32Array([84.0, 188.0, 273.0])
 ## Lead distance before marked swoop offset to start telegraph (metres).
-@export var swoop_trigger_lead: float = 3.5
+@export var swoop_trigger_lead: float = 4.0
+## Duration of the dramatic fly-by swoop (seconds).
+@export var swoop_duration: float = 1.4
+## Maximum depth dipped below normal flight path during scripted swoop (metres).
+@export var swoop_depth: float = 1.8
+## Pre-placed Area3D danger zones in the level corresponding to each marked swoop offset.
+@export var swoop_danger_zones: Array[NodePath] = []
 
 @export_group("Checkpoints")
 ## Path progress restart offsets: [0]=Spawn/Shrine1, [1]=Shrine2 (x=92), [2]=Shrine3 (x=194).
 @export var checkpoint_offsets: PackedFloat32Array = PackedFloat32Array([0.0, 116.1, 218.7])
-## Seconds to wait after respawning at a checkpoint before resuming chase.
+## Delay after respawn before the Shade resumes chasing (seconds).
 @export var rewake_delay: float = 1.0
 
-@export_group("Path")
+@export_group("References")
 ## PathFollow3D node driving position along the chase route.
 @export var path_follow: PathFollow3D
 
@@ -105,16 +121,26 @@ var _bob_t: float = 0.0
 var _rewake_t: float = -1.0
 var _facing: float = 1.0
 
+# Progress and stuck tracking
+var _player_progress: float = 0.0
+var _last_progress_checkpoint: float = 0.0
+var _max_player_progress: float = 0.0
+var _stuck_timer: float = 0.0
+
 # Attack state machine variables
 var _attack_state: AttackState = AttackState.CHASE
 var _shade_timer: float = 0.0
 var _attack_cooldown: float = 0.0
+var _warning_start_prog: float = 0.0
+var _swoop_index: int = -1
+var _swoop_phase: int = 0 # 0=telegraph, 1=flyby
 var _dive_start: Vector3 = Vector3.ZERO
 var _dive_target: Vector3 = Vector3.ZERO
 var _dive_end: Vector3 = Vector3.ZERO
 var _dive_ctrl: Vector3 = Vector3.ZERO
 var _recover_start: Vector3 = Vector3.ZERO
 var _triggered_swoops: Array[bool] = []
+var _danger_zones: Array[Area3D] = []
 
 @onready var _smoke: CPUParticles3D = get_node_or_null("SmokeTrail")
 @onready var _body: AnimatedSprite3D = get_node_or_null("Visual/Body")
@@ -123,6 +149,9 @@ var _triggered_swoops: Array[bool] = []
 @onready var _eye_2: Sprite3D = get_node_or_null("Visual/EyeAnchor/Eye2")
 @onready var _eye_3: Sprite3D = get_node_or_null("Visual/EyeAnchor/Eye3")
 @onready var _visual_root: Node3D = get_node_or_null("Visual")
+@onready var _vignette: ColorRect = get_node_or_null("VignetteUI/Vignette")
+@onready var _debug_ui: CanvasLayer = get_node_or_null("DebugUI")
+@onready var _debug_label: Label = get_node_or_null("DebugUI/Panel/Margin/Label")
 
 func _ready() -> void:
 	ignores_light = true
@@ -130,6 +159,7 @@ func _ready() -> void:
 	if wake_group == &"":
 		wake_group = &"chase"
 	_init_swoop_triggers()
+	_init_danger_zones()
 	super._ready()
 
 	# Connect frame changes to lock eyes to head
@@ -138,19 +168,43 @@ func _ready() -> void:
 		_body.animation_changed.connect(_sync_eyes_to_head)
 		_sync_eyes_to_head()
 
-	if path_follow:
-		_set_path_progress(path_follow.progress)
+	if _debug_ui:
+		_debug_ui.visible = false
+	if _vignette:
+		_vignette.modulate.a = 0.0
 
-	_set_hurtbox_enabled(false)
+func _init_danger_zones() -> void:
+	_danger_zones.clear()
+	for p in swoop_danger_zones:
+		var zone := get_node_or_null(p) as Area3D
+		if zone == null and _game and _game.current_level:
+			var node_name := String(p).get_file()
+			zone = _game.current_level.get_node_or_null(node_name) as Area3D
+		if zone == null and is_inside_tree():
+			var tree_root := get_tree().current_scene
+			if tree_root:
+				var node_name := String(p).get_file()
+				zone = tree_root.get_node_or_null(node_name) as Area3D
+		if zone:
+			_danger_zones.append(zone)
+	print("[Shade] _init_danger_zones: resolved ", _danger_zones.size(), " danger zones")
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not OS.is_debug_build():
+		return
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_F3:
+			if _debug_ui:
+				_debug_ui.visible = not _debug_ui.visible
 
 func _init_swoop_triggers() -> void:
 	_triggered_swoops.clear()
-	for i in range(swoop_offsets.size()):
-		_triggered_swoops.append(false)
+	_triggered_swoops.resize(swoop_offsets.size())
+	_triggered_swoops.fill(false)
 
 func _reset_swoop_triggers(current_prog: float) -> void:
 	for i in range(swoop_offsets.size()):
-		_triggered_swoops[i] = (current_prog >= swoop_offsets[i])
+		_triggered_swoops[i] = current_prog >= swoop_offsets[i]
 
 func _set_facing(f: float) -> void:
 	var sign_val := -1.0 if f < 0.0 else 1.0
@@ -179,6 +233,11 @@ func _get_path_position() -> Vector3:
 		return path_follow.global_position + Vector3(0.0, sin(_bob_t) * bob_amplitude, 0.0)
 	return global_position
 
+func _get_path_curve() -> Curve3D:
+	if path_follow and path_follow.get_parent() is Path3D:
+		return (path_follow.get_parent() as Path3D).curve
+	return null
+
 func reset_to_checkpoint(state: Dictionary = {}) -> void:
 	super.reset_to_checkpoint(state)
 	var shrine: Shrine = _game.get_active_shrine() as Shrine if _game else null
@@ -196,9 +255,14 @@ func reset_to_checkpoint(state: Dictionary = {}) -> void:
 
 	_attack_state = AttackState.CHASE
 	_shade_timer = 0.0
+	_stuck_timer = 0.0
 	_attack_cooldown = 0.0
+	_last_progress_checkpoint = 0.0
+	_max_player_progress = 0.0
 	_set_hurtbox_enabled(false)
 	_restore_eye_flare()
+	if _vignette:
+		_vignette.modulate.a = 0.0
 	_reset_swoop_triggers(target_prog)
 	_set_path_progress(target_prog)
 
@@ -218,9 +282,14 @@ func _reset() -> void:
 	_rewake_t = -1.0
 	_attack_state = AttackState.CHASE
 	_shade_timer = 0.0
+	_stuck_timer = 0.0
 	_attack_cooldown = 0.0
+	_last_progress_checkpoint = 0.0
+	_max_player_progress = 0.0
 	_set_hurtbox_enabled(false)
 	_restore_eye_flare()
+	if _vignette:
+		_vignette.modulate.a = 0.0
 	_init_swoop_triggers()
 
 func _physics_process(delta: float) -> void:
@@ -237,6 +306,22 @@ func _physics_process(delta: float) -> void:
 
 	super._physics_process(delta)
 
+	if _debug_ui and _debug_ui.visible:
+		_update_debug_readout()
+
+func _update_debug_readout() -> void:
+	if not _debug_label:
+		return
+	var state_str: String = String(AttackState.keys()[_attack_state])
+	_debug_label.text = "SHADE CHASE (F3)\nPlayer Prog: %.1f m\nShade Prog:  %.1f m\nCurrent Gap:  %.1f m\nStuck Timer:  %.2f s / %.1f s\nState:        %s" % [
+		_player_progress,
+		_progress,
+		_player_progress - _progress,
+		_stuck_timer,
+		stuck_time,
+		state_str
+	]
+
 func _hunt(delta: float) -> void:
 	if not _game or not _game.is_playing():
 		return
@@ -246,75 +331,158 @@ func _hunt(delta: float) -> void:
 	match _attack_state:
 		AttackState.CHASE:
 			_update_chase(delta)
+		AttackState.WARNING:
+			_update_warning(delta)
 		AttackState.TELEGRAPH:
 			_update_telegraph(delta)
 		AttackState.DIVE:
 			_update_dive(delta)
 		AttackState.RECOVER:
 			_update_recover(delta)
+		AttackState.SWOOP:
+			_update_scripted_swoop(delta)
 
 func _update_chase(delta: float) -> void:
-	var p := _game.get_player_position()
-	var current_pos := global_position
-	var ahead_x := p.x - current_pos.x
+	var curve := _get_path_curve()
+	var p_pos := _game.get_player_position()
+	_player_progress = curve.get_closest_offset(p_pos) if curve else p_pos.x
+	var gap := _player_progress - _progress
 
-	# Speed logic: stays slightly slower than player (4.6 vs 5.2 m/s), surges if far behind
+	# Pacing: target position is (player_progress - chase_gap)
+	var desired_progress := _player_progress - chase_gap
+	var dist_to_target := desired_progress - _progress
+
 	var speed := base_speed
-	if ahead_x > surge_distance:
-		speed = surge_speed
-	elif ahead_x > target_gap:
-		var t := (ahead_x - target_gap) / maxf(surge_distance - target_gap, 0.1)
-		speed = lerpf(base_speed, surge_speed, clampf(t, 0.0, 1.0))
-	elif ahead_x < target_gap * 0.5:
-		speed = catch_speed
+	if dist_to_target > 2.0:
+		var t := clampf((dist_to_target - 2.0) / 8.0, 0.0, 1.0)
+		speed = lerpf(base_speed, surge_speed, t)
+	elif dist_to_target < -1.0:
+		speed = maxf(base_speed * 0.5, 1.0)
 
 	_progress = minf(_progress + speed * delta, end_offset)
 	_set_path_progress(_progress)
 
-	# Update position to follow path + gentle bob
 	var target_pos := _get_path_position()
 	global_position = global_position.lerp(target_pos, 1.0 - exp(-12.0 * delta))
 
-	# Banking tilt forward
 	var target_tilt := -tilt_amount if speed > 0.5 else 0.0
 	rotation.z = lerpf(rotation.z, target_tilt, 1.0 - exp(-8.0 * delta))
 	_move_dir = 1.0
 	_speed_now = speed * delta
 	_set_facing(1.0)
 
-	# Evaluate conditions to attack: proximity OR marked swoop points
-	_check_attack_triggers(ahead_x)
-
-func _check_attack_triggers(ahead_x: float) -> void:
-	if _attack_cooldown > 0.0:
-		return
-
-	# 1. Marked swoop trigger along the path
+	# Check scripted swoop set pieces
 	for i in range(swoop_offsets.size()):
 		if not _triggered_swoops[i]:
 			var trigger_dist := swoop_offsets[i] - swoop_trigger_lead
 			if _progress >= trigger_dist and _progress <= swoop_offsets[i] + 4.0:
 				_triggered_swoops[i] = true
-				_start_telegraph()
+				_start_scripted_swoop(i)
 				return
 
-	# 2. Dynamic proximity attack: triggered when player is within attack_range horizontally
-	if ahead_x >= -1.0 and ahead_x <= attack_range:
+	# Evaluate stuck conditions
+	_check_stuck_conditions(delta, gap)
+
+func _check_stuck_conditions(delta: float, gap: float) -> void:
+	if _attack_cooldown > 0.0:
+		return
+
+	# Exclusions: do not count as stuck if mid-air during jump, respawning, or cutscene
+	var p_node := _get_player_node()
+	var is_midair := false
+	if p_node:
+		is_midair = not p_node.is_on_floor()
+
+	if is_midair or _rewake_t > 0.0 or not _game or not _game.is_playing() or _game.state != _game.State.PLAYING:
+		_last_progress_checkpoint = _player_progress
+		_max_player_progress = maxf(_max_player_progress, _player_progress)
+		return
+
+	# 1. Stopped: progress increased by less than min_progress in the last stuck_time
+	if _player_progress >= _last_progress_checkpoint + min_progress:
+		_stuck_timer = 0.0
+		_last_progress_checkpoint = _player_progress
+		_max_player_progress = maxf(_max_player_progress, _player_progress)
+	else:
+		_stuck_timer += delta
+
+	var is_stopped := _stuck_timer >= stuck_time
+
+	# 2. Going backwards: progress decreased by more than backtrack_limit
+	var is_backtracking := (_max_player_progress - _player_progress) > backtrack_limit
+
+	# 3. Fell behind gap: closer to Shade than danger_gap
+	var is_danger_gap := gap < danger_gap
+
+	if is_stopped or is_backtracking or is_danger_gap:
+		var reason := "STOPPED (%.1fs)" % _stuck_timer if is_stopped else ("BACKTRACK (%.1fm)" % (_max_player_progress - _player_progress) if is_backtracking else "DANGER_GAP (%.1fm)" % gap)
+		_start_warning(reason)
+
+func _start_warning(reason: String) -> void:
+	_attack_state = AttackState.WARNING
+	_shade_timer = 0.0
+	_warning_start_prog = _player_progress
+	_flare_eyes(true)
+	if _game and _game.audio:
+		_game.audio.play_event(&"enemy_hiss")
+	print("[Shade] WARNING triggered! Reason: ", reason, " PlayerProg: ", _player_progress, " ShadeProg: ", _progress)
+
+func _update_warning(delta: float) -> void:
+	_shade_timer += delta
+
+	# Screen vignette pulse
+	if _vignette:
+		var pulse := 0.25 + 0.2 * sin(_shade_timer * 14.0)
+		_vignette.modulate.a = clampf(pulse, 0.0, 0.6)
+
+	# Closes the gap slightly
+	var p_pos := _game.get_player_position()
+	var curve := _get_path_curve()
+	_player_progress = curve.get_closest_offset(p_pos) if curve else p_pos.x
+	var target_prog := minf(_player_progress - danger_gap * 0.7, end_offset)
+	if _progress < target_prog:
+		_progress = minf(_progress + (base_speed * 1.35) * delta, target_prog)
+		_set_path_progress(_progress)
+		global_position = global_position.lerp(_get_path_position(), 1.0 - exp(-12.0 * delta))
+
+	# Forgiveness check: Did player resume forward running during warning?
+	var p_node := _get_player_node()
+	var resumed_moving := false
+	if p_node and p_node.is_on_floor():
+		if p_node.velocity.x > 0.5 or _player_progress > _warning_start_prog + 0.35:
+			resumed_moving = true
+
+	if resumed_moving:
+		print("[Shade] WARNING CANCELLED: Player resumed moving forward! (Prog: ", _player_progress, ")")
+		_cancel_warning()
+		return
+
+	# If warning expires and player is still stuck -> Attack!
+	if _shade_timer >= warning_time:
+		print("[Shade] WARNING EXPIRED -> Escalating to TELEGRAPH -> DIVE!")
+		if _vignette:
+			_vignette.modulate.a = 0.0
 		_start_telegraph()
+
+func _cancel_warning() -> void:
+	_attack_state = AttackState.CHASE
+	_shade_timer = 0.0
+	_stuck_timer = 0.0
+	_last_progress_checkpoint = _player_progress
+	_max_player_progress = maxf(_max_player_progress, _player_progress)
+	_restore_eye_flare()
+	if _vignette:
+		_vignette.modulate.a = 0.0
 
 func _start_telegraph() -> void:
 	_attack_state = AttackState.TELEGRAPH
 	_shade_timer = 0.0
 	_dive_start = global_position
 
-	# Flare and enlarge eyes
 	_flare_eyes(true)
-
-	# Screech audio cue
 	if _game and _game.audio:
 		_game.audio.play_event(&"enemy_hiss")
 
-	# Lock target point: player position + movement prediction
 	var p_pos := _game.get_player_position()
 	var p_vel := Vector3.ZERO
 	var p_node := _get_player_node()
@@ -322,16 +490,12 @@ func _start_telegraph() -> void:
 		p_vel = p_node.velocity
 
 	var target := p_pos + p_vel * prediction_time
-
-	# Ensure target Y never penetrates solid terrain
 	var floor_y := _sample_terrain_floor_y(target.x, target.y)
 	target.y = maxf(target.y, floor_y + 0.35)
 	_dive_target = target
 
-	# Compute overshoot end point: past target and pulling up
 	_dive_end = _dive_target + Vector3(overshoot_distance, 0.7, 0.0)
 
-	# Solve Bezier control point so arc passes through _dive_target at u = 0.62
 	var u := 0.62
 	var denom := 2.0 * (1.0 - u) * u
 	_dive_ctrl = (_dive_target - (1.0 - u) * (1.0 - u) * _dive_start - u * u * _dive_end) / denom
@@ -341,10 +505,9 @@ func _update_telegraph(delta: float) -> void:
 	_shade_timer += delta
 	var progress_norm := clampf(_shade_timer / telegraph_duration, 0.0, 1.0)
 
-	# Pulls up slightly and spreads wings
 	var pull_up := sin(progress_norm * PI * 0.5) * 0.4
 	global_position = _dive_start + Vector3(0.0, pull_up, 0.0)
-	rotation.z = lerpf(rotation.z, 0.18, 1.0 - exp(-10.0 * delta)) # Head and chest reared up
+	rotation.z = lerpf(rotation.z, 0.18, 1.0 - exp(-10.0 * delta))
 
 	if _shade_timer >= telegraph_duration:
 		_start_dive()
@@ -355,7 +518,6 @@ func _start_dive() -> void:
 	_restore_eye_flare()
 	_set_hurtbox_enabled(true)
 
-	# Strengthen smoke trail
 	if _smoke:
 		_smoke.amount = 56
 		_smoke.initial_velocity_min = 2.4
@@ -366,28 +528,22 @@ func _update_dive(delta: float) -> void:
 	_shade_timer += delta
 	var u := clampf(_shade_timer / dive_duration, 0.0, 1.0)
 
-	# Quadratic Bezier formula: (1-u)^2 * P0 + 2*(1-u)*u * P1 + u^2 * P2
 	var inv_u := 1.0 - u
 	var arc_pos := inv_u * inv_u * _dive_start + 2.0 * inv_u * u * _dive_ctrl + u * u * _dive_end
 
-	# Terrain safety: never penetrate solid ground or platforms
 	var floor_y := _sample_terrain_floor_y(arc_pos.x, arc_pos.y)
 	arc_pos.y = maxf(arc_pos.y, floor_y + 0.3)
 	global_position = arc_pos
 
-	# Tangent derivative gives trajectory vector for banking tilt
 	var tangent := 2.0 * inv_u * (_dive_ctrl - _dive_start) + 2.0 * u * (_dive_end - _dive_ctrl)
 	var dive_angle := atan2(tangent.y, tangent.x)
 	rotation.z = lerpf(rotation.z, clampf(dive_angle, -0.6, 0.35), 1.0 - exp(-15.0 * delta))
 
-	# Advance path progress under the hood so the path position stays aligned
 	_progress = minf(_progress + base_speed * 1.3 * delta, end_offset)
 	_set_path_progress(_progress)
 
-	# Check for catch during dive
 	_check_catch()
 
-	# If dive finishes without catch, it is a MISS -> recover
 	if _shade_timer >= dive_duration:
 		_start_recover()
 
@@ -397,7 +553,6 @@ func _start_recover() -> void:
 	_recover_start = global_position
 	_set_hurtbox_enabled(false)
 
-	# Restore normal smoke trail
 	if _smoke:
 		_smoke.amount = 36
 		_smoke.initial_velocity_min = 1.2
@@ -407,8 +562,6 @@ func _start_recover() -> void:
 func _update_recover(delta: float) -> void:
 	_shade_timer += delta
 	var norm := clampf(_shade_timer / recover_duration, 0.0, 1.0)
-
-	# Smoothstep ease back to path
 	var smooth_t := norm * norm * (3.0 - 2.0 * norm)
 
 	_progress = minf(_progress + base_speed * delta, end_offset)
@@ -421,8 +574,86 @@ func _update_recover(delta: float) -> void:
 	if _shade_timer >= recover_duration:
 		_attack_state = AttackState.CHASE
 		_shade_timer = 0.0
+		_stuck_timer = 0.0
 		_attack_cooldown = attack_cooldown
+		_last_progress_checkpoint = _player_progress
+		_max_player_progress = maxf(_max_player_progress, _player_progress)
 		print("[Shade] RECOVER finished -> CHASE resumed (cooldown: ", attack_cooldown, "s)")
+
+func _start_scripted_swoop(idx: int) -> void:
+	_attack_state = AttackState.SWOOP
+	_swoop_index = idx
+	_shade_timer = 0.0
+	_swoop_phase = 0
+	_flare_eyes(true)
+	if _game and _game.audio:
+		_game.audio.play_event(&"enemy_hiss")
+	print("[Shade] SCRIPTED SWOOP %d started at progress=%.1f" % [idx + 1, _progress])
+
+func _update_scripted_swoop(delta: float) -> void:
+	_shade_timer += delta
+	if _swoop_phase == 0:
+		# Swoop telegraph: pull up slightly and spread wings for 0.4s
+		var u := clampf(_shade_timer / 0.4, 0.0, 1.0)
+		var pull_up := sin(u * PI * 0.5) * 0.4
+		var path_pos := _get_path_position()
+		global_position = path_pos + Vector3(0.0, pull_up, 0.0)
+		rotation.z = lerpf(rotation.z, 0.18, 1.0 - exp(-10.0 * delta))
+		if _shade_timer >= 0.4:
+			_swoop_phase = 1
+			_shade_timer = 0.0
+			_restore_eye_flare()
+			if _smoke:
+				_smoke.amount = 56
+	else:
+		# Swoop fly-by: dips low along the path route
+		var u := clampf(_shade_timer / swoop_duration, 0.0, 1.0)
+		_progress = minf(_progress + (base_speed + 2.0) * delta, end_offset)
+		_set_path_progress(_progress)
+
+		var path_pos := _get_path_position()
+		var dip := -sin(u * PI) * swoop_depth
+		global_position = path_pos + Vector3(0.0, dip, 0.0)
+
+		var tilt := -cos(u * PI) * 0.35
+		rotation.z = lerpf(rotation.z, tilt, 1.0 - exp(-12.0 * delta))
+
+		_check_swoop_danger_zone(_swoop_index)
+
+		if _shade_timer >= swoop_duration:
+			if _smoke:
+				_smoke.amount = 36
+			_attack_state = AttackState.CHASE
+			_shade_timer = 0.0
+			print("[Shade] SCRIPTED SWOOP %d completed -> CHASE resumed" % [_swoop_index + 1])
+
+func _check_swoop_danger_zone(idx: int) -> void:
+	if _danger_zones.is_empty():
+		_init_danger_zones()
+	if idx < 0 or idx >= _danger_zones.size():
+		print("[Shade] danger zones index invalid: idx=", idx, " count=", _danger_zones.size())
+		return
+	var zone := _danger_zones[idx]
+	if not is_instance_valid(zone):
+		print("[Shade] danger zone not valid instance: idx=", idx)
+		return
+
+	var p_node := _get_player_node()
+	if not p_node or not is_instance_valid(p_node):
+		return
+
+	var in_zone := zone.overlaps_body(p_node)
+	if not in_zone:
+		var diff := p_node.global_position - zone.global_position
+		if absf(diff.x) <= 4.0 and absf(diff.y) <= 2.5:
+			in_zone = true
+
+	var vel := p_node.velocity
+	var is_standing: bool = absf(vel.x) < 0.5 and absf(vel.y) < 1.0
+	print("[Shade] check danger zone: in_zone=", in_zone, " vel_x=", vel.x, " vel_y=", vel.y, " is_standing=", is_standing, " p_pos=", p_node.global_position, " zone_pos=", zone.global_position)
+	if in_zone and is_standing:
+		print("[Shade] SWOOP HIT! Player stood still inside SwoopDangerZone %d at pos=%s!" % [idx + 1, p_node.global_position])
+		_game.report_player_caught(self)
 
 func _flare_eyes(flare: bool) -> void:
 	var color := Color(6.0, 0.45, 0.25, 1.0) if flare else Color(2.6, 0.18, 0.12, 1.0)
@@ -469,10 +700,14 @@ func get_visual_state() -> StringName:
 	if mode == Mode.EMERGING:
 		return &"emerge"
 	match _attack_state:
+		AttackState.WARNING:
+			return &"windup"
 		AttackState.TELEGRAPH:
 			return &"windup"
 		AttackState.DIVE:
 			return &"lunge"
+		AttackState.SWOOP:
+			return &"windup" if _swoop_phase == 0 else &"lunge"
 		AttackState.RECOVER:
 			return &"idle"
 		AttackState.CHASE:
