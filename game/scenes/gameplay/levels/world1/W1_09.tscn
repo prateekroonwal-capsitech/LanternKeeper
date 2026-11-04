@@ -54,6 +54,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.05, 0)
 [node name="Lantern" parent="." instance=ExtResource("lantern")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.865, 0.6, 0.06)
 
+[node name="Lantern2" parent="." instance=ExtResource("lantern")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 0.5, 0.06)
+start_carried = false
+
 [node name="Geometry" type="Node3D" parent="."]
 
 [node name="Decor" type="Node3D" parent="."]
