@@ -1,145 +1,622 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="level"]
-[ext_resource type="Environment" path="res://game/assets/materials/world_environment.tres" id="env"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/actors/Player.gd" id="6_8h0a6"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/actors/Lantern.gd" id="8_ow5o5"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/Platform.gd" id="10_k0ely"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/GhostPlatform.gd" id="12_fbivn"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/Shrine.gd" id="16_edt6t"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/LanternHook.gd" id="18_le24x"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/Gate.gd" id="20_wgngd"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/KillZone.gd" id="22_wne7w"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/ExitPortal.gd" id="24_1ov53"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/environment/Backdrop.tscn" id="backdrop"]
 [ext_resource type="Script" path="res://game/scripts/controllers/CameraController3D.gd" id="camera"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Player.tscn" id="player"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Lantern.tscn" id="lantern"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="platform"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/GhostPlatform.tscn" id="ghost"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="kill"]
+[ext_resource type="Environment" path="res://game/assets/materials/world_environment.tres" id="env"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/ExitPortal.tscn" id="exit"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Shrine.tscn" id="shrine"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LanternHook.tscn" id="hook"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Gate.tscn" id="gate"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Lever.tscn" id="lever"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Crawler.tscn" id="crawler"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Dropper.tscn" id="dropper"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/WakeTrigger.tscn" id="wake"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Rope.tscn" id="rope"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LanternPlate.tscn" id="plate"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Stalker.tscn" id="stalker"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/SwarmMite.tscn" id="mite"]
-[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_a.png" id="tree_a"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/GhostPlatform.tscn" id="ghost"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LanternHook.tscn" id="hook"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="kill"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Lantern.tscn" id="lantern"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="level"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="platform"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Player.tscn" id="player"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_rocks.png" id="rocks"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Shrine.tscn" id="shrine"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_a.png" id="tree_a"]
 
-[node name="W1_06" type="Node3D" node_paths=PackedStringArray("spawn_point")]
+[sub_resource type="BoxShape3D" id="BoxShape3D_vpccw"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ycxtr"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vtjcu"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wlxqf"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_u7l6v"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jnrgh"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_xjouc"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_82kgq"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_b7x4k"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ekycl"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0isj1"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_t78di"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mhnta"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mxdg0"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_i4j2g"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_adtnv"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0ug6b"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ukvhd"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_78vnx"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_aljme"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rnwkl"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8bost"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1p7lu"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_q2wgt"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_irhbl"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mw7iy"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hofex"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_n65ms"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_84tb4"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qkyjt"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4bk8u"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_46jdu"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ig3im"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6n5qc"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_k0jmm"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3848v"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[node name="W1_06" type="Node3D" unique_id=665548785 node_paths=PackedStringArray("spawn_point")]
 script = ExtResource("level")
 level_id = "w1_06"
-spawn_point = NodePath("SpawnPoint")
 title_key = "LEVEL_W1_06"
-lantern_type = 0
+spawn_point = NodePath("SpawnPoint")
 dark_meter_time = 6.0
 kill_y = -10.0
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=88465398]
 environment = ExtResource("env")
 
-[node name="Backdrop" parent="." instance=ExtResource("backdrop")]
+[node name="Backdrop" type="Node3D" parent="." unique_id=1016343235 instance=ExtResource("backdrop")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -56, 0, 0)
 
-[node name="Camera" type="Camera3D" parent="."]
+[node name="Camera" type="Camera3D" parent="." unique_id=658924362]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3.5, 14)
 current = true
 fov = 45.0
 script = ExtResource("camera")
 
-[node name="SpawnPoint" type="Marker3D" parent="."]
+[node name="SpawnPoint" type="Marker3D" parent="." unique_id=1454854627]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.35, 0)
 
-[node name="Player" parent="." instance=ExtResource("player")]
+[node name="Player" type="CharacterBody3D" parent="." unique_id=1399052065 groups=["player"] instance=ExtResource("player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.35, 0)
+collision_layer = 2
+collision_mask = 5
+axis_lock_linear_z = true
+floor_max_angle = 0.959931
+floor_snap_length = 0.2
+script = ExtResource("6_8h0a6")
+lantern_spot_offsets = PackedFloat32Array(0.8, -0.8, 1.4, -1.4, 0)
 
-[node name="Lantern" parent="." instance=ExtResource("lantern")]
+[node name="Lantern" type="CharacterBody3D" parent="." unique_id=569191971 groups=["lantern"] instance=ExtResource("lantern")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.865, 1.9, 0.06)
+collision_layer = 8
+collision_mask = 5
+axis_lock_linear_z = true
+script = ExtResource("8_ow5o5")
 
-[node name="Geometry" type="Node3D" parent="."]
+[node name="Geometry" type="Node3D" parent="." unique_id=1745092330]
 
-[node name="Decor" type="Node3D" parent="."]
-
-[node name="WallLeft" parent="Geometry" instance=ExtResource("platform")]
+[node name="WallLeft" type="StaticBody3D" parent="Geometry" unique_id=1372803167 instance=ExtResource("platform")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 5, 0)
+collision_mask = 0
+script = ExtResource("10_k0ely")
 size = Vector2(2, 18)
 
-[node name="LedgeStart" parent="Geometry" instance=ExtResource("platform")]
+[node name="LedgeStart" type="StaticBody3D" parent="Geometry" unique_id=395776427 instance=ExtResource("platform")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, -1.35, 0)
+collision_mask = 0
+script = ExtResource("10_k0ely")
 size = Vector2(26, 5.3)
 
-[node name="GateCeiling" parent="Geometry" instance=ExtResource("platform")]
+[node name="GateCeiling" type="StaticBody3D" parent="Geometry" unique_id=306955310 instance=ExtResource("platform")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.8, 6.65, 0)
+collision_mask = 0
+script = ExtResource("10_k0ely")
 size = Vector2(2.4, 4.7)
 
-[node name="Stone1" parent="Geometry" instance=ExtResource("ghost")]
+[node name="Stone1" type="Node3D" parent="Geometry" unique_id=490448610 instance=ExtResource("ghost")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.75, -0.2, 0)
+script = ExtResource("12_fbivn")
 size = Vector2(2.5, 0.4)
 
-[node name="Stone2" parent="Geometry" instance=ExtResource("ghost")]
+[node name="Segment0" type="StaticBody3D" parent="Geometry/Stone1" unique_id=823061318]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone1/Segment0" unique_id=1716856994]
+shape = SubResource("BoxShape3D_vpccw")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="Geometry/Stone1" unique_id=1301358303]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone1/Segment1" unique_id=87141954]
+shape = SubResource("BoxShape3D_ycxtr")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="Geometry/Stone1" unique_id=2097711180]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone1/Segment2" unique_id=146071515]
+shape = SubResource("BoxShape3D_vtjcu")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="Geometry/Stone1" unique_id=207973413]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone1/Segment3" unique_id=51475993]
+shape = SubResource("BoxShape3D_wlxqf")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="Geometry/Stone1" unique_id=1779173977]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone1/Segment4" unique_id=1332713845]
+shape = SubResource("BoxShape3D_u7l6v")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="Geometry/Stone1" unique_id=1474361554]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone1/Segment5" unique_id=1551581818]
+shape = SubResource("BoxShape3D_jnrgh")
+disabled = true
+
+[node name="Stone2" type="Node3D" parent="Geometry" unique_id=49325048 instance=ExtResource("ghost")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.25, -0.2, 0)
+script = ExtResource("12_fbivn")
 size = Vector2(2.5, 0.4)
 
-[node name="Stone3" parent="Geometry" instance=ExtResource("ghost")]
+[node name="Segment0" type="StaticBody3D" parent="Geometry/Stone2" unique_id=428591657]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone2/Segment0" unique_id=1895666689]
+shape = SubResource("BoxShape3D_xjouc")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="Geometry/Stone2" unique_id=86838405]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone2/Segment1" unique_id=1077552394]
+shape = SubResource("BoxShape3D_82kgq")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="Geometry/Stone2" unique_id=1272725230]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone2/Segment2" unique_id=2069195206]
+shape = SubResource("BoxShape3D_b7x4k")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="Geometry/Stone2" unique_id=1037691674]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone2/Segment3" unique_id=1218917974]
+shape = SubResource("BoxShape3D_ekycl")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="Geometry/Stone2" unique_id=1125235300]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone2/Segment4" unique_id=1162554909]
+shape = SubResource("BoxShape3D_0isj1")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="Geometry/Stone2" unique_id=384007894]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone2/Segment5" unique_id=143151569]
+shape = SubResource("BoxShape3D_t78di")
+disabled = true
+
+[node name="Stone3" type="Node3D" parent="Geometry" unique_id=895182627 instance=ExtResource("ghost")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.75, -0.2, 0)
+script = ExtResource("12_fbivn")
 size = Vector2(2.5, 0.4)
 
-[node name="Stone4" parent="Geometry" instance=ExtResource("ghost")]
+[node name="Segment0" type="StaticBody3D" parent="Geometry/Stone3" unique_id=1009758109]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone3/Segment0" unique_id=1579003338]
+shape = SubResource("BoxShape3D_mhnta")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="Geometry/Stone3" unique_id=1892763604]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone3/Segment1" unique_id=989027651]
+shape = SubResource("BoxShape3D_mxdg0")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="Geometry/Stone3" unique_id=1918729836]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone3/Segment2" unique_id=1330344002]
+shape = SubResource("BoxShape3D_i4j2g")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="Geometry/Stone3" unique_id=1368562142]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone3/Segment3" unique_id=374320232]
+shape = SubResource("BoxShape3D_adtnv")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="Geometry/Stone3" unique_id=961004017]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone3/Segment4" unique_id=1530126582]
+shape = SubResource("BoxShape3D_0ug6b")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="Geometry/Stone3" unique_id=65279637]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone3/Segment5" unique_id=1617588789]
+shape = SubResource("BoxShape3D_ukvhd")
+disabled = true
+
+[node name="Stone4" type="Node3D" parent="Geometry" unique_id=2045108449 instance=ExtResource("ghost")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.25, -0.2, 0)
+script = ExtResource("12_fbivn")
 size = Vector2(2.5, 0.4)
 
-[node name="Stone5" parent="Geometry" instance=ExtResource("ghost")]
+[node name="Segment0" type="StaticBody3D" parent="Geometry/Stone4" unique_id=892477692]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone4/Segment0" unique_id=1724246349]
+shape = SubResource("BoxShape3D_78vnx")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="Geometry/Stone4" unique_id=1783630388]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone4/Segment1" unique_id=1642911409]
+shape = SubResource("BoxShape3D_aljme")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="Geometry/Stone4" unique_id=169465907]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone4/Segment2" unique_id=1733460948]
+shape = SubResource("BoxShape3D_rnwkl")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="Geometry/Stone4" unique_id=111384441]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone4/Segment3" unique_id=1192357251]
+shape = SubResource("BoxShape3D_8bost")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="Geometry/Stone4" unique_id=40563301]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone4/Segment4" unique_id=410963382]
+shape = SubResource("BoxShape3D_1p7lu")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="Geometry/Stone4" unique_id=309751536]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone4/Segment5" unique_id=1231135783]
+shape = SubResource("BoxShape3D_q2wgt")
+disabled = true
+
+[node name="Stone5" type="Node3D" parent="Geometry" unique_id=2002820879 instance=ExtResource("ghost")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.75, -0.2, 0)
+script = ExtResource("12_fbivn")
 size = Vector2(2.5, 0.4)
 
-[node name="Stone6" parent="Geometry" instance=ExtResource("ghost")]
+[node name="Segment0" type="StaticBody3D" parent="Geometry/Stone5" unique_id=251075551]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone5/Segment0" unique_id=59400210]
+shape = SubResource("BoxShape3D_irhbl")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="Geometry/Stone5" unique_id=154749251]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone5/Segment1" unique_id=178506138]
+shape = SubResource("BoxShape3D_mw7iy")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="Geometry/Stone5" unique_id=491034258]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone5/Segment2" unique_id=798193887]
+shape = SubResource("BoxShape3D_hofex")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="Geometry/Stone5" unique_id=16213948]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone5/Segment3" unique_id=336637249]
+shape = SubResource("BoxShape3D_n65ms")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="Geometry/Stone5" unique_id=44108139]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone5/Segment4" unique_id=924268913]
+shape = SubResource("BoxShape3D_84tb4")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="Geometry/Stone5" unique_id=627171345]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone5/Segment5" unique_id=1519975198]
+shape = SubResource("BoxShape3D_qkyjt")
+disabled = true
+
+[node name="Stone6" type="Node3D" parent="Geometry" unique_id=1901013620 instance=ExtResource("ghost")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.25, -0.2, 0)
+script = ExtResource("12_fbivn")
 size = Vector2(2.5, 0.4)
 
-[node name="LedgeEnd" parent="Geometry" instance=ExtResource("platform")]
+[node name="Segment0" type="StaticBody3D" parent="Geometry/Stone6" unique_id=1597741978]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone6/Segment0" unique_id=197298611]
+shape = SubResource("BoxShape3D_4bk8u")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="Geometry/Stone6" unique_id=442958800]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone6/Segment1" unique_id=623123795]
+shape = SubResource("BoxShape3D_46jdu")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="Geometry/Stone6" unique_id=1739243241]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone6/Segment2" unique_id=951363506]
+shape = SubResource("BoxShape3D_ig3im")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="Geometry/Stone6" unique_id=102311230]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone6/Segment3" unique_id=1095605014]
+shape = SubResource("BoxShape3D_6n5qc")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="Geometry/Stone6" unique_id=1331854388]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone6/Segment4" unique_id=1769431592]
+shape = SubResource("BoxShape3D_k0jmm")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="Geometry/Stone6" unique_id=1881984899]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Stone6/Segment5" unique_id=1514343411]
+shape = SubResource("BoxShape3D_3848v")
+disabled = true
+
+[node name="LedgeEnd" type="StaticBody3D" parent="Geometry" unique_id=2147170678 instance=ExtResource("platform")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51, -1.35, 0)
+collision_mask = 0
+script = ExtResource("10_k0ely")
 size = Vector2(22, 5.3)
 
-[node name="WallRight" parent="Geometry" instance=ExtResource("platform")]
+[node name="WallRight" type="StaticBody3D" parent="Geometry" unique_id=764387991 instance=ExtResource("platform")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63, 5, 0)
+collision_mask = 0
+script = ExtResource("10_k0ely")
 size = Vector2(2, 18)
 
-[node name="Shrine1" parent="." instance=ExtResource("shrine")]
+[node name="Decor" type="Node3D" parent="." unique_id=199502612]
+
+[node name="tree_a_15" type="Sprite3D" parent="Decor" unique_id=349600729]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 1.3, -0.8)
+offset = Vector2(0, 256)
+alpha_cut = 1
+texture = ExtResource("tree_a")
+
+[node name="rocks_16" type="Sprite3D" parent="Decor" unique_id=598222613]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 1.3, -0.8)
+offset = Vector2(0, 48)
+alpha_cut = 1
+texture = ExtResource("rocks")
+
+[node name="Shrine1" type="Area3D" parent="." unique_id=2101269821 instance=ExtResource("shrine")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1.3, 0)
+collision_layer = 32
+collision_mask = 2
+monitorable = false
+script = ExtResource("16_edt6t")
 
-[node name="Shrine2" parent="." instance=ExtResource("shrine")]
+[node name="Shrine2" type="Area3D" parent="." unique_id=948612330 instance=ExtResource("shrine")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 1.3, 0)
+collision_layer = 32
+collision_mask = 2
+monitorable = false
+script = ExtResource("16_edt6t")
 
-[node name="Cradle" parent="." instance=ExtResource("hook")]
+[node name="Cradle" type="Area3D" parent="." unique_id=931888154 instance=ExtResource("hook")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 1.3, 0)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("18_le24x")
 hook_id = &"lift6"
 move_when_hung = true
 travel_offset = Vector3(34, 0, 0)
 travel_time = 11.0
 
-[node name="Gate" parent="." instance=ExtResource("gate")]
+[node name="Gate" type="AnimatableBody3D" parent="." unique_id=2073291016 instance=ExtResource("gate")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2, 1.3, 0)
+collision_mask = 0
+script = ExtResource("20_wgngd")
 hook_id = &"lift6"
-close_delay = 0.0
 close_time = 0.3
+close_delay = 0.0
 
-[node name="tree_a_15" type="Sprite3D" parent="Decor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 1.3, -0.8)
-offset = Vector2(0, 256)
-pixel_size = 0.01
-alpha_cut = 1
-texture_filter = 3
-texture = ExtResource("tree_a")
-
-[node name="rocks_16" type="Sprite3D" parent="Decor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 1.3, -0.8)
-offset = Vector2(0, 48)
-pixel_size = 0.01
-alpha_cut = 1
-texture_filter = 3
-texture = ExtResource("rocks")
-
-[node name="KillZone" parent="." instance=ExtResource("kill")]
+[node name="KillZone" type="Area3D" parent="." unique_id=554768836 instance=ExtResource("kill")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, -14, 0)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("22_wne7w")
 size = Vector3(120, 4, 4)
 
-[node name="ExitPortal" parent="." instance=ExtResource("exit")]
+[node name="ExitPortal" type="Area3D" parent="." unique_id=2075110624 instance=ExtResource("exit")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 1.3, 0)
+collision_layer = 32
+collision_mask = 2
+monitorable = false
+script = ExtResource("24_1ov53")

@@ -1,133 +1,414 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="level"]
-[ext_resource type="Environment" path="res://game/assets/materials/world_environment.tres" id="env"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/actors/Player.gd" id="6_0x8wc"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/actors/Lantern.gd" id="8_tpy6w"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/Platform.gd" id="10_ufopf"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/GhostPlatform.gd" id="12_veudr"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/Shrine.gd" id="14_50uw3"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/OilFlask.gd" id="16_nmiat"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/TutorialTrigger.gd" id="18_ojjk1"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/enemies/Crawler.gd" id="20_k1pm4"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/enemies/WakeTrigger.gd" id="22_x8pgq"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/enemies/Dropper.gd" id="24_g3jkq"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/enemies/Stalker.gd" id="26_nrvly"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/enemies/BigShadow.gd" id="29_sresh"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/KillZone.gd" id="31_3mmkc"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/props/LevelExit.gd" id="33_h3tr5"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/environment/Backdrop.tscn" id="backdrop"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/BigShadow.tscn" id="big"]
 [ext_resource type="Script" path="res://game/scripts/controllers/CameraController3D.gd" id="camera"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Player.tscn" id="player"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Lantern.tscn" id="lantern"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="platform"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/GhostPlatform.tscn" id="ghost"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="kill"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LevelExit.tscn" id="exit"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Shrine.tscn" id="shrine"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/OilFlask.tscn" id="flask"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="hint"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Crawler.tscn" id="crawler"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Dropper.tscn" id="dropper"]
+[ext_resource type="Environment" path="res://game/assets/materials/world_environment.tres" id="env"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LevelExit.tscn" id="exit"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/OilFlask.tscn" id="flask"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/GhostPlatform.tscn" id="ghost"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="hint"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="kill"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Lantern.tscn" id="lantern"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="level"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="platform"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Player.tscn" id="player"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Shrine.tscn" id="shrine"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Stalker.tscn" id="stalker"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Swarm.tscn" id="swarm"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/BigShadow.tscn" id="big"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/WakeTrigger.tscn" id="wake"]
 
-[node name="TestLevel" type="Node3D" node_paths=PackedStringArray("spawn_point")]
-script = ExtResource("level")
-level_id = "test"
-spawn_point = NodePath("SpawnPoint")
-dark_meter_time = 5.0
+[sub_resource type="BoxShape3D" id="BoxShape3D_o0diu"]
+size = Vector3(0.4, 0.4, 2)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[sub_resource type="BoxShape3D" id="BoxShape3D_yrevb"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oudhn"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dlys2"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nuccb"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1wvli"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hwb1g"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4ibqr"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fm207"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jirq3"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fsb25"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tonr1"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_b6cfj"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cfxr5"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a154t"]
+size = Vector3(0.4, 0.4, 2)
+
+[node name="TestLevel" type="Node3D" unique_id=604098462 node_paths=PackedStringArray("spawn_point")]
+script = ExtResource("level")
+spawn_point = NodePath("SpawnPoint")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1825964926]
 environment = ExtResource("env")
 
-[node name="Backdrop" parent="." instance=ExtResource("backdrop")]
+[node name="Backdrop" type="Node3D" parent="." unique_id=887797683 instance=ExtResource("backdrop")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0, 0)
 
-[node name="Camera" type="Camera3D" parent="."]
+[node name="Camera" type="Camera3D" parent="." unique_id=544987337]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.2, 14)
 current = true
 fov = 45.0
 script = ExtResource("camera")
 
-[node name="SpawnPoint" type="Marker3D" parent="."]
+[node name="SpawnPoint" type="Marker3D" parent="." unique_id=785124342]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.05, 0)
 
-[node name="Player" parent="." instance=ExtResource("player")]
+[node name="Player" type="CharacterBody3D" parent="." unique_id=518838255 groups=["player"] instance=ExtResource("player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.05, 0)
+collision_layer = 2
+collision_mask = 5
+axis_lock_linear_z = true
+floor_max_angle = 0.959931
+floor_snap_length = 0.2
+script = ExtResource("6_0x8wc")
+lantern_spot_offsets = PackedFloat32Array(0.8, -0.8, 1.4, -1.4, 0)
 
-[node name="Lantern" parent="." instance=ExtResource("lantern")]
+[node name="Lantern" type="CharacterBody3D" parent="." unique_id=1787108038 groups=["lantern"] instance=ExtResource("lantern")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.7, 0.3, 0.3)
+collision_layer = 8
+collision_mask = 5
+axis_lock_linear_z = true
+script = ExtResource("8_tpy6w")
 
-[node name="Geometry" type="Node3D" parent="."]
+[node name="Geometry" type="Node3D" parent="." unique_id=1924821502]
 
-[node name="GroundA" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, -2, 0)
+[node name="GroundA" type="StaticBody3D" parent="Geometry" unique_id=1844124272 instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -2, 0)
+collision_mask = 0
+script = ExtResource("10_ufopf")
 size = Vector2(36, 4)
 
-[node name="GroundB" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.0, -2, 0)
+[node name="GroundB" type="StaticBody3D" parent="Geometry" unique_id=1713761788 instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43, -2, 0)
+collision_mask = 0
+script = ExtResource("10_ufopf")
 size = Vector2(34, 4)
 
-[node name="GroundC" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 97.0, -2, 0)
+[node name="GroundC" type="StaticBody3D" parent="Geometry" unique_id=2053051249 instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 97, -2, 0)
+collision_mask = 0
+script = ExtResource("10_ufopf")
 size = Vector2(70, 4)
 
-[node name="TunnelRoof" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.0, 5.1, 0)
+[node name="TunnelRoof" type="StaticBody3D" parent="Geometry" unique_id=370954243 instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 5.1, 0)
+collision_mask = 0
+script = ExtResource("10_ufopf")
 size = Vector2(8, 3.8)
 
-[node name="SwarmRoof" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70.0, 5.5, 0)
-size = Vector2(8, 3.0)
+[node name="SwarmRoof" type="StaticBody3D" parent="Geometry" unique_id=1687129036 instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, 5.5, 0)
+collision_mask = 0
+script = ExtResource("10_ufopf")
+size = Vector2(8, 3)
 
-[node name="WallLeft" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 6.0, 0)
+[node name="WallLeft" type="StaticBody3D" parent="Geometry" unique_id=100889538 instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 6, 0)
+collision_mask = 0
+script = ExtResource("10_ufopf")
 size = Vector2(1, 12)
 
-[node name="Bridge" parent="." instance=ExtResource("ghost")]
+[node name="Bridge" type="Node3D" parent="." unique_id=855969974 instance=ExtResource("ghost")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, -0.2, 0)
+script = ExtResource("12_veudr")
 size = Vector2(6, 0.4)
 
-[node name="ShrineA" parent="." instance=ExtResource("shrine")]
+[node name="Segment0" type="StaticBody3D" parent="Bridge" unique_id=1521348329]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment0" unique_id=259768422]
+shape = SubResource("BoxShape3D_o0diu")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="Bridge" unique_id=1357917250]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment1" unique_id=810540745]
+shape = SubResource("BoxShape3D_yrevb")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="Bridge" unique_id=434655495]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment2" unique_id=1366811691]
+shape = SubResource("BoxShape3D_oudhn")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="Bridge" unique_id=906708404]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment3" unique_id=584397467]
+shape = SubResource("BoxShape3D_dlys2")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="Bridge" unique_id=427503787]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment4" unique_id=1617929940]
+shape = SubResource("BoxShape3D_nuccb")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="Bridge" unique_id=1447269368]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment5" unique_id=1651515245]
+shape = SubResource("BoxShape3D_1wvli")
+disabled = true
+
+[node name="Segment6" type="StaticBody3D" parent="Bridge" unique_id=27622447]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment6" unique_id=2058341486]
+shape = SubResource("BoxShape3D_hwb1g")
+disabled = true
+
+[node name="Segment7" type="StaticBody3D" parent="Bridge" unique_id=1394163537]
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment7" unique_id=1130558150]
+shape = SubResource("BoxShape3D_4ibqr")
+disabled = true
+
+[node name="Segment8" type="StaticBody3D" parent="Bridge" unique_id=233494865]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment8" unique_id=1552887360]
+shape = SubResource("BoxShape3D_fm207")
+disabled = true
+
+[node name="Segment9" type="StaticBody3D" parent="Bridge" unique_id=1762075412]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment9" unique_id=1916699368]
+shape = SubResource("BoxShape3D_jirq3")
+disabled = true
+
+[node name="Segment10" type="StaticBody3D" parent="Bridge" unique_id=1292724086]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment10" unique_id=12285479]
+shape = SubResource("BoxShape3D_fsb25")
+disabled = true
+
+[node name="Segment11" type="StaticBody3D" parent="Bridge" unique_id=430424373]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment11" unique_id=57285248]
+shape = SubResource("BoxShape3D_tonr1")
+disabled = true
+
+[node name="Segment12" type="StaticBody3D" parent="Bridge" unique_id=1519267567]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment12" unique_id=1545281245]
+shape = SubResource("BoxShape3D_b6cfj")
+disabled = true
+
+[node name="Segment13" type="StaticBody3D" parent="Bridge" unique_id=1871638152]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment13" unique_id=1773119606]
+shape = SubResource("BoxShape3D_cfxr5")
+disabled = true
+
+[node name="Segment14" type="StaticBody3D" parent="Bridge" unique_id=1690127689]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bridge/Segment14" unique_id=207787936]
+shape = SubResource("BoxShape3D_a154t")
+disabled = true
+
+[node name="ShrineA" type="Area3D" parent="." unique_id=619584826 instance=ExtResource("shrine")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+collision_layer = 32
+collision_mask = 2
+monitorable = false
+script = ExtResource("14_50uw3")
 
-[node name="ShrineB" parent="." instance=ExtResource("shrine")]
+[node name="ShrineB" type="Area3D" parent="." unique_id=1298007438 instance=ExtResource("shrine")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 0, 0)
+collision_layer = 32
+collision_mask = 2
+monitorable = false
+script = ExtResource("14_50uw3")
 
-[node name="Flask" parent="." instance=ExtResource("flask")]
+[node name="Flask" type="Area3D" parent="." unique_id=1109118571 instance=ExtResource("flask")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 0.7, 0)
+collision_layer = 32
+collision_mask = 2
+monitorable = false
+script = ExtResource("16_nmiat")
 
-[node name="HintMove" parent="." instance=ExtResource("hint")]
+[node name="HintMove" type="Area3D" parent="." unique_id=1256456757 instance=ExtResource("hint")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
-hint_id = "move"
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("18_ojjk1")
 
-[node name="Crawler" parent="." instance=ExtResource("crawler")]
+[node name="Crawler" type="CharacterBody3D" parent="." unique_id=1843269891 instance=ExtResource("crawler")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37, -0.6, 0)
+collision_layer = 16
+collision_mask = 5
+axis_lock_linear_z = true
+script = ExtResource("20_k1pm4")
+enemy_kind = "crawler"
 wake_group = &"crawl"
 emerge_offset = Vector3(0, 0.65, 0)
 
-[node name="WakeCrawl" parent="." instance=ExtResource("wake")]
+[node name="WakeCrawl" type="Area3D" parent="." unique_id=589205332 instance=ExtResource("wake")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 0, 0)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("22_x8pgq")
 wake_group = &"crawl"
 
-[node name="Dropper" parent="." instance=ExtResource("dropper")]
+[node name="Dropper" type="CharacterBody3D" parent="." unique_id=921259545 instance=ExtResource("dropper")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 3.2, 0)
+collision_layer = 16
+collision_mask = 5
+axis_lock_linear_z = true
+script = ExtResource("24_g3jkq")
+enemy_kind = "dropper"
+wake_distance = 9.0
 emerge_offset = Vector3(0, -1, 0)
 
-[node name="Stalker" parent="." instance=ExtResource("stalker")]
+[node name="Stalker" type="CharacterBody3D" parent="." unique_id=1183699137 instance=ExtResource("stalker")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 1.2, 0)
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("26_nrvly")
+enemy_kind = "stalker"
 wake_group = &"stalk"
+emerge_offset = Vector3(0, 0.9, 0.6)
+emerge_time = 0.8
+show_eyes_while_dormant = false
+body_radius = 0.45
+catch_radius = 0.5
 
-[node name="WakeStalk" parent="." instance=ExtResource("wake")]
+[node name="WakeStalk" type="Area3D" parent="." unique_id=544422631 instance=ExtResource("wake")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56, 0, 0)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("22_x8pgq")
 wake_group = &"stalk"
 
-[node name="Swarm" parent="." instance=ExtResource("swarm")]
+[node name="Swarm" type="Node3D" parent="." unique_id=1040396088 instance=ExtResource("swarm")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, -0.4, 0)
 
-[node name="WakeSwarm" parent="." instance=ExtResource("wake")]
+[node name="WakeSwarm" type="Area3D" parent="." unique_id=1554848100 instance=ExtResource("wake")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76, 0, 0)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("22_x8pgq")
 wake_group = &"swarm"
 
-[node name="BigShadow" parent="." instance=ExtResource("big")]
+[node name="BigShadow" type="CharacterBody3D" parent="." unique_id=1711551614 instance=ExtResource("big")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 2.5, 0)
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("29_sresh")
+enemy_kind = "big_shadow"
+wake_group = &"chase"
+show_eyes_while_dormant = false
+catch_radius = 3.4
 
-[node name="WakeChase" parent="." instance=ExtResource("wake")]
+[node name="WakeChase" type="Area3D" parent="." unique_id=1102807163 instance=ExtResource("wake")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 96, 0, 0)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("22_x8pgq")
 wake_group = &"chase"
 
-[node name="KillZone" parent="." instance=ExtResource("kill")]
+[node name="KillZone" type="Area3D" parent="." unique_id=1998734790 instance=ExtResource("kill")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, -14, 0)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("31_3mmkc")
 size = Vector3(220, 4, 4)
 
-[node name="LevelExit" parent="." instance=ExtResource("exit")]
+[node name="LevelExit" type="Area3D" parent="." unique_id=1673456320 instance=ExtResource("exit")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 0, 0)
+collision_layer = 32
+collision_mask = 2
+monitorable = false
+script = ExtResource("33_h3tr5")
