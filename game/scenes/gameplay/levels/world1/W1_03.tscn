@@ -106,6 +106,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, -20, 0)
 hint_id = "stay_in_light"
 on_wake_group = &"gate_crawlers"
 
+[node name="HintPickup" parent="." instance=ExtResource("hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 0)
+hint_id = "pickup"
+require_lantern_placed = true
+
 [node name="tree_a_10" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -0.8)
 offset = Vector2(0, 256)

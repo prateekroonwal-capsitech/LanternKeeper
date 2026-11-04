@@ -17,6 +17,8 @@ extends Area3D
 @export var hint_id: String = "move"
 ## Fire when this enemy group wakes instead of when the player walks in (empty = walk-in).
 @export var on_wake_group: StringName = &""
+## Only fire if the player does NOT currently carry the lantern.
+@export var require_lantern_placed: bool = false
 @export var size: Vector3 = Vector3(2.0, 3.0, 2.0):
 	set(v):
 		size = v
@@ -45,9 +47,22 @@ func inject_services(registry: Node) -> void:
 			if state == GameManager.State.PLAYING:
 				for b in get_overlapping_bodies():
 					_on_body_entered(b))
+		_game.bus.lantern_placed.connect(func(_at: Vector3) -> void:
+			if require_lantern_placed or hint_id == "pickup":
+				for b in get_overlapping_bodies():
+					_on_body_entered(b))
+		_game.bus.lantern_hook_changed.connect(func(_hook_id: StringName, hung: bool) -> void:
+			if hung and (require_lantern_placed or hint_id == "pickup"):
+				get_tree().create_timer(1.2).timeout.connect(func() -> void:
+					if not is_instance_valid(self) or not _game:
+						return
+					for b in get_overlapping_bodies():
+						_on_body_entered(b)))
 
 func _on_body_entered(body: Node3D) -> void:
 	if _game and on_wake_group == &"" and body.is_in_group(&"player"):
+		if (require_lantern_placed or hint_id == "pickup") and _game.is_lantern_carried():
+			return
 		_game.report_tutorial_trigger(hint_id)
 
 func _apply_size() -> void:

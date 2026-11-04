@@ -79,10 +79,6 @@ size = Vector2(0.6, 3)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, 0)
 hint_id = "place"
 
-[node name="Hint_wall" parent="Hints" instance=ExtResource("12_hint")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 0)
-hint_id = "wall"
-
 [node name="Decor" type="Node3D" parent="."]
 
 [node name="tree_b_1" type="Sprite3D" parent="Decor"]

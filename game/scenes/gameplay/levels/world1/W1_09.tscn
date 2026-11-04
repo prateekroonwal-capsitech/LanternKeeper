@@ -21,6 +21,7 @@
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LanternPlate.tscn" id="plate"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Stalker.tscn" id="stalker"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/SwarmMite.tscn" id="mite"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="hint"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_a.png" id="tree_a"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_rocks.png" id="rocks"]
 
@@ -107,6 +108,11 @@ emerge_time = 1.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.8, 7, 0)
 wake_group_on_grab = &"swarm9"
 length = 5.2
+
+[node name="HintSealHoles" parent="." instance=ExtResource("hint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.8, -20, 0)
+hint_id = "seal_holes"
+on_wake_group = &"swarm9"
 
 [node name="tree_a_10" type="Sprite3D" parent="Decor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -0.8)

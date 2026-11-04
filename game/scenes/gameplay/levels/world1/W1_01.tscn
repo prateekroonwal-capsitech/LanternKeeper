@@ -93,11 +93,7 @@ size = Vector2(4, 0.4)
 
 [node name="Hint_move" parent="Hints" instance=ExtResource("12_hint")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 0)
-hint_id = "move"
-
-[node name="Hint_jump" parent="Hints" instance=ExtResource("12_hint")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
-hint_id = "jump"
+hint_id = "move_swipe"
 
 [node name="Hint_ghost" parent="Hints" instance=ExtResource("12_hint")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 0)

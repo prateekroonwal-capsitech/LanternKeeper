@@ -13,14 +13,14 @@ extends Node
 ## id → { touch, classic, pc: translation keys (classic falls back to touch); action: InputMap action that hides it early ("" = none) }.
 ## Placed by TutorialTrigger nodes (hint_id), in the level where the thing is introduced.
 const HINTS := {
-	"move":              { "touch": "HINT_MOVE_TOUCH", "classic": "HINT_MOVE_CLASSIC", "pc": "HINT_MOVE_PC", "action": "move" },      # 1-1 start
+	"move_swipe":        { "touch": "HINT_MOVE_TOUCH", "classic": "HINT_MOVE_CLASSIC", "pc": "HINT_MOVE_PC", "action": "move" },      # 1-1 start
 	"ghost":             { "touch": "HINT_GHOST", "pc": "HINT_GHOST", "action": "" },                 # 1-1 first ghost platform
 	"place":             { "touch": "HINT_PLACE_TOUCH", "classic": "HINT_PLACE_CLASSIC", "pc": "HINT_PLACE_PC", "action": "place_lantern" },  # 1-2 first place spot
+	"pickup":            { "touch": "HINT_PICKUP_TOUCH", "classic": "HINT_PICKUP_CLASSIC", "pc": "HINT_PICKUP_PC", "action": "place_lantern" }, # 1-3 first required pickup
 	"stay_in_light":     { "touch": "HINT_STAY_IN_LIGHT", "pc": "HINT_STAY_IN_LIGHT", "action": "" }, # 1-3 crawlers wake
 	"danger_above":      { "touch": "HINT_DANGER_ABOVE", "pc": "HINT_DANGER_ABOVE", "action": "" },   # 1-5 first dropper
 	"something_follows": { "touch": "HINT_SOMETHING_FOLLOWS", "pc": "HINT_SOMETHING_FOLLOWS", "action": "" },  # 1-7 Stalker wakes
 	"seal_holes":        { "touch": "HINT_SEAL_HOLES", "pc": "HINT_SEAL_HOLES", "action": "" },       # 1-9 swarm wakes
-	"run":               { "touch": "HINT_RUN", "pc": "HINT_RUN", "action": "" },                     # (old 1-10 chase, unused)
 	"shade_rule":        { "touch": "HINT_SHADE_RULE", "pc": "HINT_SHADE_RULE", "action": "", "time": 5.0 }, # 1-10 spawn
 	"shade_light":       { "touch": "HINT_SHADE_LIGHT", "pc": "HINT_SHADE_LIGHT", "action": "" },     # 1-10 Shade appears (run)
 	"shade_bait":        { "touch": "HINT_SHADE_BAIT", "pc": "HINT_SHADE_BAIT", "action": "" },       # 1-10 Shade perches (trap)

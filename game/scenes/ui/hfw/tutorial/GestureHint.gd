@@ -15,6 +15,8 @@ extends UIController
 @export var display_time: float = 3.0
 ## Per-hint override for display duration (seconds).
 @export var hint_display_times: Dictionary = { "shade_rule": 5.0 }
+## Force device mode for testing ("touch", "classic", "pc", or "" for auto).
+@export var force_device: String = ""
 ## Seconds the line stays at least, even if the action is done straight away.
 @export var min_time: float = 0.8
 @export var fade_time: float = 0.4
@@ -36,13 +38,18 @@ func _on_ready() -> void:
 	_game_manager.bus.lantern_placed.connect(func(_at: Vector3) -> void:
 		if _game_manager.tutorial.get_hint_action(_hint_id) == "place_lantern":
 			_dismissed = true)
+	_game_manager.bus.lantern_picked_up.connect(func(_lantern: Node3D = null) -> void:
+		if _game_manager.tutorial.get_hint_action(_hint_id) == "place_lantern":
+			_dismissed = true)
 	_game_manager.bus.game_state_changed.connect(func(state: int) -> void:
 		if state != GameManager.State.PLAYING:
 			_stop())
 
 func _show_hint(hint_id: String) -> void:
 	var device := "pc"
-	if DisplayServer.is_touchscreen_available():
+	if force_device != "":
+		device = force_device
+	elif DisplayServer.is_touchscreen_available():
 		device = "classic" if _game_manager.input.control_layout == InputManager.LAYOUT_CLASSIC else "touch"
 	var key := _game_manager.tutorial.get_hint_key(hint_id, device)
 	if key == "":
