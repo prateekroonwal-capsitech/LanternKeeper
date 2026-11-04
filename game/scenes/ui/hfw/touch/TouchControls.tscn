@@ -123,6 +123,7 @@ texture_normal = ExtResource("8_place")
 action = "place_lantern"
 
 [node name="Raise" type="TouchScreenButton" parent="Classic/SafeArea/Layout/ActionCluster"]
+visible = false
 position = Vector2(412, 20)
 texture_normal = ExtResource("9_raise")
 action = "raise_light"

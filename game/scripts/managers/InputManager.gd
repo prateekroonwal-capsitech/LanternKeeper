@@ -58,7 +58,8 @@ func _physics_process(delta: float) -> void:
 	jump_held = Input.is_action_pressed(&"jump") or _virtual_jump_held
 	jump_just_pressed = Input.is_action_just_pressed(&"jump") or _virtual_jump_latch
 	_virtual_jump_latch = false
-	raise_held = Input.is_action_pressed(&"raise_light") or _virtual_raise
+	var can_raise := _game == null or _game.uses_raise()
+	raise_held = can_raise and (Input.is_action_pressed(&"raise_light") or _virtual_raise)
 	if Input.is_action_just_pressed(&"place_lantern") and _game:
 		_game.report_place_lantern_pressed()
 
@@ -112,3 +113,4 @@ func _clear() -> void:
 	jump_just_pressed = false
 	raise_held = false
 	_virtual_jump_held = false
+	_virtual_raise = false

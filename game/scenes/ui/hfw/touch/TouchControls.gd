@@ -54,6 +54,7 @@ enum RightMode {
 @onready var _joystick: Control = $Gestures/Joystick
 @onready var _knob: Control = $Gestures/Joystick/Knob
 @onready var _classic: Control = $Classic
+@onready var _raise_btn: TouchScreenButton = $Classic/SafeArea/Layout/ActionCluster/Raise
 
 var _left_index: int = -1
 var _left_origin: Vector2
@@ -67,6 +68,7 @@ func _on_ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_game_manager.bus.game_state_changed.connect(func(_s: int) -> void: _refresh())
 	_game_manager.bus.control_layout_changed.connect(func(_l: StringName) -> void: _refresh())
+	_game_manager.bus.level_started.connect(func(_id: StringName) -> void: _refresh())
 	_joystick.hide()
 	_refresh()
 
@@ -77,6 +79,8 @@ func _refresh() -> void:
 	var gestures := _game_manager.input.control_layout == InputManager.LAYOUT_GESTURES
 	_gestures.visible = gestures
 	_classic.visible = not gestures
+	if _raise_btn and _game_manager:
+		_raise_btn.visible = _game_manager.uses_raise()
 	if not visible or not gestures:
 		_release_all()
 	set_process(visible and gestures)
@@ -163,6 +167,9 @@ func _process(delta: float) -> void:
 
 	# 3. Hold still = Raise light (not moving under 20px for 0.3s)
 	if _right_time >= hold_time:
+		if not _game_manager or not _game_manager.uses_raise():
+			_right_mode = RightMode.INVALID
+			return
 		_right_mode = RightMode.HOLD
 		_game_manager.input.set_virtual_raise(true)
 
