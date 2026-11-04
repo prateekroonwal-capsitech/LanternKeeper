@@ -88,14 +88,14 @@ func hide_screen(screen_name: StringName) -> void:
 			_bus.screen_closed.emit(String(screen_name))
 
 ## Fades the whole screen to black. Await it: `await ui.fade_out()`.
-func fade_out() -> void:
+func fade_out(duration: float = -1.0) -> void:
 	if _root and _root.screen_fade:
-		await _root.screen_fade.fade_out()
+		await _root.screen_fade.fade_out(duration)
 
 ## Fades back in from black. Await it if you need to know when it is done.
-func fade_in() -> void:
+func fade_in(duration: float = -1.0) -> void:
 	if _root and _root.screen_fade:
-		await _root.screen_fade.fade_in()
+		await _root.screen_fade.fade_in(duration)
 
 # ── Push ──────────────────────────────────────────────────────────────────
 

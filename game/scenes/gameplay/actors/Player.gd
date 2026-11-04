@@ -59,7 +59,7 @@ extends CharacterBody3D
 @export var jump_start_time: float = 0.1
 @export var place_anim_time: float = 0.3
 ## Input is ignored for this long while the respawn animation plays.
-@export var respawn_lock_time: float = 0.3
+@export var respawn_lock_time: float = 0.1
 
 @export_group("Lantern hand")
 ## Hand point in the carry frames, metres from the feet (facing right).
@@ -100,6 +100,9 @@ var _rope_cooldown: float = 0.0
 
 func get_hand_marker_position() -> Vector3:
 	return _hand_marker.global_position
+
+func is_control_locked() -> bool:
+	return _respawn_timer > 0.0
 
 func _ready() -> void:
 	set_physics_process(false)

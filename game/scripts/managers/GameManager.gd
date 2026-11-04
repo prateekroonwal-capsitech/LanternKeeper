@@ -364,13 +364,19 @@ func report_player_died(cause: String) -> void:
 	_set_heartbeat(0.0)
 	if bus:
 		bus.player_died.emit(cause)
-	var delay := current_level.respawn_delay if is_instance_valid(current_level) else 0.25
-	await get_tree().create_timer(delay, false).timeout
+	var death_time := _now()
 	if ui:
-		await ui.fade_out()
+		await ui.fade_out(0.1)
 	_respawn()
 	if ui:
-		ui.fade_in()
+		ui.fade_in(0.1)
+	if is_instance_valid(_player):
+		while _player.is_control_locked():
+			await get_tree().physics_frame
+	var elapsed := _now() - death_time
+	print("[RESPAWN] death-to-control: %.3fs" % elapsed)
+	if logger:
+		logger.info("Player respawned", { "death_to_control": elapsed })
 
 func get_respawn_position() -> Vector3:
 	return checkpoint_position
@@ -605,6 +611,13 @@ func register_light_source(source: Node3D) -> void:
 func unregister_light_source(source: Node3D) -> void:
 	_light_sources.erase(source)
 
+func get_active_light_sources() -> Array[Node3D]:
+	var result: Array[Node3D] = []
+	for source in _light_sources:
+		if is_instance_valid(source) and source.is_light_active():
+			result.append(source)
+	return result
+
 ## True if `point` (X/Y plane) is inside any active light radius.
 func is_point_lit(point: Vector3, padding: float = 0.0) -> bool:
 	for source in _light_sources:
@@ -812,8 +825,6 @@ func _physics_process(delta: float) -> void:
 		return
 	var lit := is_point_lit(_player.global_position + _PLAYER_LIGHT_PROBE)
 	player_lit = lit
-	if not uses_dark_meter():
-		return
 	if lit:
 		var refill := current_level.dark_meter_refill_rate if is_instance_valid(current_level) else 2.0
 		dark_meter = minf(dark_meter + delta * refill, dark_meter_max)
@@ -824,9 +835,10 @@ func _physics_process(delta: float) -> void:
 	else:
 		dark_meter = maxf(dark_meter - delta, 0.0)
 		if dark_meter <= 0.0 and not _dark_emptied:
-			_dark_emptied = true
-			if bus:
-				bus.dark_meter_emptied.emit()
+			if uses_dark_meter():
+				_dark_emptied = true
+				if bus:
+					bus.dark_meter_emptied.emit()
 	var ratio := get_dark_meter_ratio()
 	if absf(ratio - _last_dark_ratio) > 0.001:
 		_last_dark_ratio = ratio
@@ -845,6 +857,12 @@ func _update_heartbeat(ratio: float) -> void:
 		_set_heartbeat(intensity)
 
 func _set_heartbeat(intensity: float) -> void:
+	var was_playing := _heartbeat > 0.0
+	var is_playing := intensity > 0.0
+	if not was_playing and is_playing:
+		print("[HEARTBEAT] ON (intensity=%.2f)" % intensity)
+	elif was_playing and not is_playing:
+		print("[HEARTBEAT] OFF")
 	_heartbeat = intensity
 	if audio:
 		audio.set_heartbeat(intensity)

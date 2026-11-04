@@ -20,13 +20,15 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP if start_covered else Control.MOUSE_FILTER_IGNORE
 	visible = start_covered
 
-func fade_out() -> void:
+func fade_out(duration: float = -1.0) -> void:
 	show()
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	await _fade_to(1.0, fade_out_time)
+	var t := duration if duration >= 0.0 else fade_out_time
+	await _fade_to(1.0, t)
 
-func fade_in() -> void:
-	await _fade_to(0.0, fade_in_time)
+func fade_in(duration: float = -1.0) -> void:
+	var t := duration if duration >= 0.0 else fade_in_time
+	await _fade_to(0.0, t)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hide()
 
