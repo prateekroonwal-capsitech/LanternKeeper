@@ -443,11 +443,12 @@ func _respawn() -> void:
 func report_shrine_reached(shrine: Node3D) -> void:
 	if state != State.PLAYING:
 		return
-	oil = max_oil
-	checkpoint_oil = max_oil
+	if uses_oil():
+		oil = max_oil
+		checkpoint_oil = max_oil
+		if bus:
+			bus.oil_changed.emit(oil, max_oil)
 	dark_meter = dark_meter_max
-	if bus:
-		bus.oil_changed.emit(oil, max_oil)
 	if shrine == _active_shrine:
 		_save_checkpoint()   # touching the active shrine again refreshes the snapshot
 		return
@@ -573,9 +574,21 @@ func report_oil_collected(amount: float) -> void:
 	if bus:
 		bus.oil_changed.emit(oil, max_oil)
 
-## False in levels with LevelRoot.oil_enabled off (the lantern never runs dry).
+## False in levels with LevelRoot.lantern_type == JUGNOO (the lantern never runs dry).
 func uses_oil() -> bool:
-	return current_level.oil_enabled if is_instance_valid(current_level) else true
+	return get_lantern_type() == LevelRoot.LanternType.OIL
+
+## True only for OIL lanterns (can be raised with shift/hold to extend reach).
+func uses_raise() -> bool:
+	return get_lantern_type() == LevelRoot.LanternType.OIL
+
+func get_lantern_type() -> LevelRoot.LanternType:
+	if is_instance_valid(current_level) and "lantern_type" in current_level:
+		return current_level.lantern_type
+	var scene := get_tree().current_scene if get_tree() else null
+	if is_instance_valid(scene) and "lantern_type" in scene:
+		return scene.lantern_type
+	return LevelRoot.LanternType.JUGNOO
 
 func uses_dark_meter() -> bool:
 	return current_level.dark_meter_enabled if is_instance_valid(current_level) else true

@@ -26,7 +26,7 @@ script = ExtResource("1_level")
 level_id = "w1_08"
 spawn_point = NodePath("SpawnPoint")
 title_key = "LEVEL_W1_08"
-oil_enabled = false
+lantern_type = 0
 dark_meter_enabled = false
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]

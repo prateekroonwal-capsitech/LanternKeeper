@@ -11,6 +11,8 @@ extends Node3D
 const BOOT_SCENE := "res://game/scenes/boot/Boot.tscn"
 const DEV_BOOT_META := &"dev_boot_scene"
 
+@export var lantern_type: LevelRoot.LanternType = LevelRoot.LanternType.JUGNOO
+
 var _game: GameManager
 
 func _ready() -> void:

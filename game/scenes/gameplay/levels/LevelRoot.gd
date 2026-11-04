@@ -22,9 +22,20 @@ const DEV_BOOT_META := &"dev_boot_scene"
 ## Where the player starts and respawns until a shrine is lit.
 @export var spawn_point: Marker3D
 
+enum LanternType { JUGNOO, OIL }
+
+@export_group("Lantern")
+## JUGNOO (World 1 fireflies) = constant radius, no oil drain, no raise.
+## OIL (World 2+ oil lantern) = burns oil, variable radius, can be raised.
+@export var lantern_type: LanternType = LanternType.JUGNOO
+
 @export_group("Oil")
-## Off = the lantern never burns oil and the HUD hides the oil bar (World 1).
-@export var oil_enabled: bool = true
+## Derived from lantern_type: true only when lantern_type == LanternType.OIL.
+var oil_enabled: bool:
+	get:
+		return lantern_type == LanternType.OIL
+	set(value):
+		lantern_type = LanternType.OIL if value else LanternType.JUGNOO
 @export var max_oil: float = 100.0
 @export var start_oil: float = 100.0
 

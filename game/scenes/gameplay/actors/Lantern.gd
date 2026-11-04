@@ -265,22 +265,29 @@ func _simulate_menu(delta: float) -> void:
 		rotation.z = _sway
 
 func _simulate(delta: float) -> void:
-	var oil_ratio := _game.get_oil_ratio()
-	_raised = carried and _game.input.raise_held and oil_ratio > 0.0
+	var is_oil := _game != null and _game.uses_oil()
+	if not is_oil:
+		# JUGNOO: skips raise and burn; radius stays at base_radius.
+		_raised = false
+		_radius = base_radius
+	else:
+		# OIL path unchanged
+		var oil_ratio := _game.get_oil_ratio() if _game else 1.0
+		_raised = carried and _game and _game.uses_raise() and _game.input.raise_held and oil_ratio > 0.0
 
-	# One shared tank: only the active lantern burns it.
-	if _game.get_lantern() == self:
-		var burn := burn_rate * (raise_burn_multiplier if _raised else 1.0)
-		_game.report_oil_burned(burn * delta)
+		# One shared tank: only the active lantern burns it.
+		if _game and _game.get_lantern() == self:
+			var burn := burn_rate * (raise_burn_multiplier if _raised else 1.0)
+			_game.report_oil_burned(burn * delta)
 
-	var target := 0.0
-	if oil_ratio > 0.0:
-		target = lerpf(min_radius, base_radius, oil_ratio)
-		if _raised:
-			target *= raise_radius_multiplier
-	_radius = lerpf(_radius, target, 1.0 - exp(-radius_smoothing * delta))
-	if target == 0.0 and _radius < 0.05:
-		_radius = 0.0
+		var target := 0.0
+		if oil_ratio > 0.0:
+			target = lerpf(min_radius, base_radius, oil_ratio)
+			if _raised:
+				target *= raise_radius_multiplier
+		_radius = lerpf(_radius, target, 1.0 - exp(-radius_smoothing * delta))
+		if target == 0.0 and _radius < 0.05:
+			_radius = 0.0
 
 	if carried:
 		# The handle sits exactly on the child's HandMarker; only the pendulum sway moves it.
@@ -344,14 +351,20 @@ func _process(delta: float) -> void:
 	if _retire == Retire.GONE:
 		return
 	_time += delta
-	var ratio := _game.get_oil_ratio() if _game else 1.0
-	var strength := flicker_strength
-	if ratio < low_oil_ratio:
-		strength = lerpf(low_oil_flicker_strength, flicker_strength, ratio / maxf(low_oil_ratio, 0.001))
-	_flicker = 1.0 + strength * (
-		sin(_time * flicker_speed) * 0.5
-		+ sin(_time * flicker_speed * 2.3 + 1.7) * 0.3
-		+ sin(_time * flicker_speed * 5.1 + 0.4) * 0.2)
+	var is_oil := _game != null and _game.uses_oil()
+	if not is_oil:
+		# JUGNOO: gentle pulse and no low-oil look
+		_flicker = 1.0 + 0.06 * (sin(_time * 2.2) * 0.7 + sin(_time * 4.1 + 0.8) * 0.3)
+	else:
+		# OIL: flicker increases as oil runs low
+		var ratio := _game.get_oil_ratio() if _game else 1.0
+		var strength := flicker_strength
+		if ratio < low_oil_ratio:
+			strength = lerpf(low_oil_flicker_strength, flicker_strength, ratio / maxf(low_oil_ratio, 0.001))
+		_flicker = 1.0 + strength * (
+			sin(_time * flicker_speed) * 0.5
+			+ sin(_time * flicker_speed * 2.3 + 1.7) * 0.3
+			+ sin(_time * flicker_speed * 5.1 + 0.4) * 0.2)
 	if _appear < 1.0:
 		_flicker *= 0.5 + 0.5 * signf(sin(_time * 60.0))  # stutter while flickering in
 	var r := get_light_radius()
@@ -368,8 +381,12 @@ func _process(delta: float) -> void:
 	_light.light_energy = light_energy * _flicker * alpha
 	_glow_material.set_shader_parameter(&"flicker", _flicker * alpha)
 	_dust.emission_sphere_radius = r * 0.8
-	var warmth := clampf(ratio * 1.5, 0.4, 1.0)
-	_sprite.modulate = Color(1.0, warmth, warmth * 0.9, alpha)
+	if not is_oil:
+		_sprite.modulate = Color(1.0, 1.0, 1.0, alpha)
+	else:
+		var ratio := _game.get_oil_ratio() if _game else 1.0
+		var warmth := clampf(ratio * 1.5, 0.4, 1.0)
+		_sprite.modulate = Color(1.0, warmth, warmth * 0.9, alpha)
 
 # ── Place / pick up ───────────────────────────────────────────────────────
 

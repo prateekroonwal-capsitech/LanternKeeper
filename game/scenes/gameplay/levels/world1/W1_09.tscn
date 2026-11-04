@@ -29,7 +29,7 @@ script = ExtResource("level")
 level_id = "w1_09"
 spawn_point = NodePath("SpawnPoint")
 title_key = "LEVEL_W1_09"
-oil_enabled = false
+lantern_type = 0
 dark_meter_time = 6.0
 kill_y = -10.0
 
