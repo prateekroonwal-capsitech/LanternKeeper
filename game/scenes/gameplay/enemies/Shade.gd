@@ -311,11 +311,14 @@ func _physics_process(delta: float) -> void:
 				_fly_off(flee_point)
 		Act.PATROL:
 			_patrol(delta)
-			var seen_open := not _game.is_player_hidden() and absf(p.x - global_position.x) <= spot_range
-			var seen_light := _game.is_lantern_carried() and global_position.distance_to(chest) <= light_spot_range
-			if seen_open or seen_light:
-				print("[Shade] SPOTTED the child (%s) at x=%.1f" % ["carrying the light" if seen_light else "in the open", p.x])
-				_attack()
+			if not _game.is_player_hidden():
+				var dist := global_position.distance_to(chest)
+				var seen_close := dist <= spot_range or absf(p.x - global_position.x) <= spot_range
+				var seen_light := _game.player_lit and dist <= light_spot_range
+				if seen_close or seen_light:
+					print("[Shade] SPOTTED the child (%s) at x=%.1f" % [
+						"in the light" if seen_light else "up close", p.x])
+					_attack()
 		Act.HOVER:
 			_hover_at(hover_point.global_position, delta)
 			_face(p.x - global_position.x)

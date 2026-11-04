@@ -13,6 +13,8 @@ extends UIController
 ##   "place" hint); GameBus.game_state_changed (hides). Polls GameManager.input.move_axis.
 
 @export var display_time: float = 3.0
+## Per-hint override for display duration (seconds).
+@export var hint_display_times: Dictionary = { "shade_rule": 5.0 }
 ## Seconds the line stays at least, even if the action is done straight away.
 @export var min_time: float = 0.8
 @export var fade_time: float = 0.4
@@ -24,6 +26,7 @@ var _tween: Tween
 var _hint_id: String = ""
 var _shown_for: float = 0.0
 var _dismissed: bool = false
+var _current_display_time: float = 3.0
 
 func _on_ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -48,6 +51,12 @@ func _show_hint(hint_id: String) -> void:
 	_hint_id = hint_id
 	_shown_for = 0.0
 	_dismissed = false
+	if hint_display_times.has(hint_id):
+		_current_display_time = float(hint_display_times[hint_id])
+	elif _game_manager.tutorial and _game_manager.tutorial.has_method("get_hint_display_time"):
+		_current_display_time = _game_manager.tutorial.get_hint_display_time(hint_id, display_time)
+	else:
+		_current_display_time = display_time
 	_label.text = tr(key)
 	_label.modulate.a = 0.0
 	show()
@@ -59,7 +68,7 @@ func _process(delta: float) -> void:
 	_shown_for += delta
 	if _game_manager.tutorial.get_hint_action(_hint_id) == "move" and absf(_game_manager.input.move_axis) > 0.1:
 		_dismissed = true
-	if _shown_for >= fade_time + display_time or (_dismissed and _shown_for >= min_time):
+	if _shown_for >= fade_time + _current_display_time or (_dismissed and _shown_for >= min_time):
 		_fade_out()
 
 func _fade_out() -> void:
@@ -74,6 +83,7 @@ func _fade_out() -> void:
 func _stop() -> void:
 	set_process(false)
 	_hint_id = ""
+	_current_display_time = display_time
 	if _tween:
 		_tween.kill()
 	hide()

@@ -21,6 +21,7 @@ const HINTS := {
 	"something_follows": { "touch": "HINT_SOMETHING_FOLLOWS", "pc": "HINT_SOMETHING_FOLLOWS", "action": "" },  # 1-7 Stalker wakes
 	"seal_holes":        { "touch": "HINT_SEAL_HOLES", "pc": "HINT_SEAL_HOLES", "action": "" },       # 1-9 swarm wakes
 	"run":               { "touch": "HINT_RUN", "pc": "HINT_RUN", "action": "" },                     # (old 1-10 chase, unused)
+	"shade_rule":        { "touch": "HINT_SHADE_RULE", "pc": "HINT_SHADE_RULE", "action": "", "time": 5.0 }, # 1-10 spawn
 	"shade_light":       { "touch": "HINT_SHADE_LIGHT", "pc": "HINT_SHADE_LIGHT", "action": "" },     # 1-10 Shade appears (run)
 	"shade_bait":        { "touch": "HINT_SHADE_BAIT", "pc": "HINT_SHADE_BAIT", "action": "" },       # 1-10 Shade perches (trap)
 	"shade_hide":        { "touch": "HINT_SHADE_HIDE", "pc": "HINT_SHADE_HIDE", "action": "" },       # 1-10 Shade sweeps (hide)
@@ -55,6 +56,11 @@ func get_hint_key(hint_id: String, device: String) -> String:
 ## InputMap action that dismisses the hint early ("move" = either direction), or "".
 func get_hint_action(hint_id: String) -> String:
 	return HINTS.get(hint_id, {}).get("action", "")
+
+## Display duration (seconds) for this hint. Defaults to 3.0 s if unspecified in HINTS.
+func get_hint_display_time(hint_id: String, default_time: float = 3.0) -> float:
+	var data: Dictionary = HINTS.get(hint_id, {})
+	return float(data.get("time", default_time))
 
 func is_seen(hint_id: String) -> bool:
 	return _save != null and _save.is_tutorial_seen(hint_id)
