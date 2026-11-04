@@ -12,16 +12,16 @@ extends Node
 ##   report_level_ready(level) / report_level_unloaded(level)  — LevelRoot
 ##   register_player(player)                                    — Player
 ##   register_light_source(src) / unregister_light_source(src)  — Lantern
-##   register_lantern(lantern)                                  — Lantern (for is_lantern_carried / handle)
+##   register_lantern(lantern) / unregister_lantern(lantern)    — Lantern (a level can hold several)
 ##   report_oil_burned(amount)                                  — Lantern
 ##   report_oil_collected(amount)                               — OilFlask
-##   report_lantern_placed(at) / report_lantern_picked_up()     — Lantern
+##   report_lantern_placed(at) / report_lantern_picked_up(lantern) — Lantern
 ##   report_place_lantern_pressed() / report_pause_pressed()    — InputManager
 ##   report_platform_lost()                                     — GhostPlatform
 ##   report_player_died(cause)                                  — KillZone, Shadow
 ##   report_shrine_reached(shrine)                              — Shrine
 ##   report_level_exit_reached(menu_delay)                      — ExitPortal
-##   report_lantern_lost()                                      — Lantern (fell into a pit)
+##   report_lantern_lost(lantern)                               — Lantern (fell into a pit)
 ##   report_enemy_woke(enemy) / report_enemy_repelled(enemy) /
 ##   report_player_caught(enemy) / report_wake_trigger(group)   — enemies, WakeTrigger
 ##   report_enemy_defeated(enemy)                               — Shade (crushed)
@@ -103,9 +103,13 @@ var checkpoint_serial: int = 0
 var player_lit: bool = true
 
 var _player: Node3D = null
-var _lantern: Node3D = null
+## Every lantern in the level. get_lantern() picks the active one from these.
+var _lanterns: Array[Node3D] = []
+## The lantern the child held last. Picking up a different one retires this one.
+var _held_lantern: Node3D = null
 var _active_shrine: Node3D = null
-var _checkpoint_lantern: Dictionary = {}
+var _checkpoint_lanterns: Dictionary = {}
+var _checkpoint_held: NodePath = NodePath()
 var _checkpoint_enemies: Dictionary = {}
 var _checkpoint_triggers: Dictionary = {}
 var _checkpoint_resettables: Dictionary = {}
@@ -222,7 +226,10 @@ func report_level_unloaded(level_root: LevelRoot) -> void:
 	current_level = null
 	current_level_id = ""
 	_player = null
-	_lantern = null
+	_lanterns.clear()
+	_held_lantern = null
+	_checkpoint_lanterns.clear()
+	_checkpoint_held = NodePath()
 	_active_shrine = null
 	_light_sources.clear()
 	_checkpoint_enemies.clear()
@@ -380,8 +387,11 @@ func get_kill_y() -> float:
 	return current_level.kill_y if is_instance_valid(current_level) else -50.0
 
 func _save_checkpoint() -> void:
-	if is_instance_valid(_lantern):
-		_checkpoint_lantern = _lantern.capture_state()
+	_checkpoint_lanterns.clear()
+	for lantern in _lanterns:
+		if is_instance_valid(lantern):
+			_checkpoint_lanterns[lantern.get_path()] = lantern.capture_state()
+	_checkpoint_held = _held_lantern.get_path() if is_instance_valid(_held_lantern) else NodePath()
 	checkpoint_oil = oil
 	_checkpoint_enemies.clear()
 	for enemy in get_tree().get_nodes_in_group(&"enemies"):
@@ -412,8 +422,10 @@ func _respawn() -> void:
 	# Hooks, gates and levers first, so a lantern restored onto a hook re-opens its gate.
 	for node in get_tree().get_nodes_in_group(&"resettables"):
 		node.reset_to_checkpoint(_checkpoint_resettables.get(node.get_path(), {}))
-	if is_instance_valid(_lantern) and not _checkpoint_lantern.is_empty():
-		_lantern.restore_state(_checkpoint_lantern)
+	for lantern in _lanterns:
+		if is_instance_valid(lantern) and _checkpoint_lanterns.has(lantern.get_path()):
+			lantern.restore_state(_checkpoint_lanterns[lantern.get_path()])
+	_held_lantern = get_node_or_null(_checkpoint_held) as Node3D if not _checkpoint_held.is_empty() else null
 	for enemy in get_tree().get_nodes_in_group(&"enemies"):
 		if enemy.has_method("reset_to_checkpoint"):
 			var st: Dictionary = _checkpoint_enemies.get(enemy.get_path(), {})
@@ -467,7 +479,12 @@ func report_lantern_placed(at: Vector3) -> void:
 	if bus:
 		bus.lantern_placed.emit(at)
 
-func report_lantern_picked_up() -> void:
+## `lantern` is now in the child's hand. If it isn't the one they held last, that one retires.
+func report_lantern_picked_up(lantern: Node3D) -> void:
+	var previous := _held_lantern
+	_held_lantern = lantern
+	if is_instance_valid(previous) and previous != lantern:
+		previous.retire()
 	if audio:
 		audio.play_event(&"lantern_pickup")
 	if haptics:
@@ -476,36 +493,65 @@ func report_lantern_picked_up() -> void:
 		bus.lantern_picked_up.emit()
 
 func register_lantern(lantern: Node3D) -> void:
-	_lantern = lantern
+	if not _lanterns.has(lantern):
+		_lanterns.append(lantern)
+	if lantern.carried and not is_instance_valid(_held_lantern):
+		_held_lantern = lantern
+
+func unregister_lantern(lantern: Node3D) -> void:
+	_lanterns.erase(lantern)
+	if _held_lantern == lantern:
+		_held_lantern = null
 
 func is_lantern_raised() -> bool:
-	return _lantern.is_raised() if is_instance_valid(_lantern) else false
+	var lantern := get_lantern()
+	return lantern.is_raised() if lantern else false
 
 func is_lantern_carried() -> bool:
-	return _lantern.carried if is_instance_valid(_lantern) else false
+	var lantern := get_lantern()
+	return lantern.carried if lantern else false
 
 func is_lantern_hung() -> bool:
-	return _lantern.is_hung() if is_instance_valid(_lantern) else false
+	var lantern := get_lantern()
+	return lantern.is_hung() if lantern else false
 
+## The active lantern: the carried one, else the nearest to the child. Retired ones don't count.
 func get_lantern() -> Node3D:
-	return _lantern
+	var best: Node3D = null
+	var best_d := INF
+	var p := get_player_position()
+	for lantern in _lanterns:
+		if not is_instance_valid(lantern) or lantern.is_retired():
+			continue
+		if lantern.carried:
+			return lantern
+		var d := p.distance_squared_to(lantern.global_position)
+		if d < best_d:
+			best_d = d
+			best = lantern
+	return best
+
+## Every lantern in the level, retired ones included.
+func get_lanterns() -> Array[Node3D]:
+	return _lanterns
 
 func get_light_sources() -> Array[Node3D]:
 	return _light_sources
 
 ## World position of the lantern's handle (where the player's hand holds it).
 func get_lantern_handle_position() -> Vector3:
-	return _lantern.get_handle_position() if is_instance_valid(_lantern) else get_player_position()
+	var lantern := get_lantern()
+	return lantern.get_handle_position() if lantern else get_player_position()
 
 ## A placed lantern fell out of the level: put it down on safe ground beside the player.
-func report_lantern_lost() -> void:
-	if not is_instance_valid(_lantern) or _lantern.carried:
+func report_lantern_lost(lantern: Node3D) -> void:
+	if not is_instance_valid(lantern) or lantern.carried or lantern.is_retired():
 		return
 	var spot: Variant = _player.find_lantern_spot() if is_instance_valid(_player) else null
 	if spot == null:
-		_lantern.return_to_hand()
+		lantern.return_to_hand()
 	else:
-		_lantern.respawn_at(spot)
+		lantern.respawn_at(spot)
 	if audio:
 		audio.play_event(&"lantern_return")
 	if bus:
@@ -670,9 +716,10 @@ func report_player_pushing(direction: int) -> void:
 
 ## True while the player is inside any active lantern light radius (carried or placed): enemies can't touch them.
 func is_player_protected() -> bool:
-	if not is_instance_valid(_lantern) or not _lantern.is_light_active():
+	var lantern := get_lantern()
+	if lantern == null or not lantern.is_light_active():
 		return false
-	if _lantern.carried:
+	if lantern.carried:
 		return true
 	return player_lit
 

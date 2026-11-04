@@ -222,16 +222,18 @@ func _on_hook_changed(hook_id: StringName, hung: bool) -> void:
 	if hook_id == bait_hook_id:
 		_bait_hung = hung
 
-## The light it is drawn to: a lantern that is lit and not carried, near the perch.
+## The light it is drawn to: the nearest lantern to the perch that is set down and in play.
 func _lure_target() -> Variant:
-	var lantern := _game.get_lantern()
-	if not is_instance_valid(lantern) or _game.is_lantern_carried():
-		return null
-	if lantern.global_position.distance_to(perch_point.global_position) > lure_range:
-		return null
-	if _bait_hung:
-		return lure_point.global_position
-	return lantern.global_position + Vector3(0.0, 1.4, 0.0)
+	var target: Variant = null
+	var best := lure_range
+	for lantern in _game.get_lanterns():
+		if not is_instance_valid(lantern) or lantern.carried or lantern.is_retired():
+			continue
+		var d: float = lantern.global_position.distance_to(perch_point.global_position)
+		if d <= best:
+			best = d
+			target = lure_point.global_position if _bait_hung and lantern.is_hung() else lantern.global_position + Vector3(0.0, 1.4, 0.0)
+	return target
 
 func _on_trap_sprung(trap: Node3D) -> void:
 	if act == Act.IDLE or act == Act.CRUSHED or act == Act.PINNED:

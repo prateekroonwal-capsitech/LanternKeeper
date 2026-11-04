@@ -50,7 +50,7 @@ func _is_lit(point: Vector3) -> bool:
 	for source in _game.get_light_sources():
 		if not is_instance_valid(source) or not source.is_light_active():
 			continue
-		if source == _game.get_lantern() and _game.is_lantern_hung():
+		if source is Lantern and source.is_hung():
 			continue
 		var c: Vector3 = source.get_light_position()
 		var r: float = source.get_light_radius() + body_radius + light_margin

@@ -10,17 +10,21 @@ extends CharacterBody3D
 ## Hooks: set down while the child is within a LanternHook's reach, it hangs from the hook
 ## (no gravity, follows the hook if it rides a rail) instead of dropping.
 ##
+## A level can hold several lanterns. When the child picks up a different one, GameManager
+## calls retire() on the one they held last: its light fades and its motes drift out, then it
+## is hidden and switched off (never freed), so a checkpoint from before can bring it back.
+##
 ## Checkpoints: GameManager calls capture_state() when a checkpoint is saved and
 ## restore_state() on respawn, so a lantern that was placed is back where it was.
 ## A placed lantern that falls below the level's kill height reports report_lantern_lost();
 ## GameManager then calls respawn_at() with a safe spot beside the player.
 ##
-## Sends: GameManager.register_lantern(self), register_light_source(self) /
-##   unregister_light_source(self), report_oil_burned(amount), report_lantern_placed(at),
-##   report_lantern_picked_up(), report_lantern_lost()
+## Sends: GameManager.register_lantern(self) / unregister_lantern(self),
+##   register_light_source(self) / unregister_light_source(self), report_oil_burned(amount),
+##   report_lantern_placed(at), report_lantern_picked_up(self), report_lantern_lost(self)
 ## Receives: GameBus.lantern_place_requested → place; GameManager.input.raise_held,
 ##   GameManager.get_oil_ratio(), GameManager.get_kill_y() (polled);
-##   capture_state() / restore_state() / respawn_at() from GameManager.
+##   capture_state() / restore_state() / respawn_at() / retire() from GameManager.
 ## Light-source API (used by GameManager.is_point_lit): get_light_position(),
 ##   get_light_radius(), is_light_active().
 
@@ -66,6 +70,14 @@ extends CharacterBody3D
 ## Seconds of the flicker-in effect when the lantern reappears beside the player.
 @export var appear_time: float = 0.6
 
+@export_group("Retire")
+## Seconds the light takes to fade out when the child picks up a different lantern.
+@export var retire_time: float = 0.8
+## Upward pull on the motes while they drift out.
+@export var retire_drift: float = 1.2
+
+enum Retire { ACTIVE, FADING, GONE }
+
 var carried: bool = true
 
 var _game: GameManager
@@ -77,6 +89,9 @@ var _flicker: float = 1.0
 var _appear: float = 1.0
 var _sway: float = 0.0
 var _hook: Node3D = null
+var _retire: Retire = Retire.ACTIVE
+var _retire_fade: float = 1.0
+var _dust_gravity: Vector3
 
 @onready var _light: OmniLight3D = $Light
 @onready var _glow: MeshInstance3D = $Glow
@@ -86,11 +101,14 @@ var _hook: Node3D = null
 @onready var _pickup_area: Area3D = $PickupArea
 @onready var _light_area: Area3D = $LightArea
 @onready var _light_area_shape: CollisionShape3D = $LightArea/CollisionShape3D
+@onready var _body_shape: CollisionShape3D = $CollisionShape3D
+@onready var _pickup_shape: CollisionShape3D = $PickupArea/CollisionShape3D
 
 func _ready() -> void:
 	# Run after the Player each physics tick, so the hand it follows is this tick's hand.
 	process_physics_priority = 10
 	carried = start_carried
+	_dust_gravity = _dust.gravity
 	set_physics_process(false)
 	set_process(false)
 	_pickup_area.body_entered.connect(_on_pickup_body_entered)
@@ -115,6 +133,7 @@ func inject_services(registry: Node) -> void:
 func _exit_tree() -> void:
 	if _game:
 		_game.unregister_light_source(self)
+		_game.unregister_lantern(self)
 
 # ── Light-source API ──────────────────────────────────────────────────────
 
@@ -125,7 +144,7 @@ func get_light_position() -> Vector3:
 	return global_position + Vector3(0.0, -0.2, 0.0)   # centre of the glass (pivot = handle)
 
 func get_light_radius() -> float:
-	return _radius * _appear
+	return _radius * _appear * _retire_fade
 
 func is_light_active() -> bool:
 	return get_light_radius() > 0.05
@@ -136,10 +155,46 @@ func is_raised() -> bool:
 func is_hung() -> bool:
 	return is_instance_valid(_hook)
 
+## True from the moment it starts fading: it no longer counts as a lantern in play.
+func is_retired() -> bool:
+	return _retire != Retire.ACTIVE
+
+## The child picked up a different lantern: fade this one out, then hide and switch it off.
+func retire() -> void:
+	if is_retired():
+		return
+	carried = false
+	_raised = false
+	_awaiting_exit = false
+	_retire = Retire.FADING
+	_dust.gravity = Vector3(0.0, retire_drift, 0.0)
+
+func _finish_retire() -> void:
+	_retire = Retire.GONE
+	_retire_fade = 0.0
+	_release_hook()
+	velocity = Vector3.ZERO
+	visible = false
+	_dust.emitting = false
+	_set_shapes_disabled(true)
+	_update_transforms()
+
+func _unretire() -> void:
+	_retire = Retire.ACTIVE
+	_retire_fade = 1.0
+	visible = true
+	_dust.gravity = _dust_gravity
+	_set_shapes_disabled(false)
+
+func _set_shapes_disabled(off: bool) -> void:
+	_body_shape.set_deferred(&"disabled", off)
+	_pickup_shape.set_deferred(&"disabled", off)
+	_light_area_shape.set_deferred(&"disabled", off)
+
 # ── Checkpoint snapshot (called by GameManager) ───────────────────────────
 
 func capture_state() -> Dictionary:
-	return { "carried": carried, "position": global_position,
+	return { "carried": carried, "position": global_position, "retired": is_retired(),
 		"hook": _hook.get_path() if is_instance_valid(_hook) else NodePath() }
 
 func restore_state(state: Dictionary) -> void:
@@ -147,6 +202,11 @@ func restore_state(state: Dictionary) -> void:
 	_raised = false
 	_appear = 1.0
 	_release_hook()
+	if state.get("retired", false):
+		carried = false
+		_finish_retire()
+		return
+	_unretire()
 	var hook_path: NodePath = state.get("hook", NodePath())
 	if not hook_path.is_empty() and has_node(hook_path):
 		carried = false
@@ -182,7 +242,14 @@ func return_to_hand() -> void:
 # ── Simulation ────────────────────────────────────────────────────────────
 
 func _physics_process(delta: float) -> void:
+	if _retire == Retire.GONE:
+		return
 	_appear = move_toward(_appear, 1.0, delta / maxf(appear_time, 0.01))
+	if _retire == Retire.FADING:
+		_retire_fade = move_toward(_retire_fade, 0.0, delta / maxf(retire_time, 0.01))
+		if _retire_fade <= 0.0:
+			_finish_retire()
+			return
 	if _game and _game.is_playing():
 		_simulate(delta)
 	elif _game:
@@ -201,8 +268,10 @@ func _simulate(delta: float) -> void:
 	var oil_ratio := _game.get_oil_ratio()
 	_raised = carried and _game.input.raise_held and oil_ratio > 0.0
 
-	var burn := burn_rate * (raise_burn_multiplier if _raised else 1.0)
-	_game.report_oil_burned(burn * delta)
+	# One shared tank: only the active lantern burns it.
+	if _game.get_lantern() == self:
+		var burn := burn_rate * (raise_burn_multiplier if _raised else 1.0)
+		_game.report_oil_burned(burn * delta)
 
 	var target := 0.0
 	if oil_ratio > 0.0:
@@ -260,7 +329,7 @@ func _simulate_placed(delta: float) -> void:
 	move_and_slide()
 	global_position.z = 0.06
 	if global_position.y < _game.get_kill_y():
-		_game.report_lantern_lost()
+		_game.report_lantern_lost(self)
 
 ## Transform-affecting visuals live in the physics step so interpolation stays smooth.
 func _update_transforms() -> void:
@@ -272,6 +341,8 @@ func _update_transforms() -> void:
 # ── Visuals (non-transform) ───────────────────────────────────────────────
 
 func _process(delta: float) -> void:
+	if _retire == Retire.GONE:
+		return
 	_time += delta
 	var ratio := _game.get_oil_ratio() if _game else 1.0
 	var strength := flicker_strength
@@ -288,16 +359,17 @@ func _process(delta: float) -> void:
 	_light.visible = lit
 	_glow.visible = lit
 	_dust.emitting = lit
-	_sprite.modulate.a = _appear
+	var alpha := _appear * _retire_fade
+	_sprite.modulate.a = alpha
 	if not lit:
-		_sprite.modulate = Color(0.35, 0.35, 0.4, _appear)
+		_sprite.modulate = Color(0.35, 0.35, 0.4, alpha)
 		return
 	_light.omni_range = r * light_range_scale
-	_light.light_energy = light_energy * _flicker * _appear
-	_glow_material.set_shader_parameter(&"flicker", _flicker * _appear)
+	_light.light_energy = light_energy * _flicker * alpha
+	_glow_material.set_shader_parameter(&"flicker", _flicker * alpha)
 	_dust.emission_sphere_radius = r * 0.8
 	var warmth := clampf(ratio * 1.5, 0.4, 1.0)
-	_sprite.modulate = Color(1.0, warmth, warmth * 0.9, _appear)
+	_sprite.modulate = Color(1.0, warmth, warmth * 0.9, alpha)
 
 # ── Place / pick up ───────────────────────────────────────────────────────
 
@@ -322,14 +394,14 @@ func _on_place_requested() -> void:
 	_game.report_lantern_placed(global_position)
 
 func _on_pickup_body_entered(body: Node3D) -> void:
-	if carried or _awaiting_exit or not body.is_in_group(&"player"):
+	if carried or _awaiting_exit or is_retired() or not body.is_in_group(&"player"):
 		return
 	if is_instance_valid(_hook) and _hook.is_moving():
 		return   # can't snatch it from a moving cradle
 	if _game and _game.is_playing():
 		carried = true
 		_release_hook()
-		_game.report_lantern_picked_up()
+		_game.report_lantern_picked_up(self)
 
 func _hang_on(hook: Node3D) -> void:
 	_hook = hook

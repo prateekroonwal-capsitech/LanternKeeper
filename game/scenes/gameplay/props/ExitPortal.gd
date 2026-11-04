@@ -53,7 +53,7 @@ func _on_body_entered(body: Node3D) -> void:
 		return
 	_active = true
 	_player = body
-	_lantern = _game.get_lantern()
+	_lantern = _game.get_lantern()   # the active lantern: the carried one, else the nearest
 	_player_from = _player.global_position
 	if is_instance_valid(_lantern):
 		_lantern_from = _lantern.global_position

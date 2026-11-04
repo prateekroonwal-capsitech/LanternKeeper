@@ -67,7 +67,7 @@ func _check_body(body: Node3D) -> void:
 	var is_player := body.is_in_group(&"player")
 	var is_lantern := body.is_in_group(&"lantern") or body is Lantern
 	if (trigger_on_player and is_player) or (trigger_on_lantern and is_lantern):
-		if is_lantern and _game.is_lantern_carried():
+		if is_lantern and body.get("carried") == true:
 			return
 		_fired = true
 		print("[WakeTrigger] %s fired: %s" % [name, wake_group])
