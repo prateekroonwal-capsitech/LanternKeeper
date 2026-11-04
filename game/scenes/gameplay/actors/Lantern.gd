@@ -3,7 +3,8 @@ extends CharacterBody3D
 
 ## Lantern — the one light. Carried, it follows the player's hand; placed, it drops
 ## to the nearest surface below (solid ground, or a ghost platform it lights itself)
-## and lights that spot. Placing or picking up the lantern is a deliberate action (Place button, swipe down, or E).
+## and lights that spot. Placing or picking up the lantern is a deliberate action (Place button, swipe down, or E):
+## the Player bends and calls drop_from_hand() / take_in_hand() at the reach frame of the bend.
 ## In JUGNOO mode (World 1) fireflies pulse gently at a constant radius without burning fuel;
 ## in OIL mode (World 2+) it burns oil (3× while raised), shrinking and flickering as fuel runs low.
 ##
@@ -22,8 +23,8 @@ extends CharacterBody3D
 ## Sends: GameManager.register_lantern(self) / unregister_lantern(self),
 ##   register_light_source(self) / unregister_light_source(self), report_oil_burned(amount),
 ##   report_lantern_placed(at), report_lantern_picked_up(self), report_lantern_lost(self)
-## Receives: GameBus.lantern_place_requested → place; GameManager.input.raise_held,
-##   GameManager.get_oil_ratio(), GameManager.get_kill_y() (polled);
+## Receives: can_pick_up() / drop_from_hand() / take_in_hand() from Player;
+##   GameManager.input.raise_held, GameManager.get_oil_ratio(), GameManager.get_kill_y() (polled);
 ##   capture_state() / restore_state() / respawn_at() / retire() from GameManager.
 ## Light-source API (used by GameManager.is_point_lit): get_light_position(),
 ##   get_light_radius(), is_light_active().
@@ -56,6 +57,8 @@ extends CharacterBody3D
 @export var handle_height: float = 0.0
 @export var max_sway_angle: float = 0.35
 @export var sway_speed: float = 10.0
+## Picked up from further than the hand reaches, it glides to the hand (time constant, seconds).
+@export var attach_blend_time: float = 0.08
 
 @export_group("Placed")
 @export var gravity: float = 25.0
@@ -88,6 +91,7 @@ var _time: float = 0.0
 var _flicker: float = 1.0
 var _appear: float = 1.0
 var _sway: float = 0.0
+var _hand_lag: Vector3 = Vector3.ZERO
 var _hook: Node3D = null
 var _retire: Retire = Retire.ACTIVE
 var _retire_fade: float = 1.0
@@ -133,7 +137,6 @@ func inject_services(registry: Node) -> void:
 		return
 	_game.register_lantern(self)
 	_game.register_light_source(self)
-	_game.bus.lantern_place_requested.connect(_on_place_requested)
 	_game.bus.level_started.connect(func(_id: String) -> void:
 		_apply_type()
 		if carried:
@@ -320,7 +323,8 @@ func _simulate(delta: float) -> void:
 
 	if carried:
 		# The handle sits exactly on the child's HandMarker; only the pendulum sway moves it.
-		global_position = _hand_position()
+		_hand_lag *= exp(-delta / maxf(attach_blend_time, 0.01))
+		global_position = _hand_position() + _hand_lag
 		var p_vel := _game.get_player_velocity() if _game else Vector3.ZERO
 		var sway_target := -clampf(p_vel.x * 0.045, -max_sway_angle, max_sway_angle)
 		if absf(p_vel.x) < 0.1:
@@ -343,6 +347,7 @@ func _hand_position() -> Vector3:
 func _snap_to_hand() -> void:
 	if _game == null:
 		return
+	_hand_lag = Vector3.ZERO
 	global_position = _hand_position()
 	reset_physics_interpolation()
 
@@ -422,34 +427,36 @@ func _process(delta: float) -> void:
 
 # ── Place / pick up ───────────────────────────────────────────────────────
 
-func _on_place_requested() -> void:
-	if is_retired():
+## Can the child take this lantern now? Not from a moving cradle.
+func can_pick_up() -> bool:
+	if carried or is_retired() or not is_player_in_reach():
+		return false
+	return not (is_instance_valid(_hook) and _hook.is_moving())
+
+## The hand lets go at `at`, where it already is, so the light doesn't jump. A hook takes it instead.
+func drop_from_hand(at: Vector3, hook: Node3D) -> void:
+	if not carried or is_retired():
 		return
-	if carried:
-		carried = false
-		_raised = false
+	carried = false
+	_raised = false
+	_hand_lag = Vector3.ZERO
+	velocity = Vector3.ZERO
+	if is_instance_valid(hook):
 		rotation.z = 0.0
 		_sway = 0.0
-		var hook := _game.get_hook_in_reach()
-		if is_instance_valid(hook):
-			_hang_on(hook)
-			return
-		var p := _game.get_player_position()
-		global_position = Vector3(p.x, p.y + 0.6, 0.06)
-		rotation.z = 0.0
-		_sway = 0.0
-		velocity = Vector3.ZERO
-		reset_physics_interpolation()
-		_game.report_lantern_placed(global_position)
-	else:
-		if not is_player_in_reach():
-			return
-		if is_instance_valid(_hook) and _hook.is_moving():
-			return   # can't snatch it from a moving cradle
-		if _game and _game.is_playing():
-			carried = true
-			_release_hook()
-			_game.report_lantern_picked_up(self)
+		_hang_on(hook)
+		return
+	global_position = Vector3(at.x, at.y, 0.06)
+	_game.report_lantern_placed(global_position)
+
+## The hand closes on it. From further off it glides in rather than jumping to the hand.
+func take_in_hand() -> void:
+	if not can_pick_up() or not _game.is_playing():
+		return
+	_hand_lag = global_position - _hand_position()
+	carried = true
+	_release_hook()
+	_game.report_lantern_picked_up(self)
 
 func _on_pickup_body_entered(body: Node3D) -> void:
 	if body.is_in_group(&"player"):

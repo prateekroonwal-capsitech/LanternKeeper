@@ -37,6 +37,15 @@ ARM_LEN = UPPER_ARM + FOREARM
 # Player.gd mirrors these into HandMarker (x 0.009 m per px).
 HAND_CARRY = (15, 66)
 HAND_RAISE = (16, 128)
+# Hand points of the new poses, same units. Player.gd holds these in metres.
+HAND_REACH = (44, 47)      # place / pickup: at the reach frame the hand is at the lantern's rest height
+HAND_FEET = (10, 47)       # place_feet: the same bend, set down close in
+HAND_HOOK = (34, 118)      # hook_reach: standing, arm up to a hook
+HAND_PUSH = (36, 70)       # push: palms on the box
+HAND_ROPE = (4, 152)       # rope_*: hands above the head, on the rope
+BEND_PATH = [HAND_CARRY, (26, 54), HAND_REACH, (26, 54), HAND_CARRY]
+FEET_PATH = [HAND_CARRY, (12, 54), HAND_FEET, (12, 54), HAND_CARRY]
+HOOK_PATH = [HAND_CARRY, (22, 92), HAND_HOOK, (22, 92), HAND_CARRY]
 
 BLACK = (0, 0, 0, 255)
 EYE = (255, 255, 255, 255)
@@ -134,11 +143,16 @@ def draw_head(d, j, s, blink=False):
             d.ellipse((ex - 2.4, ey - 2.4, ex + 2.4, ey + 2.4), fill=EYE)
 
 
-def draw_carry_arm(d, j, s, hand_px):
-    """Near arm reaching a fixed hand point (two-bone IK, elbow bent back and down)."""
+def draw_carry_arm(d, j, s, hand_px, stretch=False):
+    """Near arm reaching a fixed hand point (two-bone IK, elbow bent back and down).
+    `stretch`: a point past the arm's length (hands above the head on a rope) pulls it straight."""
     sh = to_img(j["shoulder"], s)
     tx, ty = CENTER_X + hand_px[0], FRAME - hand_px[1]
     dx, dy = tx - sh[0], ty - sh[1]
+    if stretch and math.hypot(dx, dy) > UPPER_ARM + FOREARM:
+        capsule(d, sh, (tx, ty), 7)
+        d.ellipse((tx - 3.5, ty - 3.5, tx + 3.5, ty + 3.5), fill=BLACK)
+        return
     dist = min(math.hypot(dx, dy), UPPER_ARM + FOREARM - 0.5)
     base = math.atan2(dy, dx)
     cos_a = (UPPER_ARM ** 2 + dist ** 2 - FOREARM ** 2) / (2 * UPPER_ARM * dist)
@@ -158,12 +172,17 @@ def render(pose, carry):
     d = ImageDraw.Draw(img)
     j = solve(pose)
     s = ground_shift(j, pose.get("air", 0.0))
-    draw_arm(d, j["arms"][0], s)
+    if "far_hand" in pose:
+        draw_carry_arm(d, j, s, pose["far_hand"], pose.get("stretch", False))
+    else:
+        draw_arm(d, j["arms"][0], s)
     draw_leg(d, j["legs"][0], s)
     draw_leg(d, j["legs"][1], s)
     draw_body(d, j, s)
     draw_head(d, j, s, pose.get("blink", False))
-    if not carry:
+    if not carry and "near_hand" in pose:
+        draw_carry_arm(d, j, s, pose["near_hand"], pose.get("stretch", False))
+    elif not carry:
         draw_arm(d, j["arms"][1], s)
     else:
         draw_carry_arm(d, j, s, HAND_RAISE if pose.get("hand") == "raise" else HAND_CARRY)
@@ -205,6 +224,30 @@ def gait(n, amp, knee_base, knee_kick, arm_amp, elbow, lean, bob, reverse=False,
     return out
 
 
+def bend(path):
+    """Crouch, arm forward and down to the reach frame (index 2), then stand."""
+    crouch = [(14, (20, 38), (26, 44)), (26, (32, 60), (38, 66)), (38, (42, 78), (48, 84)),
+              (26, (32, 60), (38, 66)), (14, (20, 38), (26, 44))]
+    return [{"lean": lean, "head": -lean * 0.3, "legs": [a, b], "arms": [(-12, 14), (0, 0)],
+             "near_hand": hand} for (lean, a, b), hand in zip(crouch, path)]
+
+
+def reach_up(path):
+    """Standing: only the arm moves, up to a hook and back."""
+    return [{"lean": -2, "head": -6 - i * 2 if i < 3 else -6, "legs": [(-5, 2), (5, 3)],
+             "arms": [(-4, 12), (0, 0)], "near_hand": hand} for i, hand in enumerate(path)]
+
+
+def rope(near, far, legs, lean=0, head=-8):
+    return {"lean": lean, "head": head, "legs": legs, "arms": [(0, 0), (0, 0)],
+            "near_hand": near, "far_hand": far, "stretch": True}
+
+
+LOW = (HAND_ROPE[0], HAND_ROPE[1] - 26)      # the lower hand while climbing
+TOGETHER = [(2, 5), (5, 7)]
+ROPE_CLIMB = [rope(HAND_ROPE, LOW, [(16, 34), (-2, 4)]), rope(HAND_ROPE, HAND_ROPE, TOGETHER),
+              rope(LOW, HAND_ROPE, [(-2, 4), (16, 34)]), rope(HAND_ROPE, HAND_ROPE, TOGETHER)]
+
 ANIMS = {
     # name: (poses, fps, loop, has_carry_variant, carry_only)
     "idle": (idle(), 6.0, True, True, False),
@@ -223,13 +266,21 @@ ANIMS = {
               {"lean": 10, "legs": [(26, 52), (32, 56)], "arms": [(18, 20), (25, 20)]},
               {"lean": 4, "legs": [(8, 16), (12, 18)], "arms": [(4, 12), (8, 12)]}],
              14.0, False, True, False),
-    "push": (gait(6, 18, 12, 24, 0, 0, 22, 0.5, arms=[(75, 10), (82, 8)]), 7.0, True, False, False),
+    "push": ([dict(p, near_hand=HAND_PUSH, far_hand=HAND_PUSH)
+              for p in gait(6, 18, 12, 24, 0, 0, 22, 0.5, arms=[(75, 10), (82, 8)])], 7.0, True, True, False),
     "pull": (gait(6, 16, 10, 20, 0, 0, -12, 0.5, reverse=True, arms=[(68, 6), (74, 4)]), 6.0, True, False, False),
-    "place": ([{"lean": 18, "legs": [(26, 50), (34, 56)], "arms": [(10, 18), (30, 12)]},
-               {"lean": 36, "legs": [(50, 95), (55, 100)], "arms": [(18, 18), (22, 4)]},
-               {"lean": 36, "legs": [(50, 95), (55, 100)], "arms": [(18, 18), (14, 0)]},
-               {"lean": 12, "legs": [(22, 40), (26, 44)], "arms": [(4, 12), (8, 12)]}],
-              12.0, False, False, False),
+    "place": (bend(BEND_PATH), 14.0, False, False, False),
+    "place_feet": (bend(FEET_PATH), 14.0, False, False, False),
+    "pickup": (bend(BEND_PATH), 14.0, False, False, False),
+    "hook_reach": (reach_up(HOOK_PATH), 14.0, False, False, False),
+    "rope_grab": ([rope(HAND_ROPE, HAND_ROPE, [(18, 34), (26, 42)], 6),
+                   rope(HAND_ROPE, HAND_ROPE, [(8, 14), (12, 20)], 3)], 12.0, False, False, False),
+    "rope_hang": ([rope(HAND_ROPE, HAND_ROPE, TOGETHER), rope(HAND_ROPE, HAND_ROPE, [(0, 3), (3, 5)])],
+                  3.0, True, False, False),
+    "rope_climb_up": (ROPE_CLIMB, 8.0, True, False, False),
+    "rope_climb_down": (list(reversed(ROPE_CLIMB)), 8.0, True, False, False),
+    "rope_let_go": ([rope((12, 142), (22, 132), [(12, 24), (-6, 16)], -3),
+                     rope((24, 128), (34, 118), [(16, 28), (-10, 20)], -5)], 12.0, False, False, False),
     "raise": ([{"lean": -6 - b, "head": -14 - b, "legs": [(-6, 2), (6, 3)], "arms": [(-6, 12), (0, 0)], "hand": "raise"}
                for b in (0.0, 0.8, 1.2, 0.8)], 6.0, True, False, True),
     "raise_walk": ([dict(p, hand="raise", lean=-3, head=-10) for p in gait(8, 20, 6, 28, 16, 14, 3, 1.5)],

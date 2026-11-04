@@ -38,9 +38,16 @@ Rotated and stretched in-game to reach the lantern handle.
 | `player_jump_rise.png` / `player_jump_rise_carry.png` | 2 | 384 × 192 | 8, loop | Ascending through the air. |
 | `player_fall.png` / `player_fall_carry.png` | 2 | 384 × 192 | 6, loop | Arms up. Also used when a fall kills. |
 | `player_land.png` / `player_land_carry.png` | 3 | 576 × 192 | 14, once | Only after falls faster than 5 m/s. |
-| `player_push.png` | 6 | 1152 × 192 | 7, loop | Pushing heavy objects (crates). |
+| `player_push.png` / `player_push_carry.png` | 6 | 1152 × 192 | 7, loop | Lean, slow walk, palms on the box. **Palms at (36, 70) px** (= `hand_push_point`); the game nudges the Body so they sit on the box edge. `_carry`: one arm on the box, lantern hand at the side at (15, 66) px. |
 | `player_pull.png` | 6 | 1152 × 192 | 6, loop | Pulling heavy objects backwards. |
-| `player_place.png` | 4 | 768 × 192 | 12, once | Crouch to set the lantern down. |
+| `player_place.png` | 5 | 960 × 192 | 14, once | Crouch, arm forward and down, stand. Frame 2 = reach frame: the lantern leaves the hand. Hand per frame (px): (15, 66), (26, 54), **(44, 47)**, (26, 54), (15, 66) (= `bend_hand_path`). |
+| `player_place_feet.png` | 5 | 960 × 192 | 14, once | Same bend, set down at the feet (wall or ledge in front). Reach hand (10, 47) px (= `feet_hand_path`). |
+| `player_pickup.png` | 5 | 960 × 192 | 14, once | Same motion as place; the hand closes on the handle at frame 2, then lifts. Hand per frame = `player_place.png`. |
+| `player_hook_reach.png` | 5 | 960 × 192 | 14, once | Standing, only the arm moves up to a hook (place and pickup). Reach hand at frame 2, (34, 118) px (= `hook_hand_path`). |
+| `player_rope_grab.png` | 2 | 384 × 192 | 12, once | Catching the rope, legs swing in. **Hands at (4, 152) px in all rope_grab / rope_hang frames** (= `hand_rope_point`); the Body tilts around that point. |
+| `player_rope_hang.png` | 2 | 384 × 192 | 3, loop | Both hands above the head, legs together. |
+| `player_rope_climb_up.png` / `player_rope_climb_down.png` | 4 | 768 × 192 | 8, loop | Hand over hand. Frames only for now: the rope has no climbing, so nothing plays them yet. |
+| `player_rope_let_go.png` | 2 | 384 × 192 | 12, once | Hands leave the rope, then the normal jump / fall frames. |
 | `player_raise_carry.png` | 4 | 768 × 192 | 6, loop | Lantern held high, standing (carry only). |
 | `player_raise_walk_carry.png` | 8 | 1536 × 192 | 9, loop | Lantern held high while walking (carry only). |
 | `player_death.png` | 6 | 1152 × 192 | 12, once | Collapse when caught by an enemy. |

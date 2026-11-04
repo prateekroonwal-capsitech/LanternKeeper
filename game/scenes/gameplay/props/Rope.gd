@@ -38,6 +38,8 @@ var _woken: bool = false
 @onready var _grab_shape: CollisionShape3D = $GrabZone/CollisionShape3D
 
 func _ready() -> void:
+	# Before the Player each tick, so the hands sit on this tick's rope, not the last one.
+	process_physics_priority = -10
 	add_to_group(&"resettables")
 	_amp = deg_to_rad(idle_sway_degrees)
 	_grab_zone.body_entered.connect(func(b: Node3D) -> void:
