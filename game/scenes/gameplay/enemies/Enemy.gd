@@ -103,6 +103,8 @@ const _CHEST := Vector3(0.0, 0.7, 0.0)
 func _ready() -> void:
 	add_to_group(&"enemies")
 	_home = global_position
+	if has_node("Lair"):
+		$Lair.global_position = _home + Vector3(0, 0, -0.05)
 	_time = randf() * TAU
 	set_physics_process(false)
 	if is_instance_valid(_hurtbox):
@@ -154,6 +156,8 @@ func reset_to_checkpoint(state: Dictionary = {}) -> void:
 	mode = state.get("mode", Mode.DORMANT)
 	global_position = state.get("position", _home)
 	_home = state.get("home", _home)
+	if has_node("Lair"):
+		$Lair.global_position = _home + Vector3(0, 0, -0.05)
 	_relurk = state.get("relurk", false)
 	velocity = Vector3.ZERO
 	_lit_time = 0.0

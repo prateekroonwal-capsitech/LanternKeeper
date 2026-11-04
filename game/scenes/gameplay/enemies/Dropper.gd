@@ -79,7 +79,9 @@ func _hunt(delta: float) -> void:
 			velocity.x = 0.0
 			move_and_slide()
 			global_position.z = _home.z
-			if is_on_floor() or _phase_t > 2.5:
+			if _game and global_position.y < _game.get_kill_y():
+				_reset()
+			elif is_on_floor() or _phase_t > 2.5:
 				_phase = Phase.GROUNDED
 				_phase_t = 0.0
 		Phase.GROUNDED:
@@ -96,6 +98,9 @@ func _hunt(delta: float) -> void:
 			velocity.y = 0.0 if is_on_floor() else velocity.y - drop_gravity * delta
 			move_and_slide()
 			global_position.z = _home.z
+			if _game and global_position.y < _game.get_kill_y():
+				_reset()
+				return
 			if absf(vx) > 0.01:
 				_move_dir = signf(vx)
 			if _phase_t > ground_time:

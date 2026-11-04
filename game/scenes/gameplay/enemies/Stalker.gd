@@ -36,11 +36,18 @@ func _hunt(delta: float) -> void:
 	_float_toward(target, speed, delta)
 
 func _light_radius_at(center: Vector3) -> float:
-	# Radius of the light around `center`: grow outward until the point is no longer lit.
-	var r := 0.5
-	while r < 12.0 and _game.is_point_lit(center + Vector3(r, 0.0, 0.0)):
-		r += 0.25
-	return r
+	var best_dist: float = INF
+	var best_radius: float = 4.5
+	if _game:
+		for source in _game.get_light_sources():
+			if not is_instance_valid(source) or not source.is_light_active():
+				continue
+			var pos: Vector3 = source.get_light_position()
+			var d: float = pos.distance_to(center)
+			if d < best_dist:
+				best_dist = d
+				best_radius = float(source.get_light_radius())
+	return best_radius
 
 func _is_lit(point: Vector3) -> bool:
 	if ignores_light or _game == null:
@@ -50,7 +57,7 @@ func _is_lit(point: Vector3) -> bool:
 	for source in _game.get_light_sources():
 		if not is_instance_valid(source) or not source.is_light_active():
 			continue
-		if source is Lantern and source.is_hung():
+		if source.has_method("is_hung") and source.is_hung():
 			continue
 		var c: Vector3 = source.get_light_position()
 		var r: float = source.get_light_radius() + body_radius + light_margin

@@ -19,23 +19,19 @@ func _hunt(delta: float) -> void:
 	var pos := global_position
 	var probe_point := pos + Vector3(0.0, 0.35, 0.0)
 	var vx := 0.0
-	if _is_lit(probe_point):
-		var light := _game.get_nearest_light_position(probe_point)
-		vx = signf(pos.x - light.x) * retreat_speed
-		_repelled()
-	else:
-		var to_player := _game.get_player_position().x - pos.x
-		if absf(to_player) > 0.15 and absf(to_player) < lose_interest_distance:
-			var dir := signf(to_player)
-			var ahead := probe_point + Vector3(dir * (body_radius + 0.25), 0.0, 0.0)
-			if _is_lit(ahead):
-				_repelled()
-			elif _has_floor_ahead(dir):
-				vx = dir * _speed(crawl_speed)
+	var to_player := _game.get_player_position().x - pos.x
+	if absf(to_player) > 0.15 and absf(to_player) < lose_interest_distance:
+		var dir := signf(to_player)
+		var ahead := probe_point + Vector3(dir * (body_radius + 0.25), 0.0, 0.0)
+		if _is_lit(ahead):
+			_repelled()
+		elif _has_floor_ahead(dir):
+			vx = dir * _speed(crawl_speed)
 	velocity.x = vx
-	velocity.y = 0.0 if is_on_floor() else velocity.y - gravity * delta
+	velocity.y -= gravity * delta
 	velocity.z = 0.0
 	move_and_slide()
+	apply_floor_snap()
 	global_position.z = _home.z
 	_speed_now = absf(vx) * delta
 	if absf(vx) > 0.01:

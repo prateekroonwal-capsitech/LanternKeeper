@@ -97,6 +97,7 @@ var _patrol_wait: float = 0.0
 var _bait_hung: bool = false
 var _dive_from: Vector3
 var _encounter: int = 0
+var _last_completed_encounter: int = 0
 var _defeated: bool = false
 
 @onready var _smoke: CPUParticles3D = get_node_or_null("SmokeTrail")
@@ -144,6 +145,7 @@ func _on_wake_requested(group: StringName) -> void:
 				_set_act(Act.RUN)
 		run_end_group:
 			if act == Act.RUN:
+				_last_completed_encounter = maxi(_last_completed_encounter, 1)
 				_fly_off(run_exit)
 		trap_group:
 			if perch_point and _encounter != 2:
@@ -160,6 +162,7 @@ func _on_wake_requested(group: StringName) -> void:
 				_arrive(patrol_follow.global_position, Act.PATROL)
 		hide_end_group:
 			if act == Act.PATROL:
+				_last_completed_encounter = maxi(_last_completed_encounter, 3)
 				_fly_off(hide_exit)
 		final_group:
 			if hover_point and _encounter != 4:
@@ -224,6 +227,8 @@ func _on_hook_changed(hook_id: StringName, hung: bool) -> void:
 
 ## The light it is drawn to: the nearest lantern to the perch that is set down and in play.
 func _lure_target() -> Variant:
+	if not is_instance_valid(perch_point):
+		return null
 	var target: Variant = null
 	var best := lure_range
 	for lantern in _game.get_lanterns():
@@ -243,6 +248,7 @@ func _on_trap_sprung(trap: Node3D) -> void:
 		return
 	trap.mark_caught()
 	if _encounter == 4:
+		_last_completed_encounter = 4
 		_set_act(Act.CRUSHED)
 		_set_hurtbox_active(false)
 		print("[Shade] CRUSHED under %s, its eyes fade" % trap.name)
@@ -254,6 +260,7 @@ func _on_trap_sprung(trap: Node3D) -> void:
 		global_position.z = -0.6   # under the slab: the rubble covers it, its eyes and smoke show
 		_game.report_slow_motion(crush_slow_scale, crush_slow_time)
 	else:
+		_last_completed_encounter = maxi(_last_completed_encounter, 2)
 		global_position.y = trap.get_ground_point().y + 0.9
 		_set_act(Act.PINNED)
 		_set_hurtbox_active(false)
@@ -313,7 +320,7 @@ func _physics_process(delta: float) -> void:
 			_patrol(delta)
 			if not _game.is_player_hidden():
 				var dist := global_position.distance_to(chest)
-				var seen_close := dist <= spot_range or absf(p.x - global_position.x) <= spot_range
+				var seen_close := dist <= spot_range
 				var seen_light := _game.player_lit and dist <= light_spot_range
 				if seen_close or seen_light:
 					print("[Shade] SPOTTED the child (%s) at x=%.1f" % [
@@ -463,12 +470,14 @@ func get_visual_state() -> StringName:
 # ── Checkpoints: each encounter fully resets ──────────────────────────────
 
 func capture_checkpoint_state() -> Dictionary:
-	return { "act": act, "damage": damage, "encounter": _encounter }
+	return { "act": act, "damage": damage, "encounter": _last_completed_encounter, "last_completed": _last_completed_encounter }
 
 func reset_to_checkpoint(state: Dictionary = {}) -> void:
 	var a: int = state.get("act", Act.IDLE)
 	damage = state.get("damage", 0)
-	_encounter = state.get("encounter", 0)
+	var enc: int = state.get("last_completed", state.get("encounter", 0))
+	_encounter = enc
+	_last_completed_encounter = enc
 	_t = 0.0
 	_bait_hung = false
 	_patrol_wait = 0.0
@@ -478,7 +487,7 @@ func reset_to_checkpoint(state: Dictionary = {}) -> void:
 	_defeated = a == Act.CRUSHED
 	if _defeated:
 		act = Act.CRUSHED
-	print("[Shade] checkpoint reset: %s, damage %d" % [Act.keys()[act], damage])
+	print("[Shade] checkpoint reset: %s, damage %d, encounter %d" % [Act.keys()[act], damage, _encounter])
 	reset_physics_interpolation()
 
 func _reset() -> void:

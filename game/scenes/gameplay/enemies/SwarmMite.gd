@@ -27,7 +27,7 @@ func _reset() -> void:
 	_wake_pending = false
 
 func _physics_process(delta: float) -> void:
-	if _wake_pending and mode == Mode.DORMANT and _game and _game.is_playing():
+	if _wake_pending and mode == Mode.DORMANT and _game and _game.is_playing() and not _game.is_point_lit(_home, body_radius):
 		wake()
 	super._physics_process(delta)
 
