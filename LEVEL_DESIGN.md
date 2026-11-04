@@ -20,8 +20,8 @@ Status legend — **Solvable**: completed end-to-end by the route bot in the run
 | 9 | Holes (remade) | Solvable | proof bot PASS — solution, carrying the lantern can't grab the rope |
 | 10 | The Shade (hard) | Solvable | proof bot PASS — each encounter solved, failed and reset; full run start to exit |
 
-All 10 levels are solvable. Levels 3, 5, 6, 7 and 9 follow the remake brief; levels 1, 2,
-4, 8 and 10 are still the original Phase 5 layouts (solvable, not yet reworked to the brief).
+All 10 levels are solvable. Levels 3, 5, 6, 7, 9 and 10 follow the remake brief; levels 1, 2,
+4 and 8 are still the original Phase 5 layouts (solvable, not yet reworked to the brief).
 
 ---
 
@@ -48,7 +48,7 @@ foot of the gate wall on each side. The lantern's light is generous here (radius
 2. Set the lantern down at the hook (x 15) — it hangs, and the gate (x 21) slides open.
 3. The crawlers wake (hint: "Stay in the light"). Stay by the hook, inside its light: the near
    crawler freezes at the light's edge and slips back into its crack; the far one stops at the edge.
-4. Wait for the gate to finish opening, take the lantern back (step out of reach, walk back in).
+4. Wait for the gate to finish opening, take the lantern back (walk in reach and swipe down / press Place / E).
 5. Walk through the gate carrying it (≈ 1.2 s); the crawlers freeze and retreat. Exit at x 36.
 **Difficulty:** easy — no dark walking on the intended path; the shrine is 4 m from the hook;
 the gate stays open 3 s after you take the lantern (1.2 s needed).
@@ -69,7 +69,7 @@ hand, gate shut, crawlers dormant); no pits; level ends sealed by walls; gate re
 3. Dash through the dark tunnel. The tunnel droppers let go 0.3 s after you pass under —
    keep running and they land behind you.
 4. At the far end, walk into the **lever** (x 46): the rail carries the hanging lantern
-   through the tunnel to you (4 s). Take it.
+   through the tunnel to you (4 s). Take it (swipe down / press Place / E).
 5. Touch the shrine, cross the ghost bridge (needs light), carry the light under two more
    droppers, exit.
 - Shortcut checks (proof bot): carrying the light into the tunnel → the gate is shut (blocked);
@@ -88,7 +88,7 @@ hand, gate shut, crawlers dormant); no pits; level ends sealed by walls; gate re
 2. Drop onto the ghost stones and follow beneath it — each stone is solid only while the
    cradle's light is over it. Run ahead and you jump onto a dark stone; fall behind and the
    stone under you fades.
-3. At the far ledge the cradle stops; walk into the lantern to take it. Shrine, exit.
+3. At the far ledge the cradle stops; take the lantern (swipe down / press Place / E). Shrine, exit.
 - Shortcut checks (proof bot): carrying the light through the gate → shut; snatching the
   lantern back off the moving cradle → not allowed (a lantern can only be taken from a hook
   that has stopped).
@@ -106,7 +106,7 @@ the switch's chain carries the lantern through the door to you → two pit jumps
 3. Through the door is a shrine with a small sanctuary light (radius 2.8 m) the Stalker can't
    enter. Walk into the lever (x 33): the switch rides its chain through the open door and
    delivers the lantern to you (4 s).
-4. Take the lantern and carry it over the two pits to the exit (x 76). The Stalker can't come close.
+4. Take the lantern (swipe down / press Place / E) and carry it over the two pits to the exit (x 76). The Stalker can't come close.
 **Difficulty:** medium — a direct walk leaves ≈ 1.8 s of dark meter to spare; hesitating
 empties it, the Stalker speeds up and catches you. No route ever leads back past the Stalker.
 **Soft-lock checks:** the lever is only reachable through the door, i.e. while the lantern sits
@@ -162,7 +162,7 @@ soft-lock: walking on into the cavern before it had gone left it ignoring the tr
    too far for the Shade (25 m away).
 3. The Shade is drawn under the rock. Walk into the lever (x 55): the rock drops and pins it.
    The camera pulls back so you see it: wing torn, screech, it flees.
-4. Climb down, jump over the rock, take the lantern from the hook, walk on.
+4. Climb down, jump over the rock, take the lantern from the hook (swipe down / press Place / E), walk on.
 - Fail: walking near it without bait → caught.
 - Drawn to the light: a lantern set down anywhere within 30 m of its perch draws it too —
   on the bait hook it hovers under the rock, on the ground it hovers over the lantern (and
@@ -177,7 +177,7 @@ soft-lock: walking on into the cavern before it had gone left it ignoring the tr
 2. Hide in the dark crevices (x 129, 140, 151, 162). Move to the next one while it is
    sweeping away from you.
 3. Past its range (trigger x 173) it gives up and flies off. Walk into the lever (x 176.5):
-   the cradle rides its rail through the cave and brings the lantern to you (5 s).
+   the cradle rides its rail through the cave and brings the lantern to you (5 s). Take it (swipe down / press Place / E).
 - Fail: in the open within 3.5 m of it as it passes → spotted, dives, kills; carrying the
   light (only possible if you never left it) → spotted from 12 m.
 - Soft-lock: the gate closes behind you once you take the lantern; no route back is needed.
@@ -204,11 +204,11 @@ One line of light text at the bottom of the screen, once per save; data in
 
 | Level | Trigger | Text (PC · Android gestures · Android buttons) | Placed |
 |---|---|---|---|
-| 1-1 | level start (`Hint_move`, at spawn) | A/D to move · Space to jump / Drag to move · Tap to jump / Buttons to move and jump | yes |
+| 1-1 | level start (`Hint_move`, at spawn) | A/D to move · Space to jump / Drag to move · Swipe up to jump / Buttons to move and jump | yes |
 | 1-1 | before the ghost bridge (`Hint_ghost`, x 12.5) | Light makes paths | yes |
 | 1-2 | before the place spot (`Hint_place`, x 9) | E to place lantern / Swipe down to place lantern / Lantern button to place it | yes |
 | 1-3 | crawlers wake (`HintStayInLight`, on_wake_group gate_crawlers) | Stay in the light | yes |
-| 1-5 | first dropper in view | Danger above | **to place:** TutorialTrigger, hint_id `danger_above`, a few metres before Dropper1 |
+| 1-5 | first dropper in view | Danger above | yes |
 | 1-7 | Stalker wakes (`HintSomethingFollows`, on_wake_group stalk7) | Something follows. Keep moving | yes |
-| 1-9 | swarm wakes | Light seals the holes | **to place:** TutorialTrigger, hint_id `seal_holes`, on_wake_group `swarm9` (position doesn't matter) |
+| 1-9 | swarm wakes | Light seals the holes | yes |
 | 1-10 | chase starts (`HintRun`, on_wake_group chase) | Run | yes |

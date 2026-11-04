@@ -1,8 +1,8 @@
 class_name Shrine
 extends Area3D
 
-## Shrine — checkpoint. Touching it refills the oil completely (every time) and
-## makes it the respawn point. The active shrine glows; others stay dim.
+## Shrine — checkpoint. Touching it refills the dark meter completely (and oil when in OIL mode)
+## and makes it the respawn point. The active shrine glows; others stay dim.
 ##
 ## Sends: GameManager.report_shrine_reached(self)
 ## Receives: GameBus.checkpoint_activated(shrine) → active / dormant look.
@@ -19,10 +19,6 @@ extends Area3D
 ## > 0: the shrine gives off a small light of this radius. Enemies can't enter it and the
 ## dark meter refills inside it. 0 = cosmetic glow only.
 @export var sanctuary_radius: float = 0.0
-
-@export_group("Chase")
-## Where Big Shadow respawns after the player dies and respawns at this checkpoint.
-@export var shadow_restart_point: Marker3D
 
 var _game: GameManager
 var _active: bool = false
@@ -64,7 +60,7 @@ func get_respawn_position() -> Vector3:
 	return _respawn_point.global_position
 
 func get_shadow_restart_point() -> Marker3D:
-	return shadow_restart_point
+	return null
 
 func _process(delta: float) -> void:
 	var target := active_light_energy if _active else dormant_light_energy

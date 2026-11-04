@@ -442,10 +442,10 @@ func _respawn() -> void:
 			trigger.reset_to_checkpoint(st)
 	state = State.PLAYING
 
-# ── Shrines (checkpoint + full oil) ───────────────────────────────────────
+# ── Shrines (checkpoint, dark meter refill, oil refill when used) ──────────
 
-## Shrines call this whenever the player touches them: full oil refill, and the
-## shrine becomes the respawn point if it isn't already.
+## Shrines call this whenever the player touches them: refills the dark meter,
+## refills oil (in OIL mode), and makes the shrine the respawn point.
 func report_shrine_reached(shrine: Node3D) -> void:
 	if state != State.PLAYING:
 		return

@@ -2,9 +2,9 @@ class_name HUD
 extends UIController
 
 ## HUD — Limbo-style: nothing on screen during play. State shows through the world:
-## low oil = the lantern flickers and its light shrinks (Lantern.gd); a running-out dark
-## meter = DarkOverlay closes a vignette in from the edges and drains colour (plus the
-## heartbeat from AudioManager). Only a faint pause button remains, on touch screens.
+## in OIL mode, low oil flickers and shrinks the lantern (Lantern.gd); running out of dark meter
+## closes DarkOverlay's vignette in from screen edges without dimming the light circle, draining
+## colour outside (plus the heartbeat from AudioManager). Only a faint pause button remains, on touch screens.
 ##
 ## Sends: GameManager.report_pause_pressed() (pause button).
 ## Receives: GameBus.dark_meter_changed, game_state_changed.

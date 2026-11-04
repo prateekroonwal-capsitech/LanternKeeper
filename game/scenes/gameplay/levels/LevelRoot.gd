@@ -40,7 +40,7 @@ var oil_enabled: bool:
 @export var start_oil: float = 100.0
 
 @export_group("Darkness")
-## Off = no dark meter, heartbeat or vignette (worlds without shadows).
+## True = enemies frenzy when the dark meter empties. (Vignette and heartbeat operate in all levels outside light).
 @export var dark_meter_enabled: bool = true
 ## Seconds the player can stay outside all light before the shadows rush.
 @export var dark_meter_time: float = 5.0

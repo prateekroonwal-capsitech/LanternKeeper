@@ -4,8 +4,8 @@ extends CharacterBody3D
 ## Lantern — the one light. Carried, it follows the player's hand; placed, it drops
 ## to the nearest surface below (solid ground, or a ghost platform it lights itself)
 ## and lights that spot. Placing or picking up the lantern is a deliberate action (Place button, swipe down, or E).
-## Burns oil (3× while raised); its radius shrinks with the oil and it flickers harder
-## when oil runs low.
+## In JUGNOO mode (World 1) fireflies pulse gently at a constant radius without burning fuel;
+## in OIL mode (World 2+) it burns oil (3× while raised), shrinking and flickering as fuel runs low.
 ##
 ## Hooks: set down while the child is within a LanternHook's reach, it hangs from the hook
 ## (no gravity, follows the hook if it rides a rail) instead of dropping.
