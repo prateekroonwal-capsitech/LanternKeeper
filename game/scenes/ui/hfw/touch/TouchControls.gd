@@ -10,7 +10,7 @@ extends UIController
 ##              · swipe down: place lantern
 ##              · plain tap: does nothing
 ## Classic layout: visible TouchScreenButtons that press the InputMap actions directly.
-## Lantern pick-up is automatic, so there is no button for it.
+## Lantern pick-up and place share the same action (swipe down or the Place button).
 ##
 ## Sends: InputManager (via GameManager.input) set_virtual_axis, trigger_virtual_jump,
 ##   set_virtual_jump_held, trigger_virtual_place, set_virtual_raise.

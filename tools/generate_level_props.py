@@ -116,6 +116,61 @@ def debris_chunk():
     print("wrote debris_chunk.png", img.size)
 
 
+def firefly_jar():
+    w, h = 64, 96
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    # Wire handle at top (pivot = handle top image row 4, same as lantern.png)
+    wire = (120, 110, 100, 255)
+    d.arc((22, 2, 42, 22), 180, 360, fill=wire, width=2)
+    d.line((22, 12, 22, 20), fill=wire, width=2)
+    d.line((42, 12, 42, 20), fill=wire, width=2)
+
+    # Cork / lid
+    cork = (115, 85, 55, 255)
+    cork_dark = (70, 50, 30, 255)
+    d.rounded_rectangle((20, 14, 44, 21), radius=2, fill=cork, outline=cork_dark, width=1)
+    # Wire wrapped around neck
+    d.rectangle((18, 20, 46, 24), fill=(100, 95, 90, 255))
+
+    # Translucent glass body
+    glass_fill = (180, 240, 195, 40)
+    glass_edge = (170, 230, 190, 170)
+    d.rounded_rectangle((14, 23, 50, 85), radius=8, fill=glass_fill, outline=glass_edge, width=2)
+
+    # Thick glass bottom
+    d.rounded_rectangle((16, 79, 48, 84), radius=3, fill=(150, 215, 175, 75))
+
+    # Soft luminous firefly glow inside
+    glow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    gd = ImageDraw.Draw(glow)
+    gd.ellipse((23, 40, 41, 68), fill=(210, 255, 160, 90))
+    glow = glow.filter(ImageFilter.GaussianBlur(5))
+    img.alpha_composite(glow)
+
+    # Re-draw highlights on top of glow
+    d = ImageDraw.Draw(img)
+    # Glass vertical rim highlight (left curve)
+    d.line((18, 32, 18, 75), fill=(240, 255, 245, 140), width=2)
+    # Glass shoulder glint
+    d.arc((16, 24, 30, 36), 190, 270, fill=(250, 255, 250, 180), width=2)
+
+    save(img, "firefly_jar.png")
+
+
+def firefly_dot():
+    w = h = 16
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.ellipse((4, 4, 12, 12), fill=(255, 255, 255, 255))
+    img = img.filter(ImageFilter.GaussianBlur(1.8))
+    fx_path = os.path.join(OUT, "..", "fx", "firefly_dot.png")
+    os.makedirs(os.path.dirname(fx_path), exist_ok=True)
+    img.save(fx_path)
+    print("wrote firefly_dot.png", img.size)
+
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     boulder()
@@ -124,3 +179,5 @@ if __name__ == "__main__":
     plate()
     crevice()
     debris_chunk()
+    firefly_jar()
+    firefly_dot()

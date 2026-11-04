@@ -3,7 +3,7 @@ extends CharacterBody3D
 
 ## Lantern — the one light. Carried, it follows the player's hand; placed, it drops
 ## to the nearest surface below (solid ground, or a ghost platform it lights itself)
-## and lights that spot. Walking into a placed lantern picks it up again.
+## and lights that spot. Placing or picking up the lantern is a deliberate action (Place button, swipe down, or E).
 ## Burns oil (3× while raised); its radius shrinks with the oil and it flickers harder
 ## when oil runs low.
 ##
@@ -83,7 +83,7 @@ var carried: bool = true
 var _game: GameManager
 var _radius: float = 0.0
 var _raised: bool = false
-var _awaiting_exit: bool = false
+var _player_in_reach: bool = false
 var _time: float = 0.0
 var _flicker: float = 1.0
 var _appear: float = 1.0
@@ -93,11 +93,21 @@ var _retire: Retire = Retire.ACTIVE
 var _retire_fade: float = 1.0
 var _dust_gravity: Vector3
 
+const OIL_LIGHT_COLOR := Color(1.0, 0.62, 0.28, 1.0)
+const OIL_GLOW_COLOR := Color(1.0, 0.60, 0.22, 1.0)
+const OIL_DUST_COLOR := Color(1.0, 0.75, 0.45, 1.0)
+
+const JUGNOO_LIGHT_COLOR := Color(0.74, 0.96, 0.36, 1.0)
+const JUGNOO_GLOW_COLOR := Color(0.74, 0.96, 0.36, 1.0)
+const JUGNOO_DUST_COLOR := Color(0.82, 0.98, 0.46, 1.0)
+
 @onready var _light: OmniLight3D = $Light
 @onready var _glow: MeshInstance3D = $Glow
 @onready var _glow_material: ShaderMaterial = _glow.material_override
 @onready var _dust: CPUParticles3D = $Dust
 @onready var _sprite: Sprite3D = $Sprite
+@onready var _jar_sprite: Sprite3D = $JarSprite
+@onready var _fireflies: CPUParticles3D = $Fireflies
 @onready var _pickup_area: Area3D = $PickupArea
 @onready var _light_area: Area3D = $LightArea
 @onready var _light_area_shape: CollisionShape3D = $LightArea/CollisionShape3D
@@ -113,6 +123,7 @@ func _ready() -> void:
 	set_process(false)
 	_pickup_area.body_entered.connect(_on_pickup_body_entered)
 	_pickup_area.body_exited.connect(_on_pickup_body_exited)
+	_apply_type()
 
 func inject_services(registry: Node) -> void:
 	if not registry:
@@ -124,11 +135,32 @@ func inject_services(registry: Node) -> void:
 	_game.register_light_source(self)
 	_game.bus.lantern_place_requested.connect(_on_place_requested)
 	_game.bus.level_started.connect(func(_id: String) -> void:
+		_apply_type()
 		if carried:
 			_snap_to_hand())
 	_radius = base_radius
+	_apply_type()
 	set_physics_process(true)
 	set_process(true)
+
+func _apply_type() -> void:
+	var is_oil := _game != null and _game.uses_oil()
+	if _sprite:
+		_sprite.visible = is_oil
+	if _jar_sprite:
+		_jar_sprite.visible = not is_oil
+	if _fireflies:
+		_fireflies.visible = not is_oil
+		_fireflies.emitting = not is_oil and is_light_active()
+	var light_col := OIL_LIGHT_COLOR if is_oil else JUGNOO_LIGHT_COLOR
+	var glow_col := OIL_GLOW_COLOR if is_oil else JUGNOO_GLOW_COLOR
+	var dust_col := OIL_DUST_COLOR if is_oil else JUGNOO_DUST_COLOR
+	if _light:
+		_light.light_color = light_col
+	if _glow_material:
+		_glow_material.set_shader_parameter(&"glow_color", glow_col)
+	if _dust:
+		_dust.color = dust_col
 
 func _exit_tree() -> void:
 	if _game:
@@ -165,7 +197,6 @@ func retire() -> void:
 		return
 	carried = false
 	_raised = false
-	_awaiting_exit = false
 	_retire = Retire.FADING
 	_dust.gravity = Vector3(0.0, retire_drift, 0.0)
 
@@ -176,6 +207,8 @@ func _finish_retire() -> void:
 	velocity = Vector3.ZERO
 	visible = false
 	_dust.emitting = false
+	if _fireflies:
+		_fireflies.emitting = false
 	_set_shapes_disabled(true)
 	_update_transforms()
 
@@ -185,6 +218,7 @@ func _unretire() -> void:
 	visible = true
 	_dust.gravity = _dust_gravity
 	_set_shapes_disabled(false)
+	_apply_type()
 
 func _set_shapes_disabled(off: bool) -> void:
 	_body_shape.set_deferred(&"disabled", off)
@@ -210,15 +244,12 @@ func restore_state(state: Dictionary) -> void:
 	var hook_path: NodePath = state.get("hook", NodePath())
 	if not hook_path.is_empty() and has_node(hook_path):
 		carried = false
-		_awaiting_exit = false
 		_hang_on(get_node(hook_path))
 	elif state.get("carried", true):
 		carried = true
-		_awaiting_exit = false
 		_snap_to_hand()
 	else:
 		carried = false
-		_awaiting_exit = false
 		global_position = state.get("position", global_position)
 		reset_physics_interpolation()
 
@@ -226,7 +257,6 @@ func restore_state(state: Dictionary) -> void:
 func respawn_at(point: Vector3) -> void:
 	_release_hook()
 	carried = false
-	_awaiting_exit = true
 	velocity = Vector3.ZERO
 	global_position = Vector3(point.x, point.y, 0.0)
 	reset_physics_interpolation()
@@ -235,7 +265,6 @@ func respawn_at(point: Vector3) -> void:
 func return_to_hand() -> void:
 	_release_hook()
 	carried = true
-	_awaiting_exit = false
 	velocity = Vector3.ZERO
 	_snap_to_hand()
 
@@ -321,11 +350,6 @@ func _simulate_placed(delta: float) -> void:
 	if is_instance_valid(_hook):
 		global_position = _hook.get_hook_point()
 		velocity = Vector3.ZERO
-		# A hook that just stopped (end of its rail) with the child already underneath.
-		if not _awaiting_exit and not _hook.is_moving():
-			for b in _pickup_area.get_overlapping_bodies():
-				if b.is_in_group(&"player"):
-					_on_pickup_body_entered(b)
 		return
 	velocity.x = 0.0
 	velocity.z = 0.0
@@ -372,10 +396,16 @@ func _process(delta: float) -> void:
 	_light.visible = lit
 	_glow.visible = lit
 	_dust.emitting = lit
+	if _fireflies:
+		_fireflies.emitting = lit and not is_oil
 	var alpha := _appear * _retire_fade
 	_sprite.modulate.a = alpha
+	if _jar_sprite:
+		_jar_sprite.modulate.a = alpha
 	if not lit:
 		_sprite.modulate = Color(0.35, 0.35, 0.4, alpha)
+		if _jar_sprite:
+			_jar_sprite.modulate = Color(0.35, 0.35, 0.4, alpha)
 		return
 	_light.omni_range = r * light_range_scale
 	_light.light_energy = light_energy * _flicker * alpha
@@ -383,6 +413,8 @@ func _process(delta: float) -> void:
 	_dust.emission_sphere_radius = r * 0.8
 	if not is_oil:
 		_sprite.modulate = Color(1.0, 1.0, 1.0, alpha)
+		if _jar_sprite:
+			_jar_sprite.modulate = Color(1.0, 1.0, 1.0, alpha)
 	else:
 		var ratio := _game.get_oil_ratio() if _game else 1.0
 		var warmth := clampf(ratio * 1.5, 0.4, 1.0)
@@ -391,34 +423,50 @@ func _process(delta: float) -> void:
 # ── Place / pick up ───────────────────────────────────────────────────────
 
 func _on_place_requested() -> void:
-	if not carried:
+	if is_retired():
 		return
-	carried = false
-	_raised = false
-	_awaiting_exit = true
-	rotation.z = 0.0
-	_sway = 0.0
-	var hook := _game.get_hook_in_reach()
-	if is_instance_valid(hook):
-		_hang_on(hook)
-		return
-	var p := _game.get_player_position()
-	global_position = Vector3(p.x, p.y + 0.6, 0.06)
-	rotation.z = 0.0
-	_sway = 0.0
-	velocity = Vector3.ZERO
-	reset_physics_interpolation()
-	_game.report_lantern_placed(global_position)
+	if carried:
+		carried = false
+		_raised = false
+		rotation.z = 0.0
+		_sway = 0.0
+		var hook := _game.get_hook_in_reach()
+		if is_instance_valid(hook):
+			_hang_on(hook)
+			return
+		var p := _game.get_player_position()
+		global_position = Vector3(p.x, p.y + 0.6, 0.06)
+		rotation.z = 0.0
+		_sway = 0.0
+		velocity = Vector3.ZERO
+		reset_physics_interpolation()
+		_game.report_lantern_placed(global_position)
+	else:
+		if not is_player_in_reach():
+			return
+		if is_instance_valid(_hook) and _hook.is_moving():
+			return   # can't snatch it from a moving cradle
+		if _game and _game.is_playing():
+			carried = true
+			_release_hook()
+			_game.report_lantern_picked_up(self)
 
 func _on_pickup_body_entered(body: Node3D) -> void:
-	if carried or _awaiting_exit or is_retired() or not body.is_in_group(&"player"):
-		return
-	if is_instance_valid(_hook) and _hook.is_moving():
-		return   # can't snatch it from a moving cradle
-	if _game and _game.is_playing():
-		carried = true
-		_release_hook()
-		_game.report_lantern_picked_up(self)
+	if body.is_in_group(&"player"):
+		_player_in_reach = true
+
+func _on_pickup_body_exited(body: Node3D) -> void:
+	if body.is_in_group(&"player"):
+		_player_in_reach = false
+
+func is_player_in_reach() -> bool:
+	if _player_in_reach:
+		return true
+	if is_instance_valid(_pickup_area):
+		for b in _pickup_area.get_overlapping_bodies():
+			if b.is_in_group(&"player"):
+				return true
+	return false
 
 func _hang_on(hook: Node3D) -> void:
 	_hook = hook
@@ -433,7 +481,3 @@ func _release_hook() -> void:
 		_hook = null
 		_game.report_lantern_unhooked(h)
 	_hook = null
-
-func _on_pickup_body_exited(body: Node3D) -> void:
-	if body.is_in_group(&"player"):
-		_awaiting_exit = false

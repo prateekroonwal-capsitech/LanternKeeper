@@ -89,8 +89,8 @@ Located in `game/assets/sprites/single/` and `game/assets/sprites/backgrounds/`.
 | `sprites/single/props/lever_handle.png` | 16 × 80 | `Lever.tscn` → HandlePivot/Handle | Rotates around its bottom (offset (0, 40)). |
 | `sprites/single/props/lantern_plate.png` | 96 × 48 | `LanternPlate.tscn` → Sprite (pixel_size 0.009) | Floor switch (pedestal + cold-blue rune). The lantern sits on `HookPoint` above it. |
 | `sprites/enemies/thread.png` (reused) | 4 × 64 | `Rope.tscn` → Line/Sprite | Stretched to the rope length (pixel_size 1/64 → 1 m per scale unit), tinted brown. |
-| `sprites/single/props/lantern_body.png` | 64 × 96 | `Lantern.tscn` body art | Transparent. Top handle, frame cap, cage bars, and base. |
-| `sprites/single/props/lantern_glow.png` | 64 × 96 | `Lantern.tscn` glass / flame core | Transparent. Bright amber unshaded glass and luminous flame core. |
+| `sprites/single/props/firefly_jar.png` | 64 × 96 | `Lantern.tscn` → JarSprite (`pixel_size` 0.0048) | Transparent glass jar with wire handle. Pivot = top of handle (offset (0, −44)). Jugnoo lantern for World 1. |
+| `sprites/single/fx/firefly_dot.png` | 16 × 16 | `Lantern.tscn` → Fireflies | Soft white dot on transparent, drifting inside the firefly jar. |
 | `sprites/single/props/oil_flask.png` | 64 × 64 | `OilFlask.tscn` → Visual/Sprite (`pixel_size` 0.009) | Transparent, centred pivot. Cold blue. |
 | `sprites/single/props/rock_trap.png` | 192 × 160 | `RockTrap.tscn` → Block/Sprite (`pixel_size` 0.0095) | Boulder on a rope (level 10, encounter 2). From `tools/generate_level_props.py`. |
 | `sprites/single/props/ceiling_slab.png` | 384 × 128 | `CeilingCollapse.tscn` → Block/Sprite (`pixel_size` 0.0158 ≈ 6 m) | Cracked ceiling slab (level 10, encounter 4). |

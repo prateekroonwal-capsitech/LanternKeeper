@@ -18,7 +18,7 @@ extends CharacterBody3D
 ## Receives: input state from GameManager.input; GameManager.is_lantern_carried(),
 ##   get_lantern_handle_position(), is_lantern_raised() (polled);
 ##   GameBus.player_respawned → teleport + respawn animation; GameBus.player_died → death pose;
-##   GameBus.lantern_placed → place pose. find_lantern_spot() is called by GameManager.
+##   GameBus.lantern_placed / lantern_picked_up → place / pickup pose. find_lantern_spot() is called by GameManager.
 ##   set_push_state() is for pushable objects (crates) to drive push / pull.
 ##   attach_to_rope(rope) is called by GameManager when the child grabs a Rope; jump lets go.
 
@@ -114,6 +114,7 @@ func inject_services(registry: Node) -> void:
 	_game.bus.player_respawned.connect(_on_player_respawned)
 	_game.bus.player_died.connect(_on_player_died)
 	_game.bus.lantern_placed.connect(func(_at: Vector3) -> void: _place_timer = place_anim_time)
+	_game.bus.lantern_picked_up.connect(func() -> void: _place_timer = place_anim_time)
 	set_physics_process(true)
 
 ## Crates call this: 1 = pushing, -1 = pulling, 0 = neither.
