@@ -1,28 +1,21 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://ckxqo0revv2q4"]
 
-[ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="1_level"]
+[ext_resource type="Script" uid="uid://jxwc442bi77w" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="1_level"]
 [ext_resource type="Environment" path="res://game/assets/materials/world_environment.tres" id="2_env"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/environment/Backdrop.tscn" id="3_backdrop"]
-[ext_resource type="Script" path="res://game/scripts/controllers/CameraController3D.gd" id="4_camera"]
+[ext_resource type="Script" uid="uid://dbjrw3yrksytm" path="res://game/scripts/controllers/CameraController3D.gd" id="4_camera"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Player.tscn" id="5_player"]
-[ext_resource type="Script" path="res://game/scenes/gameplay/actors/Player.gd" id="6_ex8cw"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Lantern.tscn" id="6_lantern"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="7_platform"]
-[ext_resource type="Script" path="res://game/scenes/gameplay/actors/Lantern.gd" id="8_5vgee"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/GhostPlatform.tscn" id="8_ghost"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="9_kill"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/ExitPortal.tscn" id="10_exit"]
-[ext_resource type="Script" path="res://game/scenes/gameplay/props/Platform.gd" id="10_gx4rj"]
-[ext_resource type="Script" path="res://game/scenes/gameplay/props/GhostPlatform.gd" id="12_7lc6l"]
 [ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/TutorialTrigger.tscn" id="12_hint"]
-[ext_resource type="Script" path="res://game/scenes/gameplay/props/TutorialTrigger.gd" id="14_8r0mo"]
-[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_a.png" id="14_tree_a"]
-[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_b.png" id="15_tree_b"]
-[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_rocks.png" id="16_rocks"]
-[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_grass.png" id="17_grass"]
-[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_post.png" id="18_post"]
-[ext_resource type="Script" path="res://game/scenes/gameplay/props/KillZone.gd" id="21_p4l8b"]
-[ext_resource type="Script" path="res://game/scenes/gameplay/props/ExitPortal.gd" id="23_g2hwo"]
+[ext_resource type="Texture2D" uid="uid://byq4ab1md0mpv" path="res://game/assets/sprites/single/environment/decor_tree_a.png" id="14_tree_a"]
+[ext_resource type="Texture2D" uid="uid://dwef6fpwuvpab" path="res://game/assets/sprites/single/environment/decor_tree_b.png" id="15_tree_b"]
+[ext_resource type="Texture2D" uid="uid://ym5slfojxevd" path="res://game/assets/sprites/single/environment/decor_rocks.png" id="16_rocks"]
+[ext_resource type="Texture2D" uid="uid://ujktso5ka4ya" path="res://game/assets/sprites/single/environment/decor_grass.png" id="17_grass"]
+[ext_resource type="Texture2D" uid="uid://bg06l3myuu46p" path="res://game/assets/sprites/single/environment/decor_post.png" id="18_post"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bie21"]
 size = Vector3(0.4, 0.4, 2)
@@ -84,7 +77,7 @@ spawn_point = NodePath("SpawnPoint")
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=815791299]
 environment = ExtResource("2_env")
 
-[node name="Backdrop" type="Node3D" parent="." unique_id=431319659 instance=ExtResource("3_backdrop")]
+[node name="Backdrop" parent="." unique_id=431319659 instance=ExtResource("3_backdrop")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52, 0, 0)
 
 [node name="Camera" type="Camera3D" parent="." unique_id=2104603610]
@@ -96,48 +89,31 @@ script = ExtResource("4_camera")
 [node name="SpawnPoint" type="Marker3D" parent="." unique_id=580579884]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.05, 0)
 
-[node name="Player" type="CharacterBody3D" parent="." unique_id=726903392 groups=["player"] instance=ExtResource("5_player")]
+[node name="Player" parent="." unique_id=726903392 instance=ExtResource("5_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.05, 0)
-collision_layer = 2
-collision_mask = 5
-axis_lock_linear_z = true
-floor_max_angle = 0.959931
-floor_snap_length = 0.2
-script = ExtResource("6_ex8cw")
 lantern_spot_offsets = PackedFloat32Array(0.8, -0.8, 1.4, -1.4, 0)
 
-[node name="Lantern" type="CharacterBody3D" parent="." unique_id=1049569907 groups=["lantern"] instance=ExtResource("6_lantern")]
+[node name="Lantern" parent="." unique_id=1049569907 instance=ExtResource("6_lantern")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.62, 0.28, 0.3)
-collision_layer = 8
-collision_mask = 5
-axis_lock_linear_z = true
-script = ExtResource("8_5vgee")
 
 [node name="Geometry" type="Node3D" parent="." unique_id=1592835024]
 
-[node name="Start" type="StaticBody3D" parent="Geometry" unique_id=1253236135 instance=ExtResource("7_platform")]
+[node name="Start" parent="Geometry" unique_id=1253236135 instance=ExtResource("7_platform")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, -2, 0)
-collision_mask = 0
-script = ExtResource("10_gx4rj")
 size = Vector2(14, 4)
 
-[node name="Floor" type="StaticBody3D" parent="Geometry" unique_id=209082663 instance=ExtResource("7_platform")]
+[node name="Floor" parent="Geometry" unique_id=209082663 instance=ExtResource("7_platform")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, -2, 0)
-collision_mask = 0
-script = ExtResource("10_gx4rj")
 size = Vector2(28, 4)
 
-[node name="Ceiling" type="StaticBody3D" parent="Geometry" unique_id=356068539 instance=ExtResource("7_platform")]
+[node name="Ceiling" parent="Geometry" unique_id=356068539 instance=ExtResource("7_platform")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.5, 5.5, 0)
-collision_mask = 0
-script = ExtResource("10_gx4rj")
 size = Vector2(15, 5)
 
 [node name="GhostPlatforms" type="Node3D" parent="." unique_id=75951197]
 
-[node name="Bridge" type="Node3D" parent="GhostPlatforms" unique_id=1471444613 instance=ExtResource("8_ghost")]
+[node name="Bridge" parent="GhostPlatforms" unique_id=1471444613 instance=ExtResource("8_ghost")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, -0.2, 0)
-script = ExtResource("12_7lc6l")
 size = Vector2(6, 0.4)
 
 [node name="Segment0" type="StaticBody3D" parent="GhostPlatforms/Bridge" unique_id=1143521605]
@@ -274,9 +250,8 @@ collision_mask = 0
 shape = SubResource("BoxShape3D_xiv3k")
 disabled = true
 
-[node name="GhostWall" type="Node3D" parent="GhostPlatforms" unique_id=43861461 instance=ExtResource("8_ghost")]
+[node name="GhostWall" parent="GhostPlatforms" unique_id=43861461 instance=ExtResource("8_ghost")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.3, 1.5, 0)
-script = ExtResource("12_7lc6l")
 size = Vector2(0.6, 3)
 
 [node name="Segment0" type="StaticBody3D" parent="GhostPlatforms/GhostWall" unique_id=1188855952]
@@ -299,12 +274,8 @@ disabled = true
 
 [node name="Hints" type="Node3D" parent="." unique_id=505347448]
 
-[node name="Hint_place" type="Area3D" parent="Hints" unique_id=465679703 instance=ExtResource("12_hint")]
+[node name="Hint_place" parent="Hints" unique_id=465679703 instance=ExtResource("12_hint")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, 0)
-collision_layer = 0
-collision_mask = 2
-monitorable = false
-script = ExtResource("14_8r0mo")
 hint_id = "place"
 
 [node name="Decor" type="Node3D" parent="." unique_id=836974313]
@@ -339,17 +310,9 @@ offset = Vector2(0, 256)
 alpha_cut = 1
 texture = ExtResource("14_tree_a")
 
-[node name="KillZone" type="Area3D" parent="." unique_id=507883562 instance=ExtResource("9_kill")]
+[node name="KillZone" parent="." unique_id=507883562 instance=ExtResource("9_kill")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, -14, 0)
-collision_layer = 0
-collision_mask = 2
-monitorable = false
-script = ExtResource("21_p4l8b")
 size = Vector3(108, 4, 4)
 
-[node name="ExitPortal" type="Area3D" parent="." unique_id=439778781 instance=ExtResource("10_exit")]
+[node name="ExitPortal" parent="." unique_id=439778781 instance=ExtResource("10_exit")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 0, 0)
-collision_layer = 32
-collision_mask = 2
-monitorable = false
-script = ExtResource("23_g2hwo")

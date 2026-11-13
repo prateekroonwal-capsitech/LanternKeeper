@@ -31,7 +31,7 @@ window/handheld/orientation=4
 
 [editor_plugins]
 
-enabled=PackedStringArray()
+enabled=PackedStringArray("res://addons/level_editor/plugin.cfg")
 
 [gui]
 

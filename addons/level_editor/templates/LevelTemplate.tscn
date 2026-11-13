@@ -1,0 +1,72 @@
+[gd_scene format=3 uid="uid://level_template_001"]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="level"]
+[ext_resource type="Environment" path="res://game/assets/materials/world_environment.tres" id="env"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/environment/Backdrop.tscn" id="backdrop"]
+[ext_resource type="Script" path="res://game/scripts/controllers/CameraController3D.gd" id="camera"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Player.tscn" id="player"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Lantern.tscn" id="lantern"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="platform"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="kill"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/ExitPortal.tscn" id="exit"]
+
+[node name="LevelTemplate" type="Node3D" node_paths=PackedStringArray("spawn_point")]
+script = ExtResource("level")
+level_id = "w1_01"
+title_key = "LEVEL_W1_01"
+spawn_point = NodePath("SpawnPoint")
+lantern_type = 0
+dark_meter_enabled = true
+dark_meter_time = 5.0
+dark_meter_refill_rate = 2.0
+kill_y = -12.0
+respawn_delay = 0.25
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("env")
+
+[node name="Backdrop" parent="." instance=ExtResource("backdrop")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -56, 0, 0)
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.2, 14)
+current = true
+fov = 45.0
+script = ExtResource("camera")
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.05, 0)
+
+[node name="Player" parent="." instance=ExtResource("player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.05, 0)
+
+[node name="Lantern" parent="." instance=ExtResource("lantern")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.865, 0.6, 0.06)
+base_radius = 4.5
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="WallLeft" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 5, 0)
+size = Vector2(2, 18)
+
+[node name="Floor" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, -2, 0)
+size = Vector2(54, 4)
+
+[node name="WallRight" parent="Geometry" instance=ExtResource("platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41, 5, 0)
+size = Vector2(2, 18)
+
+[node name="GhostPlatforms" type="Node3D" parent="."]
+
+[node name="Decor" type="Node3D" parent="."]
+
+[node name="Hints" type="Node3D" parent="."]
+
+[node name="KillZone" parent="." instance=ExtResource("kill")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, -14, 0)
+size = Vector3(98, 4, 4)
+
+[node name="ExitPortal" parent="." instance=ExtResource("exit")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0, 0)

@@ -1,0 +1,106 @@
+[gd_scene format=3 uid="uid://c6level_dock_001"]
+
+[ext_resource type="Script" path="res://addons/level_editor/level_editor_dock.gd" id="1_dock"]
+
+[node name="LevelEditorDock" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+script = ExtResource("1_dock")
+
+[node name="Header" type="Label" parent="."]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Level Editor"
+
+[node name="HSeparator1" type="HSeparator" parent="."]
+layout_mode = 2
+
+[node name="NewLevelSection" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SectionTitle" type="Label" parent="NewLevelSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Create New Level"
+
+[node name="WorldRow" type="HBoxContainer" parent="NewLevelSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WorldLabel" type="Label" parent="NewLevelSection/WorldRow"]
+layout_mode = 2
+text = "Target World:"
+
+[node name="WorldOption" type="OptionButton" parent="NewLevelSection/WorldRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SuggestionRow" type="HBoxContainer" parent="NewLevelSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SuggestionLabel" type="Label" parent="NewLevelSection/SuggestionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Next free slot: W2_01"
+
+[node name="NewLevelButton" type="Button" parent="NewLevelSection/SuggestionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "New Level"
+
+[node name="CreatorStatusLabel" type="Label" parent="NewLevelSection"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="."]
+layout_mode = 2
+
+[node name="CatalogSection" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SectionTitle" type="Label" parent="CatalogSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Catalog from Folders"
+
+[node name="Actions" type="HBoxContainer" parent="CatalogSection"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="RebuildButton" type="Button" parent="CatalogSection/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Rebuild Catalog"
+
+[node name="AutoRebuildCheck" type="CheckBox" parent="CatalogSection/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+text = "Auto-rebuild on save"
+
+[node name="StatusLabel" type="Label" parent="CatalogSection"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Scanning levels..."
+autowrap_mode = 2
+
+[node name="WarningLabel" type="Label" parent="CatalogSection"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+text = "No warnings."
+autowrap_mode = 2
+
+[node name="HSeparator3" type="HSeparator" parent="."]
+layout_mode = 2
