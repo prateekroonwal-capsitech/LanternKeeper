@@ -1,73 +1,1250 @@
-[gd_scene format=3 uid="uid://level_template_001"]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="level"]
-[ext_resource type="Environment" path="res://game/assets/materials/world_environment.tres" id="env"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/environment/Backdrop.tscn" id="backdrop"]
-[ext_resource type="Script" path="res://game/scripts/controllers/CameraController3D.gd" id="camera"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Player.tscn" id="player"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Lantern.tscn" id="lantern"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="platform"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="kill"]
-[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/ExitPortal.tscn" id="exit"]
+[ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="1_cahrd"]
+[ext_resource type="Environment" path="res://game/assets/materials/world2_environment.tres" id="2_qvffp"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/environment/Backdrop_World2.tscn" id="3_hf6em"]
+[ext_resource type="Script" path="res://game/scripts/controllers/CameraController3D.gd" id="4_3lgug"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Player.tscn" id="5_w5axe"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/actors/Lantern.tscn" id="6_cwh6r"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Platform.tscn" id="7_wgsm2"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/GhostPlatform.tscn" id="8_214o0"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/lair_crack.png" id="9_y3ohr"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_a.png" id="10_vy1je"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_rocks.png" id="11_64u2a"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_tree_b.png" id="12_2kabp"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/single/environment/decor_grass.png" id="13_yg845"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/OilFlask.tscn" id="14_j5y4k"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Shrine.tscn" id="15_fldvj"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/CollapsingPlatform.tscn" id="16_m0am3"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/LanternPlate.tscn" id="17_e85d6"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Stalker.tscn" id="18_bcrp4"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Gate.tscn" id="19_b577s"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/Lever.tscn" id="20_vj77p"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/WakeTrigger.tscn" id="21_m846i"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/enemies/Crawler.tscn" id="22_soxqy"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/ExitPortal.tscn" id="23_6b1gb"]
+[ext_resource type="PackedScene" path="res://game/scenes/gameplay/props/KillZone.tscn" id="24_17dx3"]
 
-[node name="W2_01" type="Node3D" node_paths=PackedStringArray("spawn_point")]
-script = ExtResource("level")
+[sub_resource type="BoxShape3D" id="BoxShape3D_mc2f8"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_t3fwr"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3bu2g"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_g1k33"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7whu1"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_h61d0"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dd2u2"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ukosm"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_aqivb"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_viexw"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6yyi2"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_v8rxl"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_n07fu"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_csddj"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kvcj3"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ikjql"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hmkmd"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qpbc5"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8voba"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_u36wh"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kwx7p"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_28nle"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ygxq8"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_efoti"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mi0bi"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_84o4e"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_syhyt"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_magml"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cx1n3"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bam5q"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_umuon"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lpxka"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vyu1y"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_y7h0o"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6kw3j"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_x58ii"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_42dtv"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kfs5q"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3idqg"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2qsbl"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dawnu"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_r252t"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4y1di"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o8i2x"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_d3li0"]
+size = Vector3(0.4, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_p7j5s"]
+size = Vector3(0.3888889, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_t5356"]
+size = Vector3(0.3888889, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_v3scp"]
+size = Vector3(0.3888889, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pt3gi"]
+size = Vector3(0.3888889, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mwp5j"]
+size = Vector3(0.3888889, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wpria"]
+size = Vector3(0.3888889, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ioxbq"]
+size = Vector3(0.3888889, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cfk46"]
+size = Vector3(0.3888889, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nbo1c"]
+size = Vector3(0.3888889, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lfv78"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ko6lo"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mh1wo"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_svcsx"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ve203"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8lv1y"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o7ajj"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_eig0r"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dqhc2"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rp2tm"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fetd1"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cy3lo"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tajua"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7ihcw"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3gjop"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1l6fo"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6kwiy"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kli45"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jb13s"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_p3d0q"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_68lh4"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_v6ury"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yycdq"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1thgn"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lf7eu"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wd2yi"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_xluia"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mmm4s"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1omg3"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_y37ji"]
+size = Vector3(0.41666666, 0.4, 2)
+
+[node name="W2_01" type="Node3D" unique_id=1102605156 node_paths=PackedStringArray("spawn_point")]
+script = ExtResource("1_cahrd")
 level_id = "w2_01"
 world = 2
 title_key = "LEVEL_W2_01"
 spawn_point = NodePath("SpawnPoint")
-lantern_type = 0
-dark_meter_enabled = true
-dark_meter_time = 5.0
-dark_meter_refill_rate = 2.0
-kill_y = -12.0
-respawn_delay = 0.25
+lantern_type = 1
+max_oil = 40.0
+start_oil = 25.0
+dark_meter_time = 4.5
+kill_y = -10.0
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = ExtResource("env")
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2053123235]
+environment = ExtResource("2_qvffp")
 
-[node name="Backdrop" parent="." instance=ExtResource("backdrop")]
+[node name="Backdrop" parent="." unique_id=1736120840 instance=ExtResource("3_hf6em")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -56, 0, 0)
 
-[node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.2, 14)
+[node name="Camera" type="Camera3D" parent="." unique_id=470399096]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2.2, 14)
 current = true
 fov = 45.0
-script = ExtResource("camera")
+script = ExtResource("4_3lgug")
 
-[node name="SpawnPoint" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.05, 0)
+[node name="SpawnPoint" type="Marker3D" parent="." unique_id=1754939282]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.05, 0)
 
-[node name="Player" parent="." instance=ExtResource("player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.05, 0)
+[node name="Player" parent="." unique_id=227261096 instance=ExtResource("5_w5axe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.05, 0)
+bend_hand_path = PackedVector2Array(0.135, 0.594, 0.234, 0.486, 0.396, 0.423, 0.234, 0.486, 0.135, 0.594)
+feet_hand_path = PackedVector2Array(0.135, 0.594, 0.108, 0.486, 0.09, 0.423, 0.108, 0.486, 0.135, 0.594)
+hook_hand_path = PackedVector2Array(0.135, 0.594, 0.198, 0.828, 0.306, 1.062, 0.198, 0.828, 0.135, 0.594)
+lantern_spot_offsets = PackedFloat32Array(0.8, -0.8, 1.4, -1.4, 0)
 
-[node name="Lantern" parent="." instance=ExtResource("lantern")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.865, 0.6, 0.06)
-base_radius = 4.5
+[node name="Lantern" parent="." unique_id=1731876950 instance=ExtResource("6_cwh6r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.865, 0.6, 0.06)
 
-[node name="Geometry" type="Node3D" parent="."]
+[node name="Geometry" type="Node3D" parent="." unique_id=799459284]
 
-[node name="WallLeft" parent="Geometry" instance=ExtResource("platform")]
+[node name="WallLeft" parent="Geometry" unique_id=247533194 instance=ExtResource("7_wgsm2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 5, 0)
 size = Vector2(2, 18)
 
-[node name="Floor" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, -2, 0)
-size = Vector2(54, 4)
+[node name="FloorStart" parent="Geometry" unique_id=559743444 instance=ExtResource("7_wgsm2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, -2, 0)
+size = Vector2(22, 4)
 
-[node name="WallRight" parent="Geometry" instance=ExtResource("platform")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41, 5, 0)
+[node name="FloorMid" parent="Geometry" unique_id=2046917893 instance=ExtResource("7_wgsm2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66, -2, 0)
+size = Vector2(44, 4)
+
+[node name="DoorCeiling" parent="Geometry" unique_id=1705832717 instance=ExtResource("7_wgsm2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68, 6, 0)
+size = Vector2(4, 6)
+
+[node name="FloorEnd" parent="Geometry" unique_id=1578417538 instance=ExtResource("7_wgsm2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 118.5, -2, 0)
+size = Vector2(13, 4)
+
+[node name="WallRight" parent="Geometry" unique_id=200544737 instance=ExtResource("7_wgsm2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 126, 5, 0)
 size = Vector2(2, 18)
 
-[node name="GhostPlatforms" type="Node3D" parent="."]
+[node name="GhostPlatforms" type="Node3D" parent="." unique_id=1033592050]
 
-[node name="Decor" type="Node3D" parent="."]
+[node name="BridgeGhost1" parent="GhostPlatforms" unique_id=514961065 instance=ExtResource("8_214o0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, -0.2, 0)
+size = Vector2(6, 0.4)
 
-[node name="Hints" type="Node3D" parent="."]
+[node name="Segment0" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=1181008080]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
 
-[node name="KillZone" parent="." instance=ExtResource("kill")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, -14, 0)
-size = Vector3(98, 4, 4)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment0" unique_id=1856438564]
+shape = SubResource("BoxShape3D_mc2f8")
+disabled = true
 
-[node name="ExitPortal" parent="." instance=ExtResource("exit")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0, 0)
+[node name="Segment1" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=935968506]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment1" unique_id=2077750679]
+shape = SubResource("BoxShape3D_t3fwr")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=62616954]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment2" unique_id=19746514]
+shape = SubResource("BoxShape3D_3bu2g")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=920164885]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment3" unique_id=1122395167]
+shape = SubResource("BoxShape3D_g1k33")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=61266467]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment4" unique_id=249328235]
+shape = SubResource("BoxShape3D_7whu1")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=2040737931]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment5" unique_id=1290413951]
+shape = SubResource("BoxShape3D_h61d0")
+disabled = true
+
+[node name="Segment6" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=1006709736]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment6" unique_id=1623267412]
+shape = SubResource("BoxShape3D_dd2u2")
+disabled = true
+
+[node name="Segment7" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=1128426145]
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment7" unique_id=2058779598]
+shape = SubResource("BoxShape3D_ukosm")
+disabled = true
+
+[node name="Segment8" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=1230883554]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment8" unique_id=243568067]
+shape = SubResource("BoxShape3D_aqivb")
+disabled = true
+
+[node name="Segment9" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=215195183]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment9" unique_id=795252202]
+shape = SubResource("BoxShape3D_viexw")
+disabled = true
+
+[node name="Segment10" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=1435809867]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment10" unique_id=659823476]
+shape = SubResource("BoxShape3D_6yyi2")
+disabled = true
+
+[node name="Segment11" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=1833843639]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment11" unique_id=1125280720]
+shape = SubResource("BoxShape3D_v8rxl")
+disabled = true
+
+[node name="Segment12" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=33970030]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment12" unique_id=948611109]
+shape = SubResource("BoxShape3D_n07fu")
+disabled = true
+
+[node name="Segment13" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=1201441250]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment13" unique_id=1692728427]
+shape = SubResource("BoxShape3D_csddj")
+disabled = true
+
+[node name="Segment14" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost1" unique_id=256861578]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost1/Segment14" unique_id=9053298]
+shape = SubResource("BoxShape3D_kvcj3")
+disabled = true
+
+[node name="BridgeGhost2" parent="GhostPlatforms" unique_id=911153232 instance=ExtResource("8_214o0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -0.2, 0)
+size = Vector2(6, 0.4)
+
+[node name="Segment0" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=1342496823]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment0" unique_id=1017116106]
+shape = SubResource("BoxShape3D_ikjql")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=1584969404]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment1" unique_id=1819311807]
+shape = SubResource("BoxShape3D_hmkmd")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=1622527872]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment2" unique_id=1097654597]
+shape = SubResource("BoxShape3D_qpbc5")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=491785458]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment3" unique_id=1173283247]
+shape = SubResource("BoxShape3D_8voba")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=2112770600]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment4" unique_id=2030563660]
+shape = SubResource("BoxShape3D_u36wh")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=2069677030]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment5" unique_id=461847473]
+shape = SubResource("BoxShape3D_kwx7p")
+disabled = true
+
+[node name="Segment6" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=893334160]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment6" unique_id=783697229]
+shape = SubResource("BoxShape3D_28nle")
+disabled = true
+
+[node name="Segment7" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=1413695252]
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment7" unique_id=266666009]
+shape = SubResource("BoxShape3D_ygxq8")
+disabled = true
+
+[node name="Segment8" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=1385782918]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment8" unique_id=1662273899]
+shape = SubResource("BoxShape3D_efoti")
+disabled = true
+
+[node name="Segment9" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=528867581]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment9" unique_id=1143760601]
+shape = SubResource("BoxShape3D_mi0bi")
+disabled = true
+
+[node name="Segment10" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=1896429284]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment10" unique_id=1269445197]
+shape = SubResource("BoxShape3D_84o4e")
+disabled = true
+
+[node name="Segment11" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=975368387]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment11" unique_id=17184570]
+shape = SubResource("BoxShape3D_syhyt")
+disabled = true
+
+[node name="Segment12" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=2140007885]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment12" unique_id=1379890380]
+shape = SubResource("BoxShape3D_magml")
+disabled = true
+
+[node name="Segment13" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=998291806]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment13" unique_id=989327364]
+shape = SubResource("BoxShape3D_cx1n3")
+disabled = true
+
+[node name="Segment14" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost2" unique_id=1612454928]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost2/Segment14" unique_id=1579870073]
+shape = SubResource("BoxShape3D_bam5q")
+disabled = true
+
+[node name="BridgeGhost3" parent="GhostPlatforms" unique_id=473975665 instance=ExtResource("8_214o0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.5, -0.2, 0)
+size = Vector2(6, 0.4)
+
+[node name="Segment0" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=2005135541]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment0" unique_id=1976125346]
+shape = SubResource("BoxShape3D_umuon")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=1155656203]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment1" unique_id=1202580809]
+shape = SubResource("BoxShape3D_lpxka")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=1983691133]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment2" unique_id=743778686]
+shape = SubResource("BoxShape3D_vyu1y")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=619022612]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment3" unique_id=149324562]
+shape = SubResource("BoxShape3D_y7h0o")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=169650863]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment4" unique_id=885994266]
+shape = SubResource("BoxShape3D_6kw3j")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=182201170]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment5" unique_id=135593060]
+shape = SubResource("BoxShape3D_x58ii")
+disabled = true
+
+[node name="Segment6" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=2019897118]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment6" unique_id=1779746707]
+shape = SubResource("BoxShape3D_42dtv")
+disabled = true
+
+[node name="Segment7" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=291707478]
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment7" unique_id=368911703]
+shape = SubResource("BoxShape3D_kfs5q")
+disabled = true
+
+[node name="Segment8" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=214825413]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment8" unique_id=383427954]
+shape = SubResource("BoxShape3D_3idqg")
+disabled = true
+
+[node name="Segment9" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=1557790042]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment9" unique_id=814250212]
+shape = SubResource("BoxShape3D_2qsbl")
+disabled = true
+
+[node name="Segment10" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=595353225]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment10" unique_id=1180952114]
+shape = SubResource("BoxShape3D_dawnu")
+disabled = true
+
+[node name="Segment11" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=1558251789]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment11" unique_id=1298088263]
+shape = SubResource("BoxShape3D_r252t")
+disabled = true
+
+[node name="Segment12" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=1567182153]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment12" unique_id=2017147037]
+shape = SubResource("BoxShape3D_4y1di")
+disabled = true
+
+[node name="Segment13" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=261960110]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment13" unique_id=1030766946]
+shape = SubResource("BoxShape3D_o8i2x")
+disabled = true
+
+[node name="Segment14" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost3" unique_id=726519584]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost3/Segment14" unique_id=509733263]
+shape = SubResource("BoxShape3D_d3li0")
+disabled = true
+
+[node name="BridgeGhost4" parent="GhostPlatforms" unique_id=1473757033 instance=ExtResource("8_214o0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.25, -0.2, 0)
+size = Vector2(3.5, 0.4)
+
+[node name="Segment0" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost4" unique_id=1606119528]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5555556, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost4/Segment0" unique_id=1751783510]
+shape = SubResource("BoxShape3D_p7j5s")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost4" unique_id=1034178146]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1666666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost4/Segment1" unique_id=683808540]
+shape = SubResource("BoxShape3D_t5356")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost4" unique_id=466119489]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7777778, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost4/Segment2" unique_id=1561325051]
+shape = SubResource("BoxShape3D_v3scp")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost4" unique_id=1279212813]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3888889, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost4/Segment3" unique_id=1211163884]
+shape = SubResource("BoxShape3D_pt3gi")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost4" unique_id=823133092]
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost4/Segment4" unique_id=1208398351]
+shape = SubResource("BoxShape3D_mwp5j")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost4" unique_id=822442929]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3888889, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost4/Segment5" unique_id=1357923623]
+shape = SubResource("BoxShape3D_wpria")
+disabled = true
+
+[node name="Segment6" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost4" unique_id=352309431]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7777778, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost4/Segment6" unique_id=1755719759]
+shape = SubResource("BoxShape3D_ioxbq")
+disabled = true
+
+[node name="Segment7" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost4" unique_id=1464629599]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1666666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost4/Segment7" unique_id=254140795]
+shape = SubResource("BoxShape3D_cfk46")
+disabled = true
+
+[node name="Segment8" type="StaticBody3D" parent="GhostPlatforms/BridgeGhost4" unique_id=1033180943]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5555556, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/BridgeGhost4/Segment8" unique_id=2033308103]
+shape = SubResource("BoxShape3D_nbo1c")
+disabled = true
+
+[node name="Stone1" parent="GhostPlatforms" unique_id=902457847 instance=ExtResource("8_214o0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90.75, 0.3, 0)
+size = Vector2(2.5, 0.4)
+
+[node name="Segment0" type="StaticBody3D" parent="GhostPlatforms/Stone1" unique_id=1241072311]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone1/Segment0" unique_id=1971531779]
+shape = SubResource("BoxShape3D_lfv78")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="GhostPlatforms/Stone1" unique_id=576344531]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone1/Segment1" unique_id=540163809]
+shape = SubResource("BoxShape3D_ko6lo")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="GhostPlatforms/Stone1" unique_id=1462862928]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone1/Segment2" unique_id=539198233]
+shape = SubResource("BoxShape3D_mh1wo")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="GhostPlatforms/Stone1" unique_id=1199569415]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone1/Segment3" unique_id=118862420]
+shape = SubResource("BoxShape3D_svcsx")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="GhostPlatforms/Stone1" unique_id=1571230041]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone1/Segment4" unique_id=1363688139]
+shape = SubResource("BoxShape3D_ve203")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="GhostPlatforms/Stone1" unique_id=956463987]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone1/Segment5" unique_id=1845418321]
+shape = SubResource("BoxShape3D_8lv1y")
+disabled = true
+
+[node name="Stone2" parent="GhostPlatforms" unique_id=2140901850 instance=ExtResource("8_214o0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 95.25, 1.3, 0)
+size = Vector2(2.5, 0.4)
+
+[node name="Segment0" type="StaticBody3D" parent="GhostPlatforms/Stone2" unique_id=531940227]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone2/Segment0" unique_id=1365305009]
+shape = SubResource("BoxShape3D_o7ajj")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="GhostPlatforms/Stone2" unique_id=1726102485]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone2/Segment1" unique_id=227122563]
+shape = SubResource("BoxShape3D_eig0r")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="GhostPlatforms/Stone2" unique_id=1533254003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone2/Segment2" unique_id=991070690]
+shape = SubResource("BoxShape3D_dqhc2")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="GhostPlatforms/Stone2" unique_id=1315336849]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone2/Segment3" unique_id=972026274]
+shape = SubResource("BoxShape3D_rp2tm")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="GhostPlatforms/Stone2" unique_id=767320016]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone2/Segment4" unique_id=1605531199]
+shape = SubResource("BoxShape3D_fetd1")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="GhostPlatforms/Stone2" unique_id=655453635]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone2/Segment5" unique_id=737209969]
+shape = SubResource("BoxShape3D_cy3lo")
+disabled = true
+
+[node name="Stone3" parent="GhostPlatforms" unique_id=80715392 instance=ExtResource("8_214o0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 99.75, 0.8, 0)
+size = Vector2(2.5, 0.4)
+
+[node name="Segment0" type="StaticBody3D" parent="GhostPlatforms/Stone3" unique_id=896271843]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone3/Segment0" unique_id=2056504786]
+shape = SubResource("BoxShape3D_tajua")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="GhostPlatforms/Stone3" unique_id=1774413091]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone3/Segment1" unique_id=2099099113]
+shape = SubResource("BoxShape3D_7ihcw")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="GhostPlatforms/Stone3" unique_id=2028736085]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone3/Segment2" unique_id=535306521]
+shape = SubResource("BoxShape3D_3gjop")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="GhostPlatforms/Stone3" unique_id=648517292]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone3/Segment3" unique_id=2060149669]
+shape = SubResource("BoxShape3D_1l6fo")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="GhostPlatforms/Stone3" unique_id=517888746]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone3/Segment4" unique_id=377263045]
+shape = SubResource("BoxShape3D_6kwiy")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="GhostPlatforms/Stone3" unique_id=255513025]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone3/Segment5" unique_id=1669618562]
+shape = SubResource("BoxShape3D_kli45")
+disabled = true
+
+[node name="Stone4" parent="GhostPlatforms" unique_id=1770032416 instance=ExtResource("8_214o0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 104.25, 1.8, 0)
+size = Vector2(2.5, 0.4)
+
+[node name="Segment0" type="StaticBody3D" parent="GhostPlatforms/Stone4" unique_id=1498285433]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone4/Segment0" unique_id=403221244]
+shape = SubResource("BoxShape3D_jb13s")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="GhostPlatforms/Stone4" unique_id=925511592]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone4/Segment1" unique_id=1928346617]
+shape = SubResource("BoxShape3D_p3d0q")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="GhostPlatforms/Stone4" unique_id=575778369]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone4/Segment2" unique_id=1091908912]
+shape = SubResource("BoxShape3D_68lh4")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="GhostPlatforms/Stone4" unique_id=384562262]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone4/Segment3" unique_id=341523275]
+shape = SubResource("BoxShape3D_v6ury")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="GhostPlatforms/Stone4" unique_id=626213132]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone4/Segment4" unique_id=2043710293]
+shape = SubResource("BoxShape3D_yycdq")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="GhostPlatforms/Stone4" unique_id=1117267700]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone4/Segment5" unique_id=1640740357]
+shape = SubResource("BoxShape3D_1thgn")
+disabled = true
+
+[node name="Stone5" parent="GhostPlatforms" unique_id=1816595942 instance=ExtResource("8_214o0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 108.75, 0.8, 0)
+size = Vector2(2.5, 0.4)
+
+[node name="Segment0" type="StaticBody3D" parent="GhostPlatforms/Stone5" unique_id=358590163]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone5/Segment0" unique_id=1987247126]
+shape = SubResource("BoxShape3D_lf7eu")
+disabled = true
+
+[node name="Segment1" type="StaticBody3D" parent="GhostPlatforms/Stone5" unique_id=1484552959]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone5/Segment1" unique_id=300992201]
+shape = SubResource("BoxShape3D_wd2yi")
+disabled = true
+
+[node name="Segment2" type="StaticBody3D" parent="GhostPlatforms/Stone5" unique_id=232403851]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone5/Segment2" unique_id=904004075]
+shape = SubResource("BoxShape3D_xluia")
+disabled = true
+
+[node name="Segment3" type="StaticBody3D" parent="GhostPlatforms/Stone5" unique_id=335813464]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.20833333, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone5/Segment3" unique_id=1888772926]
+shape = SubResource("BoxShape3D_mmm4s")
+disabled = true
+
+[node name="Segment4" type="StaticBody3D" parent="GhostPlatforms/Stone5" unique_id=365406928]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.625, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone5/Segment4" unique_id=63530361]
+shape = SubResource("BoxShape3D_1omg3")
+disabled = true
+
+[node name="Segment5" type="StaticBody3D" parent="GhostPlatforms/Stone5" unique_id=500503938]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0416666, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GhostPlatforms/Stone5/Segment5" unique_id=1839988006]
+shape = SubResource("BoxShape3D_y37ji")
+disabled = true
+
+[node name="Decor" type="Node3D" parent="." unique_id=991816290]
+
+[node name="StalkerAlcove" type="Sprite3D" parent="Decor" unique_id=387261049]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.5, 0, -0.8)
+offset = Vector2(0, 80)
+pixel_size = 0.014
+alpha_cut = 1
+texture = ExtResource("9_y3ohr")
+
+[node name="CrawlerACrack" type="Sprite3D" parent="Decor" unique_id=1217980621]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 115, 0, -0.8)
+offset = Vector2(0, 80)
+pixel_size = 0.012
+alpha_cut = 1
+texture = ExtResource("9_y3ohr")
+
+[node name="CrawlerBCrack" type="Sprite3D" parent="Decor" unique_id=1747688748]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 123, 0, -0.8)
+offset = Vector2(0, 80)
+pixel_size = 0.012
+alpha_cut = 1
+texture = ExtResource("9_y3ohr")
+
+[node name="tree_1" type="Sprite3D" parent="Decor" unique_id=819324412]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, -0.8)
+offset = Vector2(0, 256)
+alpha_cut = 1
+texture = ExtResource("10_vy1je")
+
+[node name="rocks_1" type="Sprite3D" parent="Decor" unique_id=937368215]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 0, -0.8)
+offset = Vector2(0, 48)
+alpha_cut = 1
+texture = ExtResource("11_64u2a")
+
+[node name="tree_2" type="Sprite3D" parent="Decor" unique_id=343049663]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82, 0, -0.8)
+offset = Vector2(0, 192)
+alpha_cut = 1
+texture = ExtResource("12_2kabp")
+
+[node name="grass_1" type="Sprite3D" parent="Decor" unique_id=943034782]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 116, 0, -0.8)
+offset = Vector2(0, 24)
+alpha_cut = 1
+texture = ExtResource("13_yg845")
+
+[node name="Hints" type="Node3D" parent="." unique_id=12131626]
+
+[node name="FlaskStart" parent="." unique_id=841334300 instance=ExtResource("14_j5y4k")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.5, 0)
+
+[node name="Shrine1" parent="." unique_id=1827926191 instance=ExtResource("15_fldvj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+
+[node name="BridgePlank1" parent="." unique_id=583859220 instance=ExtResource("16_m0am3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, -0.2, 0)
+
+[node name="BridgePlank2" parent="." unique_id=371633543 instance=ExtResource("16_m0am3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.5, -0.2, 0)
+
+[node name="BridgePlank3" parent="." unique_id=1605312835 instance=ExtResource("16_m0am3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, -0.2, 0)
+
+[node name="BridgePlank4" parent="." unique_id=953970049 instance=ExtResource("16_m0am3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39, -0.2, 0)
+
+[node name="ShrineBridge" parent="." unique_id=340788474 instance=ExtResource("15_fldvj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 0, 0)
+
+[node name="Switch" parent="." unique_id=433437177 instance=ExtResource("17_e85d6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 0, 0)
+hook_id = &"w2a_switch"
+wake_group_on_hang = &"w2a_stalk"
+lever_id = &"w2a_lever"
+travel_offset = Vector3(23.5, 0, 0)
+
+[node name="Stalker" parent="." unique_id=517265112 instance=ExtResource("18_bcrp4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.5, 0, -0.6)
+wake_group = &"w2a_stalk"
+
+[node name="Door" parent="." unique_id=1595115829 instance=ExtResource("19_b577s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68, 0, 0)
+hook_id = &"w2a_switch"
+close_time = 0.4
+close_delay = 0.4
+
+[node name="Shrine2" parent="." unique_id=1443252006 instance=ExtResource("15_fldvj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 72, 0, 0)
+sanctuary_radius = 2.8
+
+[node name="Lever" parent="." unique_id=1609468648 instance=ExtResource("20_vj77p")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 75, 0, 0)
+lever_id = &"w2a_lever"
+
+[node name="FlaskStone3" parent="." unique_id=150150244 instance=ExtResource("14_j5y4k")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 99.75, 1.5, 0)
+
+[node name="WakePack" parent="." unique_id=1875368617 instance=ExtResource("21_m846i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90.75, 1.5, 0)
+wake_group = &"w2a_pack"
+
+[node name="CrawlerA" parent="." unique_id=418780359 instance=ExtResource("22_soxqy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 115, -0.6, 0)
+wake_group = &"w2a_pack"
+emerge_offset = Vector3(0, 0.65, 0)
+
+[node name="CrawlerB" parent="." unique_id=1081727235 instance=ExtResource("22_soxqy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 123, -0.6, 0)
+wake_group = &"w2a_pack"
+emerge_offset = Vector3(0, 0.65, 0)
+
+[node name="ExitPortal" parent="." unique_id=1972755496 instance=ExtResource("23_6b1gb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 120, 0, 0)
+
+[node name="KillZone" parent="." unique_id=1341265843 instance=ExtResource("24_17dx3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.5, -14, 0)
+size = Vector3(183, 4, 4)

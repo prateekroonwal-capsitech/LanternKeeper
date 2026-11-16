@@ -1,106 +1,363 @@
-[gd_scene format=3 uid="uid://c6level_dock_001"]
+[gd_scene format=3 uid="uid://dgfmiyphi1phh"]
 
-[ext_resource type="Script" path="res://addons/level_editor/level_editor_dock.gd" id="1_dock"]
+[ext_resource type="Script" uid="uid://2u6ew3c7uw11" path="res://addons/level_editor/level_editor_dock.gd" id="1_dock"]
 
-[node name="LevelEditorDock" type="VBoxContainer"]
+[node name="LevelEditorDock" type="VBoxContainer" unique_id=682596947]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 6
 script = ExtResource("1_dock")
 
-[node name="Header" type="Label" parent="."]
+[node name="Header" type="Label" parent="." unique_id=1145725634]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Level Editor"
 
-[node name="HSeparator1" type="HSeparator" parent="."]
+[node name="Tabs" type="TabContainer" parent="." unique_id=1331810220]
 layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
 
-[node name="NewLevelSection" type="VBoxContainer" parent="."]
+[node name="Levels" type="ScrollContainer" parent="Tabs" unique_id=1519217900]
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 0
+
+[node name="Body" type="VBoxContainer" parent="Tabs/Levels" unique_id=1647135770]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="NewLevelSection" type="VBoxContainer" parent="Tabs/Levels/Body" unique_id=814821030]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="SectionTitle" type="Label" parent="NewLevelSection"]
+[node name="SectionTitle" type="Label" parent="Tabs/Levels/Body/NewLevelSection" unique_id=102652419]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Create New Level"
 
-[node name="WorldRow" type="HBoxContainer" parent="NewLevelSection"]
+[node name="WorldRow" type="HBoxContainer" parent="Tabs/Levels/Body/NewLevelSection" unique_id=1820196676]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="WorldLabel" type="Label" parent="NewLevelSection/WorldRow"]
+[node name="WorldLabel" type="Label" parent="Tabs/Levels/Body/NewLevelSection/WorldRow" unique_id=1972335867]
 layout_mode = 2
 text = "Target World:"
 
-[node name="WorldOption" type="OptionButton" parent="NewLevelSection/WorldRow"]
+[node name="WorldOption" type="OptionButton" parent="Tabs/Levels/Body/NewLevelSection/WorldRow" unique_id=1718277327]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+selected = 0
+item_count = 4
+popup/item_0/text = "World 1: Light"
+popup/item_0/id = 1
+popup/item_1/text = "World 2: Oil"
+popup/item_1/id = 2
+popup/item_2/text = "World 3: Shadows"
+popup/item_2/id = 3
+popup/item_3/text = "World 4: Mirrors"
+popup/item_3/id = 4
 
-[node name="SuggestionRow" type="HBoxContainer" parent="NewLevelSection"]
+[node name="SuggestionRow" type="HBoxContainer" parent="Tabs/Levels/Body/NewLevelSection" unique_id=1257096871]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="SuggestionLabel" type="Label" parent="NewLevelSection/SuggestionRow"]
+[node name="SuggestionLabel" type="Label" parent="Tabs/Levels/Body/NewLevelSection/SuggestionRow" unique_id=514636797]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Next free slot: W2_01"
+text = "World 1 is full (all slots taken)"
 
-[node name="NewLevelButton" type="Button" parent="NewLevelSection/SuggestionRow"]
+[node name="NewLevelButton" type="Button" parent="Tabs/Levels/Body/NewLevelSection/SuggestionRow" unique_id=1821300341]
 unique_name_in_owner = true
 layout_mode = 2
-text = "New Level"
+disabled = true
+text = "World Full"
 
-[node name="CreatorStatusLabel" type="Label" parent="NewLevelSection"]
+[node name="CreatorStatusLabel" type="Label" parent="Tabs/Levels/Body/NewLevelSection" unique_id=948553588]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="HSeparator2" type="HSeparator" parent="."]
+[node name="HSeparator" type="HSeparator" parent="Tabs/Levels/Body" unique_id=747857385]
 layout_mode = 2
 
-[node name="CatalogSection" type="VBoxContainer" parent="."]
+[node name="CatalogSection" type="VBoxContainer" parent="Tabs/Levels/Body" unique_id=188188985]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="SectionTitle" type="Label" parent="CatalogSection"]
+[node name="SectionTitle" type="Label" parent="Tabs/Levels/Body/CatalogSection" unique_id=172366196]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Catalog from Folders"
 
-[node name="Actions" type="HBoxContainer" parent="CatalogSection"]
+[node name="Actions" type="HBoxContainer" parent="Tabs/Levels/Body/CatalogSection" unique_id=847706542]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="RebuildButton" type="Button" parent="CatalogSection/Actions"]
+[node name="RebuildButton" type="Button" parent="Tabs/Levels/Body/CatalogSection/Actions" unique_id=1240101307]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Rebuild Catalog"
 
-[node name="AutoRebuildCheck" type="CheckBox" parent="CatalogSection/Actions"]
+[node name="AutoRebuildCheck" type="CheckBox" parent="Tabs/Levels/Body/CatalogSection/Actions" unique_id=506663263]
 unique_name_in_owner = true
 layout_mode = 2
 button_pressed = true
 text = "Auto-rebuild on save"
 
-[node name="StatusLabel" type="Label" parent="CatalogSection"]
+[node name="StatusLabel" type="Label" parent="Tabs/Levels/Body/CatalogSection" unique_id=620209216]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Scanning levels..."
+text = "Catalog status: Up to date.
+  • World 1: 10 levels
+  • World 2: 1 levels
+Total registered: 11 levels (max slot: 10)"
 autowrap_mode = 2
 
-[node name="WarningLabel" type="Label" parent="CatalogSection"]
+[node name="WarningLabel" type="Label" parent="Tabs/Levels/Body/CatalogSection" unique_id=1924697886]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
-text = "No warnings."
 autowrap_mode = 2
 
-[node name="HSeparator3" type="HSeparator" parent="."]
+[node name="Palette" type="VBoxContainer" parent="Tabs" unique_id=399748718]
+visible = false
 layout_mode = 2
+theme_override_constants/separation = 6
+metadata/_tab_index = 1
+
+[node name="PaletteOptions" type="HBoxContainer" parent="Tabs/Palette" unique_id=1140762708]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SnapCheck" type="CheckBox" parent="Tabs/Palette/PaletteOptions" unique_id=1763029044]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+text = "Snap"
+
+[node name="GridSpin" type="SpinBox" parent="Tabs/Palette/PaletteOptions" unique_id=2088308765]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Grid size (m)"
+min_value = 0.05
+max_value = 10.0
+step = 0.05
+value = 0.5
+suffix = "m"
+
+[node name="RefreshPaletteButton" type="Button" parent="Tabs/Palette/PaletteOptions" unique_id=991440675]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Refresh"
+
+[node name="PlacingLabel" type="Label" parent="Tabs/Palette" unique_id=423466507]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Pick an object, then click in the 3D viewport."
+autowrap_mode = 2
+
+[node name="PaletteTree" type="Tree" parent="Tabs/Palette" unique_id=2010089614]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+size_flags_vertical = 3
+hide_root = true
+
+[node name="Tools" type="ScrollContainer" parent="Tabs" unique_id=17186781]
+visible = false
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 2
+
+[node name="Body" type="VBoxContainer" parent="Tabs/Tools" unique_id=44572720]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="FitSection" type="VBoxContainer" parent="Tabs/Tools/Body" unique_id=1409035683]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SectionTitle" type="Label" parent="Tabs/Tools/Body/FitSection" unique_id=657670022]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Fit Level (kill zone + kill_y)"
+
+[node name="FitRow" type="HBoxContainer" parent="Tabs/Tools/Body/FitSection" unique_id=374580405]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FitButton" type="Button" parent="Tabs/Tools/Body/FitSection/FitRow" unique_id=1847469110]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Fit Level"
+
+[node name="FitOnSaveCheck" type="CheckBox" parent="Tabs/Tools/Body/FitSection/FitRow" unique_id=1824984786]
+unique_name_in_owner = true
+layout_mode = 2
+text = "On save"
+
+[node name="GrowOnlyCheck" type="CheckBox" parent="Tabs/Tools/Body/FitSection/FitRow" unique_id=667182448]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Never raise kill_y or shrink the kill zone"
+button_pressed = true
+text = "Grow only"
+
+[node name="MarginRow" type="HBoxContainer" parent="Tabs/Tools/Body/FitSection" unique_id=177807160]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="KillMarginLabel" type="Label" parent="Tabs/Tools/Body/FitSection/MarginRow" unique_id=252589075]
+layout_mode = 2
+text = "kill_y margin"
+
+[node name="KillMarginSpin" type="SpinBox" parent="Tabs/Tools/Body/FitSection/MarginRow" unique_id=366886658]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "kill_y = lowest floor minus this"
+max_value = 50.0
+step = 0.5
+value = 8.0
+suffix = "m"
+
+[node name="EndMarginLabel" type="Label" parent="Tabs/Tools/Body/FitSection/MarginRow" unique_id=1836074448]
+layout_mode = 2
+text = "ends"
+
+[node name="EndMarginSpin" type="SpinBox" parent="Tabs/Tools/Body/FitSection/MarginRow" unique_id=221001703]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Kill zone reaches this far past each end"
+value = 20.0
+suffix = "m"
+
+[node name="FitResultLabel" type="Label" parent="Tabs/Tools/Body/FitSection" unique_id=922088546]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="Tabs/Tools/Body" unique_id=1865286397]
+layout_mode = 2
+
+[node name="LinkSection" type="VBoxContainer" parent="Tabs/Tools/Body" unique_id=1722515556]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SectionTitle" type="Label" parent="Tabs/Tools/Body/LinkSection" unique_id=1581875806]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Link Helper"
+
+[node name="LinkStatusLabel" type="Label" parent="Tabs/Tools/Body/LinkSection" unique_id=605462970]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Select two puzzle pieces (Ctrl+click)."
+autowrap_mode = 2
+
+[node name="LinkCandidateOption" type="OptionButton" parent="Tabs/Tools/Body/LinkSection" unique_id=776579592]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Which fields to connect"
+
+[node name="LinkIdOption" type="OptionButton" parent="Tabs/Tools/Body/LinkSection" unique_id=529008739]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Shared id: a new one, or one already in this level"
+
+[node name="LinkButtons" type="HBoxContainer" parent="Tabs/Tools/Body/LinkSection" unique_id=863943744]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LinkButton" type="Button" parent="Tabs/Tools/Body/LinkSection/LinkButtons" unique_id=1161196698]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Link"
+
+[node name="UnlinkButton" type="Button" parent="Tabs/Tools/Body/LinkSection/LinkButtons" unique_id=1599768787]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Unlink"
+
+[node name="HSeparator2" type="HSeparator" parent="Tabs/Tools/Body" unique_id=701948128]
+layout_mode = 2
+
+[node name="OverlaySection" type="VBoxContainer" parent="Tabs/Tools/Body" unique_id=154287496]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SectionTitle" type="Label" parent="Tabs/Tools/Body/OverlaySection" unique_id=634393080]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Overlays"
+
+[node name="ShowLinksCheck" type="CheckBox" parent="Tabs/Tools/Body/OverlaySection" unique_id=135146636]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Link lines"
+
+[node name="ShowLightCheck" type="CheckBox" parent="Tabs/Tools/Body/OverlaySection" unique_id=212177827]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Light (lantern, hooks, shrines)"
+
+[node name="ShowJumpCheck" type="CheckBox" parent="Tabs/Tools/Body/OverlaySection" unique_id=436435101]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Jump reach (selected platform)"
+
+[node name="ShowPathsCheck" type="CheckBox" parent="Tabs/Tools/Body/OverlaySection" unique_id=231274852]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Paths (rails, ropes, crates, hook reach)"
+
+[node name="JumpReachLabel" type="Label" parent="Tabs/Tools/Body/OverlaySection" unique_id=1117508996]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Jump (from Player exports): 2.16 m up, 3.87 m across (+0.62 m coyote)."
+autowrap_mode = 2
+
+[node name="Validate" type="VBoxContainer" parent="Tabs" unique_id=1823759022]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 6
+metadata/_tab_index = 3
+
+[node name="ValidateButtons" type="HBoxContainer" parent="Tabs/Validate" unique_id=1222753583]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ValidateButton" type="Button" parent="Tabs/Validate/ValidateButtons" unique_id=624710565]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Validate"
+
+[node name="ValidateAllButton" type="Button" parent="Tabs/Validate/ValidateButtons" unique_id=1099880544]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Validate All"
+
+[node name="ValidateSummaryLabel" type="Label" parent="Tabs/Validate" unique_id=1954776376]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Read-only checks. Click a line to select its node."
+autowrap_mode = 2
+
+[node name="ValidateTree" type="Tree" parent="Tabs/Validate" unique_id=1916691734]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+size_flags_vertical = 3
+hide_root = true
+

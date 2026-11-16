@@ -198,6 +198,48 @@ the slab (0.5 s) → search there 1.1 s → lunge at the child.
 
 ---
 
+## World 2 — Oil (oil lantern: `lantern_type = OIL`)
+
+Oil rules (code): the tank burns 2/s whenever the lantern is lit — carried, set down or hung —
+and 6/s while raised. The light radius shrinks with the tank: lerp(1.6 m, 4.5 m, oil / max_oil),
+×1.6 while raised; at 0 oil the light goes out (ghost platforms vanish, enemies can catch you).
+A shrine refills the tank to `max_oil`; an OilFlask adds 35. World 2 makes levels hard with
+**small tanks** rather than new mechanics.
+
+Status: built with the level editor and checked by Validate / Fit (0 errors) and by hand against
+the jump (2.16 m up, 3.87 m across) and oil numbers. **Not yet completed by a bot or a person
+in the running game** — play-test both.
+
+## 2-1 Running Low — HARD (tank 40 = 20 s of light, start 25, dark meter 4.5 s)
+1. Take the flask (x −5, → 40), touch Shrine1 (x 4).
+2. **Crumbling bridge** (x 8–44): ghost platforms (need light) alternate with planks that drop
+   0.5 s after you step on them, with a 2.5 m gap to jump at x 26. Don't stop.
+3. ShrineBridge (x 46). Set the lantern on the **switch** (x 50): the door (x 68) opens and the
+   Stalker wakes. Walk 18 m to the door in the dark: ≈ 3.9 s of a 4.5 s meter (W1_07 gave 6 s for 22 m).
+4. Shrine2 (x 72, sanctuary 2.8 m). Walk into the lever (x 75): the switch rides to you (4 s,
+   burning oil the whole time). Take the lantern.
+5. **Stepping stones on the last of the oil** (x 89–110, tops 0.5–2.0 m, 2 m gaps): crawlers wake
+   on the far floor. From Shrine2 to the exit is ≈ 11 s + 4 s waiting for the switch, about
+   30 of 40 oil — the flask on Stone3 (x 99.75) is your margin. Out of oil = stones vanish.
+- Shortcut checks: the door reaches the ceiling block (no jump over); the bridge pit spans x 8–44.
+- Soft-lock checks: the lever is only reachable through the door, i.e. while the lantern sits on
+  the switch; death restores the checkpoint (switch, lever, oil = full).
+
+## 2-2 Short Wick — HARDER (tank 30 = 15 s of light, dark meter 4.5 s)
+1. Shrine1 (x −4). Hang the lantern on the **cradle** (x 6.5): the gate (x 11.2) opens and the
+   cradle rides 34 m in 11 s (the W1_06 lift). Follow on the ghost stones under it.
+2. The ride burns 22 of 30 oil: the light shrinks to ≈ 2 m by the end, barely covering the
+   2 m gaps. **Grab the flask on Stone4** (x 28.25) as you pass — it refills the shared tank and
+   the light grows back. Without it, the last stones are nearly unlit.
+3. Take the lantern at the far ledge, Shrine2 (x 44). Hang it on the gate hook (x 48): the gate
+   (x 54) opens, two crawlers wake. Take the lantern back: the gate stays open **1.8 s**
+   (6 m to walk ≈ 1.2 s + pickup) — W1_03 gave 3 s.
+4. Climb the ghost steps (tops 2.5 and 3.7 m, 2 m gaps) to the exit plateau (exit x 89).
+- Soft-lock checks: falling behind the cradle → death → Shrine1, cradle back at its start;
+  gate shut → hang the lantern again; the crawlers can't catch you while you carry a lit lantern.
+
+---
+
 ## Tutorial hints (Prompt 4)
 One line of light text at the bottom of the screen, once per save; data in
 `TutorialManager.HINTS`, text in `strings.csv` (touch gestures / classic touch buttons / PC).

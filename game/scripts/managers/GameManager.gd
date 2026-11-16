@@ -128,6 +128,8 @@ var _heartbeat: float = 0.0
 const _LEVEL_COMPLETE_DELAY := 0.8
 const _MASTER_VOLUME_KEY := "master_volume"
 const _FULLSCREEN_KEY := "fullscreen"
+## Runs started from the Godot editor open windowed (exported builds use the saved setting).
+const DEV_START_WINDOWED := true
 
 func configure(p_logger: Node, p_bus: Node) -> void:
 	logger = p_logger
@@ -939,7 +941,13 @@ func _apply_window_mode(fullscreen: bool) -> void:
 func _apply_saved_settings() -> void:
 	if save == null:
 		return
-	_apply_window_mode(bool(save.get_value(_FULLSCREEN_KEY, true)))
+	# Played from the Godot editor: start in a window (project.godot window size override,
+	# 1280x720) instead of the saved fullscreen choice. Exported builds are unchanged, and the
+	# Settings toggle still switches modes live.
+	var start_fullscreen := bool(save.get_value(_FULLSCREEN_KEY, true))
+	if DEV_START_WINDOWED and OS.has_feature("editor"):
+		start_fullscreen = false
+	_apply_window_mode(start_fullscreen)
 	if audio:
 		audio.set_bus_volume(&"Master", float(save.get_value(_MASTER_VOLUME_KEY, 1.0)))
 		if save.settings_data:

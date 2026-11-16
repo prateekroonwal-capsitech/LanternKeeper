@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://level_template_001"]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://game/scenes/gameplay/levels/LevelRoot.gd" id="level"]
 [ext_resource type="Environment" path="res://game/assets/materials/world_environment.tres" id="env"]

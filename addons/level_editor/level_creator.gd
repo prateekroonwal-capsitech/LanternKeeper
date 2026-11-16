@@ -98,6 +98,15 @@ static func create_level(
 	var new_id := "w%d_%02d" % [world, level_number]
 	var new_title := "LEVEL_W%d_%02d" % [world, level_number]
 
+	# Give the new scene its own UID: drop any uid the template carries (Godot may add one
+	# when it re-saves the template) and write a freshly generated one, so levels never share it.
+	var uid_regex := RegEx.new()
+	uid_regex.compile('^\\[gd_scene([^\\]]*?) uid="[^"]*"')
+	content = uid_regex.sub(content, "[gd_scene$1")
+	var new_uid_id := ResourceUID.create_id()
+	var new_uid_text := ResourceUID.id_to_text(new_uid_id)
+	content = content.replace("[gd_scene format=3", '[gd_scene format=3 uid="%s"' % new_uid_text)
+
 	# Customize root node in scene text
 	var root_regex := RegEx.new()
 	root_regex.compile('\\[node name="[^"]+" type="Node3D"')
@@ -118,6 +127,14 @@ static func create_level(
 	title_regex.compile('(?m)^title_key\\s*=.*$')
 	content = title_regex.sub(content, 'title_key = "%s"' % new_title)
 
+	# Each world can have its own look: Backdrop_World<N>.tscn and world<N>_environment.tres.
+	var world_backdrop := "res://game/scenes/gameplay/environment/Backdrop_World%d.tscn" % world
+	if ResourceLoader.exists(world_backdrop):
+		content = content.replace("res://game/scenes/gameplay/environment/Backdrop.tscn", world_backdrop)
+	var world_env := "res://game/assets/materials/world%d_environment.tres" % world
+	if ResourceLoader.exists(world_env):
+		content = content.replace("res://game/assets/materials/world_environment.tres", world_env)
+
 	# Write customized level scene
 	var wf := FileAccess.open(target_path, FileAccess.WRITE)
 	if not wf:
@@ -126,6 +143,8 @@ static func create_level(
 		return result
 	wf.store_string(content)
 	wf.close()
+	if not ResourceUID.has_id(new_uid_id):
+		ResourceUID.add_id(new_uid_id, target_path)
 
 	# Add row to strings.csv if missing
 	var placeholder_title := "Level %d-%02d" % [world, level_number]
